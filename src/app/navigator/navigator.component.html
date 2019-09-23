@@ -1,0 +1,45 @@
+<div class="navigatorViewBG">
+    <mat-drawer-container class="example-container">
+        <mat-drawer mode="side" opened>
+            <div class="example-container2">
+                <h1>FiliTime</h1>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=0">Plantafel</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=1">Projekte</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=2">Mitarbeiter</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=3">Auswertung</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=4">Hilfe</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=5">Profil</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=6">Logout</button>
+                <button mat-flat-button class="example-container2-button" (click)="navigatorPageIndex=7">Lizenz</button>
+                <!-- 
+                    >
+                    <
+                -->
+            </div>
+        </mat-drawer>
+        <mat-drawer-content>
+            <ng-container [ngSwitch]="navigatorPageIndex">
+                <span *ng-switch-default>...</span>
+                <app-planboard-view *ngSwitchCase="0"></app-planboard-view>
+                <app-project-view *ngSwitchCase="1"></app-project-view>
+            </ng-container>
+        </mat-drawer-content>
+    </mat-drawer-container>
+
+    <!-- <mat-drawer-container class="example-container" autosize>
+        <mat-drawer #drawer class="example-sidenav" mode="side">
+            <p>Auto-resizing sidenav</p>
+            <p *ngIf="showFiller">Lorem, ipsum dolor sit amet consectetur.</p>
+            <button (click)="showFiller = !showFiller" mat-raised-button>
+                Toggle extra text
+            </button>
+        </mat-drawer>
+    
+        <div class="example-sidenav-content">
+            <button type="button" mat-button (click)="drawer.toggle()">
+                Toggle sidenav
+            </button>
+        </div>
+    
+    </mat-drawer-container> -->
+</div>

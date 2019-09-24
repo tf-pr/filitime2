@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavigatorComponent implements OnInit {
   navigatorPageIndex = 0;
+  colased = false;
 
   constructor() { }
 

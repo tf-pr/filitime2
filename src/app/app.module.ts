@@ -16,6 +16,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
@@ -37,6 +39,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     MatSidenavModule,
     MatButtonModule,
+    MatIconModule,
+    MatRippleModule,
     MatCheckboxModule,
   ],
   providers: [],

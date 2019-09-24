@@ -14,7 +14,16 @@ body {
     overflow: hidden;
 }
 
-app-root, app-navigator, app-login, app-project-view, app-planboard-view {
+app-root,
+app-navigator,
+app-login,
+app-planboard-view,
+app-project-view,
+app-employee-view,
+app-analysis-view,
+app-profile-view,
+app-lizenz-view,
+app-help-view {
     display: inline-block;
     width: 100%;
     height: 100%;

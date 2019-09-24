@@ -22,53 +22,48 @@ import { ProfileViewComponent } from './navigator/profile-view/profile-view.comp
 import { LizenzViewComponent } from './navigator/lizenz-view/lizenz-view.component';
 import { HelpViewComponent } from './navigator/help-view/help-view.component';
 
-// import { AuthGuard } from './auth/auth.guard';
-
 const appRoutes: Routes = [
   {
     path: 'planboard',
-    component: PlanboardViewComponent
+    component: PlanboardViewComponent,
+    data: { animation: 'planboard' },
   },
   {
     path: 'projects',
-    component: ProjectViewComponent
+    component: ProjectViewComponent,
+    data: { animation: 'projects' },
   },
   {
     path: 'employees',
-    component: EmployeeViewComponent
+    component: EmployeeViewComponent,
+    data: { animation: 'employees' },
   },
   {
     path: 'analysis',
-    component: AnalysisViewComponent
+    component: AnalysisViewComponent,
+    data: { animation: 'analysis' },
   },
   {
     path: 'profile',
-    component: ProfileViewComponent
+    component: ProfileViewComponent,
+    data: { animation: 'profile' },
   },
   {
     path: 'lizenz',
-    component: LizenzViewComponent
+    component: LizenzViewComponent,
+    data: { animation: 'lizenz' },
   },
   {
     path: 'help',
-    component: HelpViewComponent
+    component: HelpViewComponent,
+    data: { animation: 'help' },
   },
   { path: '', redirectTo: '/planboard', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(
-      appRoutes,
-      {
-        // enableTracing: false, // <-- debugging purposes only
-        // preloadingStrategy: SelectivePreloadingStrategyService,
-      }
-    )
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forRoot(appRoutes)],
+  exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -90,8 +90,9 @@
                 <app-lizenz-view *ngSwitchCase="6"></app-lizenz-view>
             </ng-container> -->
 
-
-            <router-outlet></router-outlet>
+            <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
+                <router-outlet #outlet="outlet"></router-outlet>
+            </div>
 
 
         </mat-drawer-content>

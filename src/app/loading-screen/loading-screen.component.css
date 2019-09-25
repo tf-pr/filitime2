@@ -1,0 +1,13 @@
+.loadingScreenBG {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    background: #00ff0066;
+}
+
+.darker {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    background: #00000066;
+}

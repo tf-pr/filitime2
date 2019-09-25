@@ -26,6 +26,7 @@ export class FsiService {
   public logIn(email: string, pw: string): Promise<boolean|string> {
     return new Promise<boolean|string>((res, rej) => {
       setTimeout(() => {
+        this.setIsLoggedInState = true;
         res(true);
       }, 1200);
     });
@@ -34,6 +35,7 @@ export class FsiService {
   public logOut(): Promise<void|string> {
     return new Promise<void|string>((res, rej) => {
       setTimeout(() => {
+        this.setIsLoggedInState = false;
         res();
       }, 500);
     });

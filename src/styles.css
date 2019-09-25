@@ -17,6 +17,7 @@ body {
 app-root,
 app-navigator,
 app-login,
+app-loading-screen,
 app-planboard-view,
 app-project-view,
 app-employee-view,
@@ -29,11 +30,19 @@ app-help-view {
     height: 100%;
 }
 
-app-login {
+app-login, app-loading-screen {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+app-login {
+    z-index: 1900;
+}
+
+app-loading-screen {
     z-index: 2000;
 }
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

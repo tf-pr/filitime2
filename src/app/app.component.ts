@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DbiService } from './services/dbi.service';
 import { HelperFunctions } from './helper/helperFunctions';
+import { LoadingHandlerService } from './services/loading-handler.service';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,10 @@ import { HelperFunctions } from './helper/helperFunctions';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private dbi: DbiService) {
+  private isLoggedIn = false;
+  private isLoading = false;
+
+  constructor(private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
     this.isLoggedIn = dbi.getLoggedInSate();
     dbi.loggedInSateChange.subscribe({
       next: value => {
@@ -16,14 +20,18 @@ export class AppComponent {
           console.error('Error: 46351354');
           return;
         }
-        // console.log(value)
         this.isLoggedIn = value;
       },
       error: err => {
         console.error('Error: 31351351 | ' + err);
       }
     });
-  }
 
-  private isLoggedIn = false;
+    this.isLoading = loadingHandler.getIsLoading();
+    loadingHandler.loadingSateChange.subscribe({
+      next: value => {
+        this.isLoading = value;
+      }
+    });
+  }
 }

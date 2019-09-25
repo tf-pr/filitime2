@@ -43,10 +43,24 @@ export class DbiService {
   }
 
   public logIn(email: string, pw: string): Promise<boolean|string> {
-    return this.fsi.logIn(email, pw);
+    return new Promise<boolean | string>((res, rej) => {
+      this.fsi.logIn(email, pw).then(value => {
+        res(value);
+      }).catch(err => {
+        console.error('Error: 89466354');
+        rej(err);
+      });
+    });
   }
 
   public logOut(): Promise<void|string> {
-    return this.fsi.logOut();
+    return new Promise<void | string>((res, rej) => {
+      this.fsi.logOut().then(() => {
+        res();
+      }).catch(err => {
+        console.error('Error: 89466354');
+        rej(err);
+      });
+    });
   }
 }

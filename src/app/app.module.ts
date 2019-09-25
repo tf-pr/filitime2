@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { PageNotFoundComponent } from './navigator/page-not-found/page-not-found.component';
+import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { PageNotFoundComponent } from './navigator/page-not-found/page-not-found
     ProfileViewComponent,
     ProjectViewComponent,
     PageNotFoundComponent,
+    LoadingScreenComponent,
   ],
   imports: [
     BrowserModule,

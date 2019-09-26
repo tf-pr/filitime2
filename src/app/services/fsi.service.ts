@@ -7,8 +7,7 @@ import { Observable } from 'rxjs';
 export class FsiService {
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
-
-  public loggedInStateChange: Observable<boolean>;
+  public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
   public getIsLoggedInState() {
     return this.isLoggedIn;
@@ -19,9 +18,7 @@ export class FsiService {
     this.isLoggedInEmitter.emit(this.isLoggedIn);
   }
 
-  constructor() {
-    this.loggedInStateChange = this.isLoggedInEmitter.asObservable();
-  }
+  constructor() { }
 
   public logIn(email: string, pw: string): Promise<boolean|string> {
     return new Promise<boolean|string>((res, rej) => {

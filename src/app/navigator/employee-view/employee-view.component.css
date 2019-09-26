@@ -1,6 +1,29 @@
-.employeeViewBG {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    background: steelblue;
+/* desktop and tablet */
+@media (orientation: landscape) and (min-height: calc( 580px + 1px)) , (orientation: portrait) and ( min-width: calc( 580px + 1px) ) {
+    .employeeViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(164deg, steelblue, skyblue);
+    }
+}
+
+/* smartphone in portrait */
+@media all and (orientation: portrait) and (max-width: 580px) {
+    .employeeViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(164deg, steelblue, lightsalmon);
+    }
+}
+
+/* smartphone in landscape */
+@media all and (orientation: landscape) and ( max-height: 580px ) {
+    .employeeViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(164deg, steelblue, lightgreen);
+    }
 }

@@ -11,10 +11,9 @@ import { HelperFunctions } from '../helper/helperFunctions';
 export class DbiService {
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
+  public loggedInSateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
-  public loggedInSateChange: Observable<boolean>;
-
-  public getLoggedInSate(): boolean {
+  public getLoggedInState(): boolean {
     return this.isLoggedIn;
   }
 
@@ -24,8 +23,6 @@ export class DbiService {
   }
 
   constructor(private fsi: FsiService) {
-    this.loggedInSateChange = this.isLoggedInEmitter.asObservable();
-
     this.setIsLoggedInState = fsi.getIsLoggedInState();
     fsi.loggedInStateChange.subscribe({
       next: value => {

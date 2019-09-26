@@ -1,3 +1,12 @@
-<div class="employeeViewBG">
-    <p>employee-view works!</p>
-</div>
+<ng-container *ngIf="!isMobile">
+    <div class="employeeViewBG">
+        <p>employee-view works!</p>
+    </div>
+
+</ng-container>
+<ng-container *ngIf="isMobile && isLandscape">
+
+</ng-container>
+<ng-container *ngIf="isMobile && !isLandscape">
+
+</ng-container>

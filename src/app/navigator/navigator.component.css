@@ -1,97 +1,134 @@
-.navigatorViewBG {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    padding: 2px;
+/* desktop and tablet */
+@media (orientation: landscape) and (min-height: calc( 580px + 1px)) , (orientation: portrait) and ( min-width: calc( 580px + 1px) ) {
+    .navigatorViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 2px;
+    }
+    
+    .example-container {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        /* border: 1px solid #555; */
+    }
+    
+    .example-container2 {
+        display: inline-block;
+        height: 100%;
+        /* padding: 2px; */
+        background: lightgreen;
+    }
+    
+    .expandLogoContainer {
+        display: inline-block;
+        width: 250px;
+        margin: 5px;
+        background: mediumseagreen;
+    }
+    
+    .colapsedLogoContainer {
+        display: inline-block;
+        width: 30px;
+        margin: 5px;
+        background: lightseagreen;
+    }
+    
+    .example-container2-button {
+        width: 100%;
+        display: block;
+        padding: 0 5px;
+        min-width: 0;
+        text-align: left;
+        background: lightcoral;
+    }
+    
+    .example-container2-button:hover {
+        background: lightblue;
+    }
+    
+    .example-container3 {
+        display: inline-block;
+        background: darkorchid;
+        width: 100%;
+        padding-left: 10px;
+        padding-bottom: 4px;
+        overflow: hidden;
+        animation: expandVertically 1s;
+    }
+    
+    .example-container3-button {
+        width: 100%;
+        display: block;
+        padding: 0 5px;
+        min-width: 0;
+        text-align: left;
+        background: lightskyblue;
+    }
+    
+    .example-container3-button:hover {
+        background: limegreen;
+    }
+    
+    .example-container3-bottomButton {
+        position: absolute;
+        min-width: 0;
+        width: unset;
+        padding: 0;
+        bottom: 0;
+        right: 0;
+        overflow: hidden;
+        animation: apear 0.3s;
+    }
+    
+    .example-container3-bottomButtonIcon {
+        animation: rotate90deg 0.3s;
+    }
+    
+    .example-container4 {
+        display: inline-block;
+        width: 100%;
+        height: calc( 100% - 4px );
+        padding: 4px 4px 0px 4px;
+        overflow: hidden;
+        background: darkslategray;
+    }
+    
+    @keyframes expandVertically {
+        0% { max-height: 0px; }
+        99% { max-height: 800px; }
+        100% { max-height: unset; }
+    }
+    
+    @keyframes rotate90deg {
+        0% { transform: rotate(-180deg); }
+        100% { transform: rotate(0); }
+    }
+    
+    @keyframes apear {
+        0% { opacity: 0; }
+        99% { opacity: 0; }
+        100% { opacity: 1; }
+    }
 }
 
-.example-container {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    /* border: 1px solid #555; */
+/* smartphone in portrait */
+@media all and (orientation: portrait) and (max-width: 580px) {
+    .navigatorViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 2px;
+    }
 }
 
-.example-container2 {
-    display: inline-block;
-    height: 100%;
-    /* padding: 2px; */
-    background: lightgreen;
-}
-
-.example-container2-button {
-    width: 100%;
-    display: block;
-    padding: 0 5px;
-    min-width: 0;
-    text-align: left;
-    background: lightcoral;
-}
-
-.example-container2-button:hover {
-    background: lightblue;
-}
-
-.example-container3 {
-    display: inline-block;
-    background: darkorchid;
-    width: 100%;
-    padding-left: 10px;
-    padding-bottom: 4px;
-    overflow: hidden;
-    animation: expandVertically 1s;
-}
-
-.example-container3-button {
-    width: 100%;
-    display: block;
-    padding: 0 5px;
-    min-width: 0;
-    text-align: left;
-    background: lightskyblue;
-}
-
-.example-container3-button:hover {
-    background: limegreen;
-}
-
-.example-container3-bottomButton {
-    position: absolute;
-    min-width: 0;
-    width: unset;
-    padding: 0;
-    bottom: 0;
-    right: 0;
-    overflow: hidden;
-    animation: apear 0.3s;
-}
-
-.example-container3-bottomButtonIcon {
-    animation: rotate90deg 0.3s;
-}
-
-.example-container4 {
-    display: inline-block;
-    width: 100%;
-    height: calc( 100% - 4px );
-    padding: 4px 4px 0px 4px;
-    overflow: hidden;
-    background: darkslategray;
-}
-
-@keyframes expandVertically {
-	0% { max-height: 0px; }
-	99% { max-height: 800px; }
-	100% { max-height: unset; }
-}
-
-@keyframes rotate90deg {
-	0% { transform: rotate(-180deg); }
-	100% { transform: rotate(0); }
-}
-
-@keyframes apear {
-	0% { opacity: 0; }
-	99% { opacity: 0; }
-	100% { opacity: 1; }
+/* smartphone in landscape */
+@media all and (orientation: landscape) and ( max-height: 580px ) {
+    .navigatorViewBG {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 2px;
+    }
 }

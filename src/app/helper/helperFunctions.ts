@@ -4,6 +4,30 @@ export class HelperFunctions {
             return false;
         }
 
+        if (val === false) {
+            return true;
+        }
+
+        if (!val) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static checkForValidNumber(val: any): boolean {
+        if (typeof val !== 'number') {
+            return false;
+        }
+
+        if (val === 0) {
+            return true;
+        }
+
+        if (!val) {
+            return false;
+        }
+
         return true;
     }
 

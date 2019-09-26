@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { slideInAnimation } from '../animations';
 import { DbiService } from '../services/dbi.service';
 import { LoadingHandlerService } from '../services/loading-handler.service';
+import { GlobalDataService } from '../services/global-data.service';
 
 @Component({
   selector: 'app-navigator',
@@ -13,10 +14,18 @@ import { LoadingHandlerService } from '../services/loading-handler.service';
   ]
 })
 export class NavigatorComponent implements OnInit {
-  navigatorPageIndex = 0;
-  colased = false;
+  public isMobile = false;
+  public isLandscape = true;
+  public navigatorPageIndex = 0;
+  public colapsed = false;
 
-  constructor(private dbi: DbiService, private loadingHandler: LoadingHandlerService) { }
+  constructor(private globalData: GlobalDataService, private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
+    this.isMobile = globalData.getIsMobile();
+    this.globalData.isMobileSateChange.subscribe({next: val => { this.isMobile = val; }});
+
+    this.isLandscape = globalData.getIsLandscape();
+    this.globalData.isLandscapeSateChange.subscribe({next: val => { this.isLandscape = val; }});
+  }
 
   ngOnInit() {
   }

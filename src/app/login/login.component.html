@@ -1,4 +1,18 @@
-<div class="loginViewBG">
-    <p>Please log in</p>
-    <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
-</div>
+<ng-container *ngIf="!isMobile">
+    <div class="loginViewBG">
+        <p>Hi Desktop-User, Please log in!</p>
+        <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
+    </div>    
+</ng-container>
+<ng-container *ngIf="isMobile && isLandscape">
+    <div class="loginViewBG">
+        <p>Hi Landscape-Smartphone-User, Please log in!</p>
+        <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
+    </div>  
+</ng-container>
+<ng-container *ngIf="isMobile && !isLandscape">
+    <div class="loginViewBG">
+        <p>Hi Portrait-Smartphone-User, Please log in!</p>
+        <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
+    </div>  
+</ng-container>

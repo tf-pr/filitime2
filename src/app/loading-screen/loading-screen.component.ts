@@ -1,6 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-// import { LoadingHandlerService } from '../services/loading-handler.service';
-import { start } from 'repl';
 
 @Component({
   selector: 'app-loading-screen',
@@ -20,22 +18,7 @@ export class LoadingScreenComponent implements OnInit {
   private darkerTimeout = undefined;
   private showLoadingTimeout = undefined;
 
-  constructor() {
-    // if (!!loadingHandlerService.getIsLoading()) {
-    //   this.start();
-    // } else {
-    //   this.stop();
-    // }
-    // loadingHandlerService.loadingSateChange.subscribe({
-    //   next: value => {
-    //     if (!!value) {
-    //       this.start();
-    //     } else {
-    //       this.stop();
-    //     }
-    //   }
-    // });
-  }
+  constructor() { }
 
   ngOnInit() {
     this.initLoadingScreen();
@@ -58,21 +41,4 @@ export class LoadingScreenComponent implements OnInit {
     this.startTimers();
     this.isLoading = true;
   }
-
-  // private stop() {
-  //   this.blockView = false;
-  //   this.darkerView = false;
-  //   this.showLoading = false;
-
-  //   if (!!this.darkerTimeout) {
-  //     clearTimeout(this.darkerTimeout);
-  //     this.darkerTimeout = undefined;
-  //   }
-  //   if (!!this.showLoadingTimeout) {
-  //     clearTimeout(this.showLoadingTimeout);
-  //     this.showLoadingTimeout = undefined;
-  //   }
-
-  //   this.isLoading = false;
-  // }
 }

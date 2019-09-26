@@ -1,100 +1,136 @@
-<div class="navigatorViewBG">
-    <mat-drawer-container class="example-container" autosize>
-        <mat-drawer mode="side" opened disableClose>
-            <div class="example-container2">
-                <h2 *ngIf="!colased">FT FiliTime</h2>
-                <h2 *ngIf="!!colased">FT</h2>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/planboard" routerLinkActive="active" (click)="navigatorPageIndex=0">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Plantafel':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===0" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=0">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=0">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=0">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=0">Option4</button>
+<ng-container *ngIf="!isMobile">
+    <div class="navigatorViewBG">
+        <mat-drawer-container class="example-container" autosize>
+            <mat-drawer mode="side" opened disableClose>
+                <div class="example-container2">
+                    <div *ngIf="!colapsed" class="expandLogoContainer">
+                        <h2>FT FiliTime</h2>
+                    </div>
+                    <div *ngIf="!!colapsed" class="colapsedLogoContainer">
+                        <h2>FT</h2>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/planboard"
+                        routerLinkActive="active" (click)="navigatorPageIndex=0">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Plantafel':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===0" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=0">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=0">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=0">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=0">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/projects"
+                        routerLinkActive="active" (click)="navigatorPageIndex=1">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Projekte':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===1" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=1">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=1">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=1">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=1">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/employees"
+                        routerLinkActive="active" (click)="navigatorPageIndex=2">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Mitarbeiter':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===2" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=2">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=2">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=2">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=2">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/analysis"
+                        routerLinkActive="active" (click)="navigatorPageIndex=3">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Auswertung':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===3" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=3">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=3">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=3">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=3">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/profile"
+                        routerLinkActive="active" (click)="navigatorPageIndex=4">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Profil':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===4" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=4">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=4">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=4">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=4">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/lizenz"
+                        routerLinkActive="active" (click)="navigatorPageIndex=5">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Lizenz':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===5" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=5">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=5">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=5">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=5">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple routerLink="/help"
+                        routerLinkActive="active" (click)="navigatorPageIndex=6">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Hilfe':''}}
+                    </button>
+                    <div *ngIf="!colapsed && navigatorPageIndex===6" class="example-container3">
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=6">Option1</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=6">Option2</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=6">Option3</button>
+                        <button mat-flat-button class="example-container3-button" disableRipple
+                            (click)="navigatorPageIndex=6">Option4</button>
+                    </div>
+                    <button mat-flat-button class="example-container2-button" disableRipple (click)="logoutClicked()">
+                        <mat-icon>format_paint</mat-icon>{{(!colapsed)?'Logout':''}}
+                    </button>
+                    <button mat-flat-button class="example-container3-bottomButton" (click)="colapsed=!colapsed">
+                        <mat-icon *ngIf="!colapsed" class="example-container3-bottomButtonIcon">chevron_left</mat-icon>
+                        <mat-icon *ngIf="!!colapsed" class="example-container3-bottomButtonIcon">chevron_right</mat-icon>
+                    </button>
                 </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/projects" routerLinkActive="active" (click)="navigatorPageIndex=1">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Projekte':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===1" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=1">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=1">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=1">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=1">Option4</button>
+            </mat-drawer>
+            <mat-drawer-content>
+                <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
+                    <router-outlet #outlet="outlet"></router-outlet>
                 </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/employees" routerLinkActive="active" (click)="navigatorPageIndex=2">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Mitarbeiter':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===2" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=2">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=2">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=2">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=2">Option4</button>
-                </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/analysis" routerLinkActive="active" (click)="navigatorPageIndex=3">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Auswertung':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===3" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=3">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=3">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=3">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=3">Option4</button>
-                </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/profile" routerLinkActive="active" (click)="navigatorPageIndex=4">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Profil':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===4" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=4">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=4">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=4">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=4">Option4</button>
-                </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/lizenz" routerLinkActive="active" (click)="navigatorPageIndex=5">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Lizenz':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===5" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=5">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=5">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=5">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=5">Option4</button>
-                </div>
-                <button mat-flat-button class="example-container2-button" disableRipple routerLink="/help" routerLinkActive="active" (click)="navigatorPageIndex=6">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Hilfe':''}}
-                </button>
-                <div  *ngIf="!colased && navigatorPageIndex===6" class="example-container3">
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=6">Option1</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=6">Option2</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=6">Option3</button>
-                    <button mat-flat-button class="example-container3-button" disableRipple (click)="navigatorPageIndex=6">Option4</button>
-                </div>
-                <button mat-flat-button class="example-container2-button" disableRipple (click)="logoutClicked()">
-                    <mat-icon>format_paint</mat-icon>{{(!colased)?'Logout':''}}
-                </button>
-
-                <button mat-flat-button class="example-container3-bottomButton" (click)="colased=!colased">
-                    <mat-icon *ngIf="!colased" class="example-container3-bottomButtonIcon">chevron_left</mat-icon>
-                    <mat-icon *ngIf="!!colased" class="example-container3-bottomButtonIcon">chevron_right</mat-icon>
-                </button>
-
-            </div>
-        </mat-drawer>
-        <mat-drawer-content>
-            <!-- <ng-container [ngSwitch]="navigatorPageIndex">
-                <span *ngSwitchDefault>Hopala, hier ist ein Fehler passiert, bitte klicke einen Reiter in der rechten Spalte an.</span>
-                <app-planboard-view *ngSwitchCase="0"></app-planboard-view>
-                <app-project-view *ngSwitchCase="1"></app-project-view>
-                <app-employee-view *ngSwitchCase="2"></app-employee-view>
-                <app-analysis-view *ngSwitchCase="3"></app-analysis-view>
-                <app-help-view *ngSwitchCase="4"></app-help-view>
-                <app-profile-view *ngSwitchCase="5"></app-profile-view>
-                <app-lizenz-view *ngSwitchCase="6"></app-lizenz-view>
-            </ng-container> -->
-
-            <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
-                <router-outlet #outlet="outlet"></router-outlet>
-            </div>
-
-
-        </mat-drawer-content>
-    </mat-drawer-container>
-</div>
+            </mat-drawer-content>
+        </mat-drawer-container>
+    </div>
+</ng-container>
+<ng-container *ngIf="isMobile && isLandscape">
+    <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
+        <router-outlet #outlet="outlet"></router-outlet>
+    </div>
+</ng-container>
+<ng-container *ngIf="isMobile && !isLandscape">
+    <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
+        <router-outlet #outlet="outlet"></router-outlet>
+    </div>
+</ng-container>

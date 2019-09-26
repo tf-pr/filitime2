@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DbiService } from '../services/dbi.service';
 import { LoadingHandlerService } from '../services/loading-handler.service';
+import { GlobalDataService } from '../services/global-data.service';
 
 @Component({
   selector: 'app-login',
@@ -8,8 +9,16 @@ import { LoadingHandlerService } from '../services/loading-handler.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  public isMobile = false;
+  public isLandscape = true;
 
-  constructor(private dbi: DbiService, private loadingHandler: LoadingHandlerService) { }
+  constructor(private globalData: GlobalDataService, private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
+    this.isMobile = globalData.getIsMobile();
+    this.globalData.isMobileSateChange.subscribe({next: val => { this.isMobile = val; }});
+
+    this.isLandscape = globalData.getIsLandscape();
+    this.globalData.isLandscapeSateChange.subscribe({next: val => { this.isLandscape = val; }});
+  }
 
   public loginClicked() {
     // const imWaiting = this.loadingHandler.addWaitCode('WARTE FÜR IMMER, MUHAHAHAHAHA!');

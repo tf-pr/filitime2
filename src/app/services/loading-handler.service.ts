@@ -11,7 +11,7 @@ export class LoadingHandlerService {
   private waitCodeList: string[] = [];
   private isLoadingEmitter = new EventEmitter<boolean>();
 
-  public loadingSateChange: Observable<boolean>;
+  public loadingSateChange: Observable<boolean> = this.isLoadingEmitter.asObservable();
 
   public getIsLoading(): boolean {
     return this.isLoading;
@@ -25,9 +25,7 @@ export class LoadingHandlerService {
     this.isLoadingEmitter.emit(this.isLoading);
   }
 
-  constructor() {
-    this.loadingSateChange = this.isLoadingEmitter.asObservable();
-  }
+  constructor() { }
 
   public addWaitCode(waitCode: string): boolean {
     if (this.waitCodeList.indexOf(waitCode) !== -1) {

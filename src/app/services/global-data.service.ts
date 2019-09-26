@@ -66,13 +66,5 @@ export class GlobalDataService {
     } else {
       this.setIsMobile = false;
     }
-
-    const blub = {
-      width,
-      height,
-      isMobile: this.isMobile,
-      isLandscape: this.isLandscape,
-    };
-    console.log(blub);
   }
 }

@@ -1,11 +1,15 @@
 <ng-container *ngIf="!isMobile">
     <div class="lizenzViewBG">
-        <p>lizenz-view works!</p>
+        <p>lizenz-view works on desk!</p>
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">
-
+    <div class="lizenzViewBG">
+        <p>lizenz-view works on spl!</p>
+    </div>
 </ng-container>
 <ng-container *ngIf="isMobile && !isLandscape">
-
+    <div class="lizenzViewBG">
+        <p>lizenz-view works on spp!</p>
+    </div>
 </ng-container>

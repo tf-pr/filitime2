@@ -16,7 +16,6 @@ export class AppComponent {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     const target = event.target;
-    console.log({target});
     this.globalData.setDeviceScreenVar(target.innerWidth, target.innerHeight);
   }
 

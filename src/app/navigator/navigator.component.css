@@ -115,20 +115,56 @@
 
 /* smartphone in portrait */
 @media all and (orientation: portrait) and (max-width: 580px) {
-    .navigatorViewBG {
+    .toolbar {
+        height: 56px;
+    }
+
+    .optionsButton {
+        position: absolute;
+        right: 0;
+    }
+
+    .content {
         display: inline-block;
+        height: calc( 100% - 56px );
         width: 100%;
-        height: 100%;
-        padding: 2px;
+        overflow: hidden;
+        background: red;
+    }
+
+    .routerOutlet {
+        display: inline-block;
+        height: calc( 100% - 4px );
+        width: 100%;
+        padding: 4px 4px 0px 4px;
+        background: blue;
     }
 }
 
 /* smartphone in landscape */
 @media all and (orientation: landscape) and ( max-height: 580px ) {
-    .navigatorViewBG {
+    .toolbar {
+        height: 56px;
+    }
+
+    .optionsButton {
+        position: absolute;
+        right: 0;
+    }
+
+    .content {
         display: inline-block;
+        height: calc( 100% - 56px );
         width: 100%;
-        height: 100%;
-        padding: 2px;
+        overflow: hidden;
+        background: red;
+    }
+
+    .routerOutlet {
+        display: inline-block;
+        height: calc( 100% - 4px );
+        width: 100%;
+        padding: 4px 4px 0px 4px;
+        background: blue;
     }
 }

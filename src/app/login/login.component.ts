@@ -21,8 +21,6 @@ export class LoginComponent {
   }
 
   public loginClicked() {
-    // const imWaiting = this.loadingHandler.addWaitCode('WARTE FÜR IMMER, MUHAHAHAHAHA!');
-    // console.log({imWaiting});
     const waitCode = '843643544';
     this.loadingHandler.addWaitCode(waitCode);
 

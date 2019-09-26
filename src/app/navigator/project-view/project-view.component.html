@@ -1,11 +1,15 @@
 <ng-container *ngIf="!isMobile">
     <div class="projectViewBG">
-        <p>project-view works!</p>
+        <p>project-view works on desk!</p>
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">
-
+    <div class="projectViewBG">
+        <p>project-view works on spl!</p>
+    </div>
 </ng-container>
 <ng-container *ngIf="isMobile && !isLandscape">
-
+    <div class="projectViewBG">
+        <p>project-view works on spp!</p>
+    </div>
 </ng-container>

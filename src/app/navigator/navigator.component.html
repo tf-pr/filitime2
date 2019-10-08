@@ -118,8 +118,8 @@
                 </div>
             </mat-drawer>
             <mat-drawer-content>
-                <div class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
-                    <router-outlet #outlet="outlet"></router-outlet>
+                <div *ngIf="!isMobile" class="example-container4" [@routeAnimation]=prepareRoute(outlet)>
+                    <router-outlet *ngIf="!isMobile" #outlet="outlet"></router-outlet>
                 </div>
             </mat-drawer-content>
         </mat-drawer-container>
@@ -171,8 +171,8 @@
             </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>
-            <div class="routerOutlet" [@routeAnimation]=prepareRoute(outlet)>
-                <router-outlet #outlet="outlet"></router-outlet>
+            <div *ngIf="isMobile && isLandscape" class="routerOutlet" [@routeAnimation]=prepareRoute(outlet)>
+                <router-outlet *ngIf="isMobile && isLandscape" #outlet="outlet"></router-outlet>
             </div>
         </mat-sidenav-content>
     </mat-sidenav-container>
@@ -223,8 +223,8 @@
             </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>
-            <div class="routerOutlet" [@routeAnimation]=prepareRoute(outlet)>
-                <router-outlet #outlet="outlet"></router-outlet>
+            <div  *ngIf="isMobile && !isLandscape" class="routerOutlet" [@routeAnimation]=prepareRoute(outlet)>
+                <router-outlet  *ngIf="isMobile && !isLandscape" #outlet="outlet"></router-outlet>
             </div>
         </mat-sidenav-content>
     </mat-sidenav-container>

@@ -34,6 +34,11 @@ const appRoutes: Routes = [
     data: { animation: 'projects' },
   },
   {
+    path: 'projects/:data',
+    component: ProjectViewComponent,
+    data: { animation: 'projects' }
+  },
+  {
     path: 'employees',
     component: EmployeeViewComponent,
     data: { animation: 'employees' },

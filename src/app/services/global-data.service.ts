@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HelperFunctions } from '../helper/helperFunctions';
+import { Helper } from '../helper';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +39,8 @@ export class GlobalDataService {
   }
 
   public setDeviceScreenVar(width: number, height: number) {
-    const widthValid = HelperFunctions.checkForValidNumber(width);
-    const heightValid = HelperFunctions.checkForValidNumber(height);
+    const widthValid = Helper.checkForValidNumber(width);
+    const heightValid = Helper.checkForValidNumber(height);
 
     if (!widthValid || !heightValid) {
       if (!widthValid) {

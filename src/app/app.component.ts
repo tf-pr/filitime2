@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { DbiService } from './services/dbi.service';
-import { HelperFunctions } from './helper/helperFunctions';
+import { Helper } from './helper';
 import { LoadingHandlerService } from './services/loading-handler.service';
 import { GlobalDataService } from './services/global-data.service';
 
@@ -23,7 +23,7 @@ export class AppComponent {
     this.isLoggedIn = dbi.getLoggedInState();
     dbi.loggedInSateChange.subscribe({
       next: value => {
-        if (!HelperFunctions.checkForValidBoolean(value)) {
+        if (!Helper.checkForValidBoolean(value)) {
           console.error('Error: 46351354');
           return;
         }

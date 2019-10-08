@@ -1,6 +1,44 @@
 <ng-container *ngIf="!isMobile">
     <div class="projectViewBG">
-        <p>project-view works on desk!</p>
+
+        <mat-card class="project-folder-card">
+            <mat-card-title *ngIf="!currProjectId" class="project-folder-card-header">
+                <button *ngIf="!!currFolder" mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+                {{!!currFolder?'Ordner: '+currFolder:'Alle Projekte'}}
+            </mat-card-title>
+            <mat-card-title *ngIf="!!currProjectId" class="project-folder-card-header">
+                <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+                {{'Projektnummer: '+currProjectId}}
+            </mat-card-title>
+            <mat-card-content class="project-folder-card-content">
+                <ng-container *ngFor="let project of projectList">
+                    <mat-card *ngIf="projectIsFilterdIn(project)" class="project-card" [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'">
+                        <mat-card-header class="project-card-header">
+                            <mat-card-title>{{project.name}}</mat-card-title>
+                            <mat-card-subtitle>{{project.identifier}}</mat-card-subtitle>
+                        </mat-card-header>
+                        <mat-divider></mat-divider><br>
+                        <mat-card-content>
+                            <span>duration: {{project.duration}}</span><br>
+                            <span>endless: {{project.endless}}</span><br>
+                            <span>timeToAllocate: {{project.timeToAllocate}}</span><br>
+                            <span>isConflicted: {{project.isConflicted}}</span><br>
+                            <span>color: {{project.color}}</span><br>
+                            <span>marker: {{project.marker}}</span><br>
+                            <span>markerColor: {{project.markerColor}}</span><br>
+                            <span>note: {{project.note}}</span><br>
+                            <span>reserved: {{project.reserved}}</span><br>
+                            <span>blockCode: {{project.blockCode}}</span><br>
+                            <span>finished: {{project.finished}}</span><br>
+                            <span (click)="changeCurrFolder(project.folder)">folder: {{project.folder}}</span><br>
+                        </mat-card-content>
+                        <mat-card-actions>
+                            <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                        </mat-card-actions>
+                    </mat-card>
+                </ng-container>
+            </mat-card-content>
+        </mat-card>
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">

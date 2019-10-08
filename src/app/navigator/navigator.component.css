@@ -18,21 +18,21 @@
         display: inline-block;
         height: 100%;
         /* padding: 2px; */
-        background: lightgreen;
+        /* background: lightgreen; /* color4test */
     }
     
     .expandLogoContainer {
         display: inline-block;
         width: 250px;
         margin: 5px;
-        background: mediumseagreen;
+        /* background: mediumseagreen; /* color4test */
     }
     
     .colapsedLogoContainer {
         display: inline-block;
         width: 30px;
         margin: 5px;
-        background: lightseagreen;
+        /* background: lightseagreen; /* color4test */
     }
     
     .example-container2-button {
@@ -41,16 +41,16 @@
         padding: 0 5px;
         min-width: 0;
         text-align: left;
-        background: lightcoral;
+        /* background: lightcoral; /* color4test */
     }
     
     .example-container2-button:hover {
-        background: lightblue;
+        /* background: lightblue; /* color4test */
     }
     
     .example-container3 {
         display: inline-block;
-        background: darkorchid;
+        /* background: darkorchid; /* color4test */
         width: 100%;
         padding-left: 10px;
         padding-bottom: 4px;
@@ -64,11 +64,11 @@
         padding: 0 5px;
         min-width: 0;
         text-align: left;
-        background: lightskyblue;
+        /* background: lightskyblue; /* color4test */
     }
     
     .example-container3-button:hover {
-        background: limegreen;
+        /* background: limegreen; /* color4test */
     }
     
     .example-container3-bottomButton {
@@ -92,7 +92,7 @@
         height: calc( 100% - 4px );
         padding: 4px 4px 0px 4px;
         overflow: hidden;
-        background: darkslategray;
+        /* background: darkslategray; /* color4test */
     }
     
     @keyframes expandVertically {
@@ -129,7 +129,7 @@
         height: calc( 100% - 56px );
         width: 100%;
         overflow: hidden;
-        background: red;
+        /* background: red; /* color4test */
     }
 
     .routerOutlet {
@@ -137,7 +137,7 @@
         height: calc( 100% - 4px );
         width: 100%;
         padding: 4px 4px 0px 4px;
-        background: blue;
+        /* background: blue; /* color4test */
     }
 }
 
@@ -157,7 +157,7 @@
         height: calc( 100% - 56px );
         width: 100%;
         overflow: hidden;
-        background: red;
+        /* background: red; /* color4test */
     }
 
     .routerOutlet {
@@ -165,6 +165,6 @@
         height: calc( 100% - 4px );
         width: 100%;
         padding: 4px 4px 0px 4px;
-        background: blue;
+        /* background: blue; /* color4test */
     }
 }

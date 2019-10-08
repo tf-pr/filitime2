@@ -21,6 +21,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
@@ -52,6 +54,8 @@ import { LoadingScreenComponent } from './loading-screen/loading-screen.componen
     MatToolbarModule,
     MatListModule,
     MatMenuModule,
+    MatCardModule,
+    MatDividerModule,
     MatButtonModule,
     MatIconModule,
     MatRippleModule,

@@ -4,7 +4,7 @@
         display: inline-block;
         width: 100%;
         height: 100%;
-        background: linear-gradient(164deg, wheat, skyblue);
+        /* background: linear-gradient(164deg, wheat, skyblue); /* color4test */
     }
 }
 
@@ -14,7 +14,7 @@
         display: inline-block;
         width: 100%;
         height: 100%;
-        background: linear-gradient(164deg, wheat, lightsalmon);
+        /* background: linear-gradient(164deg, wheat, lightsalmon); /* color4test */
     }
 }
 
@@ -24,6 +24,6 @@
         display: inline-block;
         width: 100%;
         height: 100%;
-        background: linear-gradient(164deg, wheat, lightgreen);
+        /* background: linear-gradient(164deg, wheat, lightgreen); /* color4test */
     }
 }

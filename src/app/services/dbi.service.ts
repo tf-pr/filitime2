@@ -2,7 +2,7 @@ import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { FsiService } from './fsi.service';
 import { Observable } from 'rxjs';
-import { HelperFunctions } from '../helper/helperFunctions';
+import { Helper } from '../helper';
 
 
 @Injectable({
@@ -26,7 +26,7 @@ export class DbiService {
     this.setIsLoggedInState = fsi.getIsLoggedInState();
     fsi.loggedInStateChange.subscribe({
       next: value => {
-        if (!HelperFunctions.checkForValidBoolean(value)) {
+        if (!Helper.checkForValidBoolean(value)) {
           console.error('Error: 35134354');
           return;
         }

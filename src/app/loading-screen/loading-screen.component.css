@@ -11,3 +11,9 @@
     height: 100%;
     background: #00000066;
 }
+
+.loadingSpinner {
+    margin: auto;
+    position: relative;
+    top: 40%;
+}

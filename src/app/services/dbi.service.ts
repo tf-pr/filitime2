@@ -1,8 +1,9 @@
 import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { FsiService } from './fsi.service';
-import { Observable } from 'rxjs';
-import { Helper } from '../helper';
+import { Observable, Subscription } from 'rxjs';
+import { Helper, Project } from '../helper';
+import { DpoService } from './dpo.service';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import { Helper } from '../helper';
 export class DbiService {
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
-  public loggedInSateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+  public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
   public getLoggedInState(): boolean {
     return this.isLoggedIn;
@@ -22,7 +23,8 @@ export class DbiService {
     this.isLoggedInEmitter.emit(this.isLoggedIn);
   }
 
-  constructor(private fsi: FsiService) {
+  constructor(private fsi: FsiService,
+              private dpo: DpoService) {
     this.setIsLoggedInState = fsi.getIsLoggedInState();
     fsi.loggedInStateChange.subscribe({
       next: value => {
@@ -59,5 +61,61 @@ export class DbiService {
         rej(err);
       });
     });
+  }
+
+  public addNewProject(projectData: {}): Promise<any> {
+    return new Promise<any>((res, rej) => {
+      this.fsi.addNewProject(projectData).then(val => {
+        console.log('dbi-addNewProject-res');
+        console.log(val);
+        res();
+      }).catch(err => {
+        console.error('Error: 2354131352' + ' | ' + err);
+        rej(err);
+      });
+    });
+  }
+
+  public addMultipleProjects(projectDataList: {}[]): Promise<any> {
+    return new Promise<any>((res, rej) => {
+      this.fsi.addMultipleProjects(projectDataList).then(val => {
+        console.log('dbi-addMultipleProject-res');
+        console.log(val);
+        res();
+      }).catch(err => {
+        console.error('Error: 43435453' + ' | ' + err);
+        rej(err);
+      });
+    });
+  }
+
+  private tempSub: Subscription;
+
+  public syncAlLPrOjEcTs() {
+    if (!!this.tempSub) {
+      console.log('this.stopSyncAlLPrOjEcTs();')
+      this.stopSyncAlLPrOjEcTs();
+    }
+
+    console.log('this.tempSub = this.fsi.getAlLPrOjEcTs_Added().subscribe({');
+    this.tempSub = this.fsi.getAlLPrOjEcTs_Added().subscribe({
+      next: val => {
+        console.log('this.dpo.addProjects(val);');
+        console.log('val:');
+        console.log(val);
+        console.log('this.dpo.addProjects(val);');
+        this.dpo.addProjects(val);
+      },
+      error: err => {
+        console.error('JOHN CENA' + ' | ' + err);
+      }
+    });
+  }
+
+  public stopSyncAlLPrOjEcTs() {
+    if (!!this.tempSub) {
+      this.tempSub.unsubscribe();
+      this.tempSub = undefined;
+    }
   }
 }

@@ -14,6 +14,8 @@ import { GlobalDataService } from '../services/global-data.service';
   ]
 })
 export class NavigatorComponent implements OnInit {
+  public outlet;
+
   public isMobile = false;
   public isLandscape = true;
   public navigatorPageIndex = 0;

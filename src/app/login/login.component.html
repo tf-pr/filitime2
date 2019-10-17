@@ -1,7 +1,33 @@
 <ng-container *ngIf="!isMobile">
     <div class="loginViewBG">
-        <p>Hi Desktop-User, Please log in!</p>
-        <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
+        <mat-card class="loginFormContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <form [formGroup]="formGroup" (ngSubmit)="loginClicked()" class="form">
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="E-Mail-Adresse" formControlName="email">
+                        <mat-error *ngIf="!formGroup.controls['email'].valid && formGroup.controls['email'].touched">
+                            {{ getErrorEmail() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Passwort" formControlName="password" type="password">
+                        <mat-error *ngIf="!formGroup.controls['password'].valid && formGroup.controls['password'].touched">
+                            {{ getErrorPassword() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <div *ngIf="!!logInErrorMsg" class="logInError">
+                        <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                    </div>
+                    <div class="form-element">
+                        <button mat-raised-button color="primary" type="submit" class="loginButton" [disabled]="!formGroup.valid">Login</button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
     </div>    
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">

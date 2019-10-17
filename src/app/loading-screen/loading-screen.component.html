@@ -1,10 +1,6 @@
 <div *ngIf="blockView" class="loadingScreenBG">
     <div *ngIf="darkerView" class="darker">
         <ng-container *ngIf="showLoading"></ng-container>
-
-        
-        <h1 style="color: red;">Chill! I'm loading DUDE!!!!!</h1>
-        
-
+        <mat-progress-spinner class="loadingSpinner" color="primary" mode="indeterminate"></mat-progress-spinner>
     </div>
 </div>

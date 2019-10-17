@@ -14,6 +14,72 @@
     .project-folder-card-content {
 
     }
+
+    .controlPanel {
+        background: lightblue;
+        width: 100%;
+        min-height: 50px;
+        border-radius: 4px;
+        padding: 6px;
+    }
+
+    .controlPanelButtonLayer {
+        display: inline-block;
+        background: royalblue;
+    }
+
+    .controlPanelHelper {
+        display: inline-block;
+        background:saddlebrown;
+        width: 100%;
+    }
+
+    .controlPanelFilterLayer {
+        display: inline-block;
+        vertical-align: top;
+        background: seagreen;
+        min-width: 600px;
+        height: 50px;
+    }
+
+    .controlPanelLineIconLayer {
+        vertical-align: top;
+        text-align: center;
+        width: 130px;
+        height: 50px;
+        line-height: 50px;
+        display: inline-block;
+        background: chocolate;
+    }
+
+    .controlPanelLineIcon {
+        vertical-align: middle;
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .controlPanelLineIconLabel {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .contentLayer {
+        width: calc( 100% - 130px );
+        vertical-align: top;
+        height: 50px;
+        display: inline-block;
+        background: darkviolet;
+    }
+
+    .controlPanelLine {
+        display: inline-block;
+        vertical-align: top;
+        background: violet;
+        min-width: 600px;
+        max-width: 100%;
+        height: 50px;
+    }
     
     .project-card-header {
     }

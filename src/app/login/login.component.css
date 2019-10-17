@@ -4,8 +4,81 @@
         display: inline-block;
         width: 100%;
         height: 100%;
+        background: linear-gradient(164deg, #316d7b, skyblue);
         /* background: linear-gradient(164deg, white, skyblue); /* color4test */
         padding: 10px;
+    }
+
+    .loginFormContainer {
+        width: 400px;
+        max-height: 500px;
+        overflow: hidden;
+        margin: 0 auto;
+        top: calc( 50% - 500px /2 - 20px );
+        position: relative;
+        /* background: darkturquoise; /* color4test */
+        animation: cardAni 1s;
+    }
+
+    .filitimeLogo {
+        /* width: 111px; */
+        height: 111px;
+        /* margin-left: calc( ( 100% - 111px ) / 2 ); */
+        margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+        overflow: hidden;
+        animation: logoAni 1s;
+    }
+      
+    .form {
+        width: 100%;
+        margin-top: 65px;
+    }
+    
+    .form-element {
+        /* padding: 5px 0px 25px 2px; */
+        width: 100%;
+    }
+
+    .logInError {
+        margin-top: 5px;
+    }
+    
+    .loginButton {
+        margin-top: 20px;
+        width: 100%;
+    }
+    
+    @keyframes logoAni {
+        0% { 
+            opacity: 0.6;
+            transform: scale(0) rotate(270deg);
+            margin-left: calc( ( 100% - 111px ) / 2 );
+            width: 111px;
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px ) / 2 );
+            width: 111px;
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: 111px;
+        }
+    }
+    
+    @keyframes cardAni {
+        0% {
+            max-height: 144px;
+        }
+        60% {
+            max-height: 144px;
+        }
+        100% {
+            max-height: 500px;
+        }
     }
 }
 

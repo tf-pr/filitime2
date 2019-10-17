@@ -11,8 +11,161 @@
                 {{'Projektnummer: '+currProjectId}}
             </mat-card-title>
             <mat-card-content class="project-folder-card-content">
-                <ng-container *ngFor="let project of projectList">
-                    <mat-card *ngIf="projectIsFilterdIn(project)" class="project-card" [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'">
+
+
+                <!-- <mat-toolbar color="primary">
+                    <mat-toolbar-row>
+                        <span>Custom Toolbar</span>
+                    </mat-toolbar-row>
+                
+                    <mat-toolbar-row>
+                        <span>Second Line</span>
+                        <span class="example-spacer"></span>
+                        <mat-icon class="example-icon" aria-hidden="false" aria-label="Example user verified icon">verified_user
+                        </mat-icon>
+                    </mat-toolbar-row>
+                
+                    <mat-toolbar-row>
+                        <span>Third Line</span>
+                        <span class="example-spacer"></span>
+                        <mat-icon class="example-icon" aria-hidden="false" aria-label="Example heart icon">favorite</mat-icon>
+                        <mat-icon class="example-icon" aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+                    </mat-toolbar-row>
+                </mat-toolbar> -->
+
+                <!-- 
+                <div id="ll3_projectsBL">
+                    <div id="ll4_projectsBL1">
+                        <div id="ll5_projectsBL1">
+                        <button id="ll6_addProjectB" type="button" pButton icon="fa fa-plus" label="{{translate('Projekt hinzufügen')}}" (click)="openAddProjectDialog()"></button>
+                        <button id="ll6_archiveProjectB" type="button" pButton icon="fa fa-archive" (click)="openShowProjectArchiveListDialog()"></button>
+                        </div>
+                        <div id="ll5_projectsBL2">
+                        <button id="ll6_textSearchL" type="button" pButton icon="fa fa-search" class="ui-button-secondary" [disabled]="true"></button>
+                        <div id="ll6_projectTS_helper">
+                            <input id="ll6_projectTS" type="text" pInputText [(ngModel)]="textSearch" (ngModelChange)="checkForTextSearchChange()" [tooltipDisabled]="isMobile" pTooltip="{{translate('Projekte nach Projektname oder -nummer durchsuchen')}}" tooltipPosition="right" life="7000"/>
+                        </div>
+                        </div>
+                    </div>
+                    <div id="ll4_projectsBL2">
+                        <div id="ll5_projectsBL3">
+                            <button id="ll6_filterL" type="button" pButton icon="fa fa-filter" class="ui-button-secondary" [disabled]="true"></button>
+                            <button id="ll6_reserveFilterB" type="button" [class.ui-button-secondary]="!filterReserved" pButton [tooltipDisabled]="isMobile"
+                                pTooltip="{{translate('Nach Vorbehalt filtern')}}" tooltipPosition="right" life="7000" icon="fa fa-question-circle" (click)="reservedFilterChange()"></button>
+                            <button id="ll6_zeroTTAFilterB" type="button" [class.ui-button-secondary]="!filterZero" pButton [tooltipDisabled]="isMobile"
+                                pTooltip="{{translate('Nach Projekten mit Planbedarf filtern')}}" tooltipPosition="right" life="7000" icon="fa fa-clock-o" (click)="zeroFilterChange()"></button>
+                            <button id="ll6_completedFilterB" type="button" [class.ui-button-secondary]="!filterCompleted" pButton [tooltipDisabled]="isMobile"
+                                pTooltip="{{translate('Beendete Projekte ausfiltern')}}" tooltipPosition="right" life="7000" icon="fa fa-check-square-o" (click)="completedFilterChange()"></button>
+                        </div>
+                        <div id="ll5_projectsBL4">
+                            <button id="ll6_SortL" type="button" pButton icon="fa fa fa-sort" class="ui-button-secondary" [disabled]="true"></button>
+                            <button id="ll6_newSortB" type="button" [class.ui-button-secondary]="sortNew===null" pButton [tooltipDisabled]="isMobile" pTooltip="{{translate('Projekte chronologisch sortieren')}}"
+                                tooltipPosition="right" life="7000" [icon]="sortNew === false ? 'fa fa-sort-asc' : 'fa fa-sort-desc'" (click)="newSortChange()"></button>
+                            <button id="ll6_nameSortB" type="button" [class.ui-button-secondary]="sortName===null" pButton [tooltipDisabled]="isMobile" pTooltip="{{translate('Projekte alphabetisch sortieren')}}"
+                                tooltipPosition="right" life="7000" [icon]="sortName === false ? 'fa fa-sort-alpha-desc' : 'fa fa-sort-alpha-asc'" (click)="nameSortChange()"></button>
+                            <button id="ll6_numberSortB" type="button" [class.ui-button-secondary]="sortNumber===null" pButton [tooltipDisabled]="isMobile" pTooltip="{{translate('Projekte nach Projektkennziffer sortieren')}}"
+                                tooltipPosition="right" life="7000" [icon]="sortNumber === false ? 'fa fa-sort-numeric-desc' : 'fa fa-sort-numeric-asc'" (click)="numberSortChange()"></button>
+                        </div>
+                    </div>
+                </div>
+                 -->
+
+                <div class="controlPanel">
+                    <div class="controlPanelHelper">
+                        <div class="controlPanelLine">
+                            <div class="controlPanelLineIconLayer">
+                                <mat-icon class="controlPanelLineIcon">format_paint</mat-icon>
+                                <span class="controlPanelLineIconLabel">Filtern</span>
+                            </div>
+                            <div class="contentLayer">
+                                    <p-button label="Click"></p-button>
+                                <!--
+                                <mat-checkbox [(ngModel)]="filterReserved">unter Vorbehalt</mat-checkbox>
+                                <mat-checkbox [(ngModel)]="filterZeroTTA">Planbedarf</mat-checkbox>
+                                <mat-checkbox [(ngModel)]="filterCompleted">Beendet</mat-checkbox>
+                                -->
+                                <button id="ll6_reserveFilterB" type="button" [class.ui-button-secondary]="!filterReserved" pButton
+                                    icon="fa fa-question-circle" (click)="reservedFilterChange()" label="unter Vorbehalt">
+                                </button>
+                                <button id="ll6_zeroTTAFilterB" type="button" [class.ui-button-secondary]="!filterZero" pButton icon="fa fa-clock-o"
+                                    (click)="zeroFilterChange()" label="Planbedarf">
+                                </button>
+                                <button id="ll6_completedFilterB" type="button" [class.ui-button-secondary]="!filterCompleted" pButton
+                                    icon="fa fa-check-square-o" (click)="completedFilterChange()" label="Beendet">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="controlPanelLine">
+                            <div class="controlPanelLineIconLayer">
+                                <mat-icon class="controlPanelLineIcon">format_paint</mat-icon>
+                                <span class="controlPanelLineIconLabel">Sortieren</span>
+                            </div>
+                            <div class="contentLayer">
+                                <mat-checkbox class="example-margin" [(ngModel)]="sortDesc">autsteigend/abteigend</mat-checkbox>
+                                <mat-button-toggle-group #group="matButtonToggleGroup">
+                                    <mat-button-toggle value="left" aria-label="Text align left">
+                                        <mat-icon>format_align_left</mat-icon>chronologisch
+                                    </mat-button-toggle>
+                                    <mat-button-toggle value="center" aria-label="Text align center">
+                                        <mat-icon>format_align_center</mat-icon>alphabtisch
+                                    </mat-button-toggle>
+                                    <mat-button-toggle value="right" aria-label="Text align right">
+                                        <mat-icon>format_align_right</mat-icon>nach Identifikator
+                                    </mat-button-toggle>
+                                </mat-button-toggle-group>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="controlPanelButtonLayer">
+                        <input id="ll6_projectTS" type="text" pInputText [(ngModel)]="textSearch" (ngModelChange)="checkForTextSearchChange()" placeholder="Textsuche" tooltipPosition="right"/>
+                        <button mat-raised-button color="primary" (click)="addProjectButtonClicked()"><mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen</button>
+                        <button mat-raised-button color="primary" (click)="syncProjects()"><mat-icon>cloud_download</mat-icon>sync projects and get in 3sec</button>
+                    </div>
+                </div>
+                <mat-paginator [length]="paginatorLength" [pageSize]="paginatorPageSize" [pageSizeOptions]="paginatorPageSizeOptions" (page)="paginatorChanged($event)"></mat-paginator>
+
+
+                <!-- <div class="projectListHeaderButtonsAndStuffPlsRenameMeThx">
+                    
+                    <div>
+                        <div class="renameMePlsBox">
+                            <div class="renameMePlsIconBox">
+                                <mat-icon class="renameMePlsBoxIcon">format_paint</mat-icon>
+                                <span class="renameMePlsBoxIconText">Filtern</span>
+                            </div>
+                            <div class="renameMePlsBoxContent">
+                                <mat-checkbox class="example-margin" [(ngModel)]="checked1">Nach Vorbehalt filtern</mat-checkbox>
+                                <mat-checkbox class="example-margin" [(ngModel)]="checked2">Nach Projekten mit Plabedarf filtern</mat-checkbox>
+                                <mat-checkbox class="example-margin" [(ngModel)]="checked3">Beendte Projekte ausfiltern</mat-checkbox>
+                            </div>
+                        </div>
+                        <div class="renameMePlsBox">
+                            <div class="renameMePlsIconBox">
+                                <mat-icon class="renameMePlsBoxIcon">format_paint</mat-icon>
+                                <span class="renameMePlsBoxIconText">Sortieren</span>
+                            </div>
+                            <div class="renameMePlsBoxContent">
+                                <mat-checkbox class="example-margin" [(ngModel)]="checked3">autsteigend/abteigend</mat-checkbox>
+                                <mat-button-toggle-group #group="matButtonToggleGroup">
+                                    <mat-button-toggle value="left" aria-label="Text align left">
+                                        <mat-icon>format_align_left</mat-icon>Chronologisch sortieren
+                                    </mat-button-toggle>
+                                    <mat-button-toggle value="center" aria-label="Text align center">
+                                        <mat-icon>format_align_center</mat-icon>Alphabtisch sortieren
+                                    </mat-button-toggle>
+                                    <mat-button-toggle value="right" aria-label="Text align right">
+                                        <mat-icon>format_align_right</mat-icon>Nach Identifikator sortieren
+                                    </mat-button-toggle>
+                                </mat-button-toggle-group>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+
+
+                <ng-container *ngFor="let project of projectListFnS">
+                    <mat-card class="project-card" [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'">
                         <mat-card-header class="project-card-header">
                             <mat-card-title>{{project.name}}</mat-card-title>
                             <mat-card-subtitle>{{project.identifier}}</mat-card-subtitle>
@@ -37,6 +190,10 @@
                         </mat-card-actions>
                     </mat-card>
                 </ng-container>
+
+
+                
+                <mat-paginator [length]="paginatorLength" [pageSize]="paginatorPageSize" [pageSizeOptions]="paginatorPageSizeOptions" (page)="paginatorChanged($event)"></mat-paginator>
             </mat-card-content>
         </mat-card>
     </div>

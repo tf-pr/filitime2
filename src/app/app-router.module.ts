@@ -63,7 +63,12 @@ const appRoutes: Routes = [
     component: HelpViewComponent,
     data: { animation: 'help' },
   },
-  { path: '', redirectTo: '/planboard', pathMatch: 'full' },
+  // { path: '', redirectTo: '/planboard', pathMatch: 'full' },
+  {
+    path: '', pathMatch: 'full',
+    component: PlanboardViewComponent,
+    data: { animation: 'planboard' },
+  },
   { path: '**', component: PageNotFoundComponent }
 ];
 

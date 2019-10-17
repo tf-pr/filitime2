@@ -1,7 +1,8 @@
 export class Helper {
-    private readonly msPerDay: number = 86400000;
-    private readonly msPerHour: number = 3600000;
-    private readonly msPerMinute: number = 60000;
+    public static readonly msPerDay: number = 86400000;
+    public static readonly msPerHour: number = 3600000;
+    public static readonly msPerMinute: number = 60000;
+    private static readonly regExpEMail = new RegExp('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$');
 
     public static checkForValidBoolean(val: any): boolean {
         if (typeof val !== 'boolean') {
@@ -52,6 +53,11 @@ export class Helper {
 
     //     return this.removeItemFromArrayAtIndex(array, i);
     // }
+
+    public static emailFormatCheck(email: string): boolean {
+        const result = this.regExpEMail.test(email);
+        return result;
+    }
 
     public static encodeDeepLinkData( dataObj: {} ): string {
         let paresedObjStr: string;
@@ -116,20 +122,35 @@ export class Helper {
 
 
 export class Project {
-    identifier: string;
-    name: string;
-    duration: number;
-    endless: boolean;
-    timeToAllocate: number;
-    isConflicted: boolean;
-    color: string;
-    marker: string;
-    markerColor: string;
-    note: string;
-    reserved: boolean;
-    blockCode: string;
-    finished: boolean;
-    folder: string;
+    public static readonly identifierKeyStr = 'identifier';
+    public static readonly nameKeyStr = 'name';
+    public static readonly durationKeyStr = 'duration';
+    public static readonly endlessKeyStr = 'endless';
+    public static readonly timeToAllocateKeyStr = 'timeToAllocate';
+    public static readonly isConflictedKeyStr = 'isConflicted';
+    public static readonly colorKeyStr = 'color';
+    public static readonly markerKeyStr = 'marker';
+    public static readonly markerColorKeyStr = 'markerColor';
+    public static readonly noteKeyStr = 'note';
+    public static readonly reservedKeyStr = 'reserved';
+    public static readonly blockCodeKeyStr = 'blockCode';
+    public static readonly finishedKeyStr = 'finished';
+    public static readonly folderKeyStr = 'folder';
+
+    public identifier: string;
+    public name: string;
+    public duration: number;
+    public endless: boolean;
+    public timeToAllocate: number;
+    public isConflicted: boolean;
+    public color: string;
+    public marker: string;
+    public markerColor: string;
+    public note: string;
+    public reserved: boolean;
+    public blockCode: string;
+    public finished: boolean;
+    public folder: string;
 
     constructor(identifier: string,
                 name: string,

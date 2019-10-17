@@ -13,6 +13,18 @@ export class AppComponent {
   private isLoggedIn = false;
   private isLoading = false;
 
+  public showLoginForm = true;
+
+  private set loggedInSetter(value) {
+    if (this.isLoggedIn === value) { return; }
+    this.isLoggedIn = value;
+    this.showLoginForm = !value;
+  }
+
+  public get isLoadingGetter(): boolean {
+    return this.isLoading;
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     const target = event.target;
@@ -20,14 +32,14 @@ export class AppComponent {
   }
 
   constructor(private globalData: GlobalDataService, private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
-    this.isLoggedIn = dbi.getLoggedInState();
-    dbi.loggedInSateChange.subscribe({
+    this.loggedInSetter = dbi.getLoggedInState();
+    dbi.loggedInStateChange.subscribe({
       next: value => {
         if (!Helper.checkForValidBoolean(value)) {
           console.error('Error: 46351354');
           return;
         }
-        this.isLoggedIn = value;
+        this.loggedInSetter = value;
       },
       error: err => {
         console.error('Error: 31351351 | ' + err);

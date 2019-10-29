@@ -31,7 +31,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginatorIntl  } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
@@ -39,11 +39,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 import { AlertModule } from 'ngx-bootstrap/alert';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
+import { ColorPickerModule } from 'primeng/colorpicker';
 
 import { ButtonModule } from 'primeng/button';
+import { PaginatorTranslator } from './PaginatorTranslator';
 
 @NgModule({
   declarations: [
@@ -67,6 +72,7 @@ import { ButtonModule } from 'primeng/button';
     BrowserModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.fs_conf),
+    AngularFirestoreModule.enablePersistence(),
     AngularFirestoreModule,
     AngularFireAuthModule,
     AppRoutingModule,
@@ -86,12 +92,15 @@ import { ButtonModule } from 'primeng/button';
     MatIconModule,
     MatRippleModule,
     MatCheckboxModule,
+    MatRadioModule,
     MatButtonToggleModule,
     AlertModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    ColorPickerModule,
     ButtonModule,
   ],
   entryComponents: [CreateProjectDialogComponent],
-  providers: [],
+  providers: [{provide: MatPaginatorIntl, useClass: PaginatorTranslator}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

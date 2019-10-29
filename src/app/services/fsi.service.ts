@@ -3,6 +3,9 @@ import { Observable, Subscription } from 'rxjs';
 import { Helper, Project } from '../helper';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Timestamp } from '@firebase/firestore-types';
+import * as firebase from 'firebase/app';
+import { DpoService } from './dpo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,17 +13,33 @@ import { AngularFirestore } from '@angular/fire/firestore';
 export class FsiService {
   private readonly clientDataColKeyStr = 'clientData';
   private readonly projectsColKeyStr = 'projects';
+  private readonly docIdKeyStr = 'docId';
 
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
   public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
+  private isOffline = false;
+  private isOfflineEmitter = new EventEmitter<boolean>();
+  public isOfflineStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+
   private clientId = 'imCvgvkLoPiori2KptQo'; // private clientId: string;
+
+  private firstProjInNameOrderSub: Subscription;
+  private firstProjInNameOrder: Project;
+  private firstProjInNameOrderEmitter = new EventEmitter<boolean>();
+  public firstProjInNameOrderStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+
+  private lastProjInNameOrderSub: Subscription;
+  private lastProjInNameOrder: Project;
+  private lastProjInNameOrderEmitter = new EventEmitter<boolean>();
+  public lastProjInNameOrderStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
   private static convertDBObjToProject(projectDbObj: {}): Project {
     let returnValue: Project;
     try {
       returnValue = new Project(
+        projectDbObj[Project.docIdKeyStr],
         projectDbObj[Project.identifierKeyStr],
         projectDbObj[Project.nameKeyStr],
         projectDbObj[Project.durationKeyStr],
@@ -35,6 +54,15 @@ export class FsiService {
         projectDbObj[Project.blockCodeKeyStr],
         projectDbObj[Project.finishedKeyStr],
         projectDbObj[Project.folderKeyStr],
+        projectDbObj[Project.createTsKeyStr],
+        projectDbObj[Project.createIdKeyStr],
+        projectDbObj[Project.createNameKeyStr],
+        projectDbObj[Project.editTsKeyStr],
+        projectDbObj[Project.editIdKeyStr],
+        projectDbObj[Project.editNameKeyStr],
+        projectDbObj[Project.useTsKeyStr],
+        projectDbObj[Project.useIdKeyStr],
+        projectDbObj[Project.useNameKeyStr],
       );
     } catch (error) {
       console.error('Error: 35468453' + ' | ' + error);
@@ -52,17 +80,23 @@ export class FsiService {
       pushId += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    /*******************************
-    chars.length = 62
-    pushId.length = 20
-    62^20 = 7.04423425547*10^35
-    ******************************/
-
     return pushId;
   }
 
   public getIsLoggedInState() {
     return this.isLoggedIn;
+  }
+
+  public getIsOfflineInState() {
+    return this.isOffline;
+  }
+
+  public getFirstProjInNameOrderEmitter() {
+    return this.firstProjInNameOrderEmitter;
+  }
+
+  public getLastProjInNameOrderEmitter() {
+    return this.lastProjInNameOrderEmitter;
   }
 
   private set setIsLoggedInState(value: boolean) {
@@ -71,10 +105,18 @@ export class FsiService {
     this.isLoggedInEmitter.emit(this.isLoggedIn);
   }
 
-  constructor(private ngFireAuth: AngularFireAuth,
+  private set setIsOfflineInState(value: boolean) {
+    if (this.isOffline === value) { return; }
+    this.isOffline = value;
+    this.isOfflineEmitter.emit(this.isOffline);
+  }
+
+  constructor(private dpo: DpoService,
+              private angFireAuth: AngularFireAuth,
               private angFirestore: AngularFirestore,
               private zone: NgZone) {
-    ngFireAuth.auth.onAuthStateChanged(user => {
+    angFireAuth.auth.onAuthStateChanged(user => {
+      console.log(user);
       if (!!user) {
         this.zone.run(() => { this.setIsLoggedInState = true; });
       }
@@ -92,49 +134,51 @@ export class FsiService {
         return;
       }
 
-      this.ngFireAuth.auth.signInWithEmailAndPassword(email, pw)
-      .then(auth => {
-        if (auth) {
-          this.setIsLoggedInState = true;
-          res(true);
-        } else {
-          this.setIsLoggedInState = false;
-          rej('????');
-        }
-      })
-      .catch(error => {
-        let errText = ('Login fehlgeschlagen');
-        switch (error.code) {
-          case 'auth/user-not-found':
-            errText = ('E-Mail-Adresse inkorrekt');
-            break;
-          case 'auth/wrong-password':
-            errText = ('Passwort inkorrekt');
-            break;
-          case 'auth/too-many-requests':
-            errText = ('Zu viele Anfragen auf diesen Account. Wenden Sie sich an den Administrator.');
-            break;
-          case 'auth/user-disabled':
-            errText = ('Ihr Account wurde deaktiviert!');
-            break;
-        }
+      this.angFireAuth.auth.signInWithEmailAndPassword(email, pw)
+        .then(auth => {
+          if (auth) {
+            this.setIsLoggedInState = true;
+            res(true);
+          } else {
+            this.setIsLoggedInState = false;
+            rej('????');
+          }
+        })
+        .catch(error => {
+          let errText = ('Login fehlgeschlagen');
+          switch (error.code) {
+            case 'auth/user-not-found':
+              errText = ('E-Mail-Adresse inkorrekt');
+              break;
+            case 'auth/wrong-password':
+              errText = ('Passwort inkorrekt');
+              break;
+            case 'auth/too-many-requests':
+              errText = ('Zu viele Anfragen auf diesen Account. Wenden Sie sich an den Administrator.');
+              break;
+            case 'auth/user-disabled':
+              errText = ('Ihr Account wurde deaktiviert!');
+              break;
+          }
 
-        rej(errText);
-        this.setIsLoggedInState = false;
-      });
+          rej(errText);
+          this.setIsLoggedInState = false;
+        });
     });
   }
 
   public logOut(): Promise<void | string> {
     return new Promise<void | string>((res, rej) => {
-      this.ngFireAuth.auth.signOut().then(() => {
-        this.setIsLoggedInState = false;
-        res();
-      }).catch(err => {
-        // isLoggedInState undechanged i guess?!
-        console.error('Error: 86435489');
-        rej();
-      });
+      this.angFireAuth.auth.signOut()
+        .then(() => {
+          this.setIsLoggedInState = false;
+          res();
+        })
+        .catch(err => {
+          // isLoggedInState unchanged i guess?!
+          console.error('Error: 86435489');
+          rej();
+        });
     });
   }
 
@@ -146,184 +190,209 @@ export class FsiService {
     return this.clientDataColKeyStr + '/' + this.clientId + '/' + this.projectsColKeyStr;
   }
 
-  public addNewProject( projectData: {} ) {
-    return new Promise<any>((res, rej) => {
-      const projColPath = this.buildProjectsColPath();
-      this.addNewDocToColPath(projColPath, projectData).then(val => {
-        res(val);
-      }).catch(err => {
-        console.error('Error: 46534135' + ' | ' + err);
-        rej(err);
-      });
-    });
+  private addCreateDataToDbObj(dbObj: {}, docId?: string): string {
+    dbObj[Project.createTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
+    dbObj[Project.createIdKeyStr] = this.dpo.usersEmployeeId;
+    dbObj[Project.createNameKeyStr] = this.dpo.usersEmployeeName;
+
+    if ( !docId ) { docId = FsiService.generatePushId(); }
+    dbObj[this.docIdKeyStr] = docId;
+
+    return docId;
   }
 
-  public addMultipleProjects( projectDataList: {}[] ) {
-    return new Promise<any>((res, rej) => {
-      const batch = this.angFirestore.firestore.batch();
-
-      projectDataList.forEach(projectData => {
-        const projectDocRef = this.angFirestore.firestore.doc(this.buildProjectDocPath(FsiService.generatePushId()));
-        batch.set(projectDocRef, projectData);
-      });
-
-      batch.commit().then(() => {
-        res();
-      }).catch(err => {
-        console.error('Error: 54531325' + ' | ' + err);
-        rej(err);
-      });
-    });
+  private addChangeDataToDbObj(dbObj: {}): void {
+    dbObj[Project.editTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
+    dbObj[Project.editIdKeyStr] = this.dpo.usersEmployeeId;
+    dbObj[Project.editNameKeyStr] = this.dpo.usersEmployeeName;
   }
 
+  private addUseInfoToDbObj(dbObj: {}): void {
+    dbObj[Project.useTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
+    dbObj[Project.useIdKeyStr] = this.dpo.usersEmployeeId;
+    dbObj[Project.useNameKeyStr] = this.dpo.usersEmployeeName;
+  }
 
-
-
-  public getAlLPrOjEcTs_Added(): Observable<[Project[], string[]]> {
-    console.log('public getAlLPrOjEcTs_Added(): Observable<[Project[], string[]]> {');
-    const projectColPath = this.buildProjectsColPath();
-    console.log({projectColPath});
-    const projectColRef = this.angFirestore.collection(projectColPath);
-    console.log({projectColRef});
-
-    console.log('return new Observable<[Project[], string[]]>(function subscribe(subscriber)');
-    return new Observable<[Project[], string[]]>(function subscribe(subscriber) {
-      // register to fs event
-      // and throw next on result
-
-      /**/
-      // tslint:disable-next-line:quotemark
-      console.log("const sub: Subscription = projectColRef.stateChanges(['added']).subscribe({");
-      /**/
-
-      const sub: Subscription = projectColRef.stateChanges(['added']).subscribe({
-        next: projectSnapList => {
-          console.log('valla added!');
-          console.log(projectSnapList);
-
-          const addedProjectsList: Project[] = [];
-          const addedProjectsIds: string[] = [];
-
-          projectSnapList.forEach(projectSnap => {
-            console.log(projectSnap);
-            console.log('id');
-            console.log(projectSnap.payload.doc.id);
-            console.log('data');
-            console.log(projectSnap.payload.doc.data());
-
-            const convertedObj = FsiService.convertDBObjToProject(projectSnap.payload.doc.data());
-            if (!convertedObj) {
-              console.error('FATAL ERROR: ' + ' convertedObj is not');
-              console.error('snap');
-              return; // aka continue
-            }
-
-            console.log(convertedObj);
-
-            addedProjectsList.push(convertedObj);
-            addedProjectsIds.push(projectSnap.payload.doc.id);
-
-            console.log('subscriber.next([addedProjectsList, addedProjectsIds]);');
-            console.log([addedProjectsList, addedProjectsIds]);
-
-            subscriber.next([addedProjectsList, addedProjectsIds]);
-          });
-        },
-        error: err => {
-          subscriber.error(err);
+  public addProjectToDb(identifier: string,
+                        name: string,
+                        duration: number,
+                        endless: boolean,
+                        color: string,
+                        marker: string,
+                        markerColor: string,
+                        note: string,
+                        reserved: boolean,
+                        folder: string): Promise<void> {
+    {
+      return new Promise<void>((res, rej) => {
+        // check identifier
+        if (!identifier) {
+          rej('identifier invalid');
+          return;
         }
+        // check name
+        if (!name) {
+          rej('name invalid');
+          return;
+        }
+        // check duration
+        if (!duration) {
+          if (!!endless) {
+            duration = 0;
+          } else {
+            rej('duration invalid');
+            return;
+          }
+        }
+        // check color
+        if (!color) {
+          rej('color invalid');
+          return;
+        }
+
+        const dataObj = {};
+        dataObj[Project.identifierKeyStr] = identifier;
+        dataObj[Project.nameKeyStr] = name;
+        dataObj[Project.durationKeyStr] = duration;
+        dataObj[Project.endlessKeyStr] = !!endless;
+        dataObj[Project.timeToAllocateKeyStr] = duration;
+        dataObj[Project.colorKeyStr] = color;
+        if (!!marker) { dataObj[Project.markerKeyStr] = marker; }
+        if (!!markerColor) { dataObj[Project.markerColorKeyStr] = markerColor; }
+        if (!!note) { dataObj[Project.noteKeyStr] = note; }
+        dataObj[Project.reservedKeyStr] = !!reserved;
+        dataObj[Project.finishedKeyStr] = false;
+        if (!!folder) { dataObj[Project.folderKeyStr] = folder; }
+
+        const docId = this.addCreateDataToDbObj(dataObj);
+        this.addChangeDataToDbObj(dataObj);
+        this.addUseInfoToDbObj(dataObj);
+        const projDocPath = this.buildProjectDocPath(docId);
+        this.addDocToDbAtDocPath(projDocPath, dataObj)
+          .then(() => { res(); })
+          .catch(err => {
+            console.error('Error: 46534135' + ' | ' + err);
+            rej(err);
+          });
       });
-
-      return function unsubscribe() {
-        console.log('unsubscribe');
-        sub.unsubscribe();
-      };
-    });
-
-    /*
-    this is the tamplate dear skriptkiddy
-
-    const observable = new Observable(function subscribe(subscriber) {
-      // Keep track of the interval resource
-      const intervalId = setInterval(() => {
-        subscriber.next('hi');
-      }, 1000);
-
-      // Provide a way of canceling and disposing the interval resource
-      return function unsubscribe() {
-        clearInterval(intervalId);
-      };
-    });
-    */
+    }
   }
 
-  public getAlLPrOjEcTs_Modified(cb: (modfiedProjectsTuple: [Project[], string[]]) => void, errorCB: (err: string) => void ): Subscription {
-    const projectColPath = this.buildProjectsColPath();
-    const projectColRef = this.angFirestore.collection(projectColPath);
+/*
+   _________________________________________________________________________________
+  |                                                                                 |
+  |        where | Create a new query. Can be chained to form complex queries.      |
+  |      orderBy | Sort by the specified field, in descending or ascending order.   |
+  |        limit | Sets the maximum number of items to return.                      |
+  |      startAt | Results start at the provided document (inclusive).              |
+  |   startAfter | Results start after the provided document (exclusive).           |
+  |        endAt | Results end at the provided document (inclusive).                |
+  |    endBefore | Results end before the provided document (exclusive).            |
+  |_________________________________________________________________________________|
+*/
 
-    return projectColRef.stateChanges(['modified']).subscribe({
-      next: projectSnapList => {
-        console.log('valla modified!');
-        console.log(projectSnapList);
+  public getQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts',
+                            startAt: Date,
+                            endBefore: Date): Promise<{}[]> {
+    return new Promise<{}[]>((res, rej) => {
+      const projectColPath = this.buildProjectsColPath();
+      const queriedCol = this.angFirestore.collection(projectColPath, ref => ref.orderBy(orderedBy).startAt(startAt).endBefore(endBefore));
 
-        const modifiedProjectsList: Project[] = [];
-        const modifiedProjectsIds: string[] = [];
-
-        projectSnapList.forEach(projectSnap => {
-          const convertedObj = FsiService.convertDBObjToProject(projectSnap.payload.doc.data());
-          if (!convertedObj) {
-            return; // aka continue
-          }
-
-          modifiedProjectsList.push(convertedObj);
-          modifiedProjectsIds.push(projectSnap.payload.doc.id);
-
-          cb([modifiedProjectsList, modifiedProjectsIds]);
+      queriedCol.get().toPromise()
+        .then(snapList => {
+          const projectList: {}[] = [];
+          snapList.docs.forEach(doc => {
+            projectList.push(doc.data());
+          });
+          res(projectList);
+        })
+        .catch(err => {
+          console.error('Error: 41354354' + ' | ' + err);
+          rej(err);
         });
+    });
+  }
+
+  public syncQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts', startAt: Date,
+                             endBefore: Date,
+                             addedCB: (arg0: Project[]) => void,
+                             modifiedCB: (arg0: Project[]) => void,
+                             removedCB: (arg0: Project[]) => void): [Subscription, Subscription, Subscription] {
+    console.log(' orderedBy:' + orderedBy);
+    console.log('   startAt:' + startAt);
+    console.log(' endBefore:' + endBefore);
+
+    const projectColPath = this.buildProjectsColPath();
+    const queriedCol = this.angFirestore.collection(projectColPath, ref => ref.orderBy(orderedBy).startAt(startAt).endBefore(endBefore));
+    const addedSub = queriedCol.stateChanges(['added']).subscribe({
+      next: snaps => {
+        const projList: Project[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const proj = FsiService.convertDBObjToProject(docData);
+          projList.push(proj);
+        });
+        addedCB(projList);
       },
       error: err => {
-        errorCB(err);
+        console.error('Error: 54635163' + ' | ' + err);
       }
     });
 
-    // hmmm not quite what im looking for!!! how about a RxJs Observer?!... tbc in 'Added'
-  }
-
-  public getAlLPrOjEcTs_Removed(): Promise<any> {
-    const projectColPath = this.buildProjectsColPath();
-    const projectColRef = this.angFirestore.collection(projectColPath);
-
-    return new Promise<any>((res, rej) => {
-      projectColRef.stateChanges(['removed']).toPromise().then(val => {
-        console.log('valla removed!');
-        console.log(val);
-        res(val);
-      }).catch(err => {
-        console.error('SHIT!');
-        res(err);
-      });
+    const modifiedSub = queriedCol.stateChanges(['modified']).subscribe({
+      next: snaps => {
+        console.log('snapshotChanges([modified])');
+        console.log(snaps);
+        const projList: Project[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const proj = FsiService.convertDBObjToProject(docData);
+          projList.push(proj);
+        });
+        modifiedCB(projList);
+      },
+      error: err => {
+        console.error('Error: 13541653' + ' | ' + err);
+      }
     });
+
+    const removedSub = queriedCol.stateChanges(['removed']).subscribe({
+      next: snaps => {
+        console.log('snapshotChanges([removed])');
+        console.log(snaps);
+        const projList: Project[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const proj = FsiService.convertDBObjToProject(docData);
+          projList.push(proj);
+        });
+        removedCB(projList);
+      },
+      error: err => {
+        console.error('Error: 65453641' + ' | ' + err);
+      }
+    });
+
+    return [addedSub, modifiedSub, removedSub];
   }
 
-  private addNewDocToColPath( colPath: string, data: any): Promise<firebase.firestore.DocumentReference | any> {
+  private addDocToDbAtColPath( colPath: string, data: any): Promise<firebase.firestore.DocumentReference | any> {
     return new Promise<firebase.firestore.DocumentReference | any>((res, rej) => {
-      this.angFirestore.collection(colPath).add(data).then(val => {
-        console.log('addNewDocToColPath-res');
-        console.log(val);
-        res(val);
-      }).catch(err => {
-        rej(err);
-      });
+      this.angFirestore.collection(colPath).add(data)
+        .then(val => {
+          console.log('addNewDocToColPath-res');
+          console.log(val);
+          res(val);
+        })
+        .catch(err => { rej(err); });
     });
   }
 
-  private addNewDocToDocPath( docPath: string, data: any ) {
-    return new Promise<any>((res, rej) => {
-      this.angFirestore.doc(docPath).set(data).then(() => {
-        res();
-      }).catch(err => {
-        rej(err);
-      });
+  private addDocToDbAtDocPath( docPath: string, data: any ): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.angFirestore.doc(docPath).set(data)
+        .then(() => { res(); })
+        .catch(err => { rej(err); });
     });
   }
 }

@@ -32,7 +32,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.createForm();
-    // this.setChangeValidate();
   }
 
   createForm() {
@@ -45,20 +44,6 @@ export class LoginComponent implements OnInit {
       validate: ''
     });
   }
-
-  // setChangeValidate() {
-  //   this.formGroup.get('validate').valueChanges.subscribe(
-  //     (validate) => {
-  //       if (validate === '1') {
-  //         this.formGroup.get('name').setValidators([Validators.required, Validators.minLength(3)]);
-  //         this.titleAlert = "You need to specify at least 3 characters";
-  //       } else {
-  //         this.formGroup.get('name').setValidators(Validators.required);
-  //       }
-  //       this.formGroup.get('name').updateValueAndValidity();
-  //     }
-  //   );
-  // }
 
   checkPassword(control) {
     const enteredPassword: string = control.value;
@@ -95,20 +80,20 @@ export class LoginComponent implements OnInit {
     const waitCode = '843643544';
     this.loadingHandler.addWaitCode(waitCode);
 
-    this.dbi.logIn(email, password).then(succes => {
-      this.loadingHandler.removeWaitCode(waitCode);
-      if (!succes) {
-        console.error('Error: 89354343');
-        return;
-      }
-      this.formGroup = undefined;
-    }).catch(err => {
-      const detail: string = err;
-      // this.errorMassage('Login Fehlgeschlagen', detail);
-
-      console.error('Error: 43546853 | ' + detail);
-      this.logInErrorMsg = detail;
-      this.loadingHandler.removeWaitCode(waitCode);
-    });
+    this.dbi.logIn(email, password)
+      .then(succes => {
+        this.loadingHandler.removeWaitCode(waitCode);
+        if (!succes) {
+          console.error('Error: 89354343');
+          return;
+        }
+        this.formGroup = undefined;
+      })
+      .catch(err => {
+        const detail: string = err;
+        console.error('Error: 43546853' + ' | ' + detail);
+        this.logInErrorMsg = detail;
+        this.loadingHandler.removeWaitCode(waitCode);
+      });
   }
 }

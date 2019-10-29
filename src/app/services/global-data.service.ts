@@ -14,6 +14,10 @@ export class GlobalDataService {
   private isLandscapeEmitter = new EventEmitter<boolean>();
   public isLandscapeSateChange: Observable<boolean> = this.isLandscapeEmitter.asObservable();
 
+  private isOffline = false;
+  private isOfflineEmitter = new EventEmitter<boolean>();
+  public isOfflineSateChange: Observable<boolean> = this.isOfflineEmitter.asObservable();
+
   public getIsLandscape(): boolean {
     return this.isLandscape;
   }
@@ -34,8 +38,22 @@ export class GlobalDataService {
     this.isMobileEmitter.emit(value);
   }
 
+  public getIsOffline(): boolean {
+    return this.isOffline;
+  }
+
+  private set setIsOffline(value: boolean) {
+    if (this.isOffline === value) { return; }
+    this.isOffline = value;
+    this.isOfflineEmitter.emit(value);
+  }
+
   constructor() {
     this.setDeviceScreenVar(window.innerWidth, window.innerHeight);
+
+    this.setIsOffline = !(navigator.onLine.valueOf());
+    window.addEventListener('online', () => { this.setIsOffline = false; });
+    window.addEventListener('offline', () => { this.setIsOffline = true; });
   }
 
   public setDeviceScreenVar(width: number, height: number) {

@@ -118,10 +118,41 @@ export class Helper {
 
         return paresedObj;
     }
+
+    public static getEuropeanDateString( date: Date, shortYear?: boolean ): string {
+        let yearNum = date.getFullYear();
+        if ( !!shortYear ) {
+            yearNum = yearNum - Math.floor( yearNum / 100 ) * 100;
+        }
+        let yearStr = yearNum.toString();
+        yearStr = yearStr.length > 1 ? yearStr : '0' + yearStr;
+
+        let monthStr: string = (1 + date.getMonth()).toString();
+        monthStr = monthStr.length > 1 ? monthStr : '0' + monthStr;
+
+        let dayStr = date.getDate().toString();
+        dayStr = dayStr.length > 1 ? dayStr : '0' + dayStr;
+
+        return dayStr + '.' + monthStr + '.' + yearStr;
+    }
+
+    public static isColorDark(colorHexStr: string) {
+        const colorHexNum: number = + ('0x' + colorHexStr.slice(1).replace(colorHexStr.length < 5 && /./g, '$&$&'));
+        // tslint:disable:no-bitwise
+        const r = colorHexNum >> 16;
+        const g = colorHexNum >> 8 & 255;
+        const b = colorHexNum & 255;
+        // tslint:enable:no-bitwise
+
+        // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+        const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+        return (hsp < 127.5);
+    }
 }
 
 
 export class Project {
+    public static readonly docIdKeyStr = 'docId';
     public static readonly identifierKeyStr = 'identifier';
     public static readonly nameKeyStr = 'name';
     public static readonly durationKeyStr = 'duration';
@@ -136,7 +167,17 @@ export class Project {
     public static readonly blockCodeKeyStr = 'blockCode';
     public static readonly finishedKeyStr = 'finished';
     public static readonly folderKeyStr = 'folder';
+    public static readonly createTsKeyStr = 'create_ts';
+    public static readonly createIdKeyStr = 'create_id';
+    public static readonly createNameKeyStr = 'create_name';
+    public static readonly editTsKeyStr = 'edit_ts';
+    public static readonly editIdKeyStr = 'edit_id';
+    public static readonly editNameKeyStr = 'edit_name';
+    public static readonly useTsKeyStr = 'use_ts';
+    public static readonly useIdKeyStr = 'use_id';
+    public static readonly useNameKeyStr = 'use_name';
 
+    public docId: string;
     public identifier: string;
     public name: string;
     public duration: number;
@@ -151,8 +192,18 @@ export class Project {
     public blockCode: string;
     public finished: boolean;
     public folder: string;
+    public createTS: Date;
+    public createId: string;
+    public createName: string;
+    public editTS: Date;
+    public editId: string;
+    public editName: string;
+    public useTS: Date;
+    public useId: string;
+    public useName: string;
 
-    constructor(identifier: string,
+    constructor(docId: string,
+                identifier: string,
                 name: string,
                 duration: number,
                 endless: boolean,
@@ -165,7 +216,17 @@ export class Project {
                 reserved: boolean,
                 blockCode: string,
                 finished: boolean,
-                folder: string) {
+                folder: string,
+                createTS: Date,
+                createId: string,
+                createName: string,
+                editTS: Date,
+                editId: string,
+                editName: string,
+                useTS: Date,
+                useId: string,
+                useName: string) {
+        this.docId = docId;
         this.identifier = identifier;
         this.name = name;
         this.duration = duration;
@@ -180,6 +241,15 @@ export class Project {
         this.blockCode = blockCode;
         this.finished = finished;
         this.folder = folder;
+        this.createTS = createTS;
+        this.createId = createId;
+        this.createName = createName;
+        this.editTS = editTS;
+        this.editId = editId;
+        this.editName = editName;
+        this.useTS = useTS;
+        this.useId = useId;
+        this.useName = useName;
     }
 }
 

@@ -42,11 +42,11 @@ export class NavigatorComponent implements OnInit {
   public logoutClicked() {
     const waitCode = '231263464';
     this.loadingHandler.addWaitCode(waitCode);
-    this.dbi.logOut().then(() => {
-      this.loadingHandler.removeWaitCode(waitCode);
-    }).catch(err => {
-      console.error('Error: 68343354 | ' + err);
-      this.loadingHandler.removeWaitCode(waitCode);
-    });
+    this.dbi.logOut()
+      .then(() => { this.loadingHandler.removeWaitCode(waitCode); })
+      .catch(err => {
+        console.error('Error: 68343354 | ' + err);
+        this.loadingHandler.removeWaitCode(waitCode);
+      });
   }
 }

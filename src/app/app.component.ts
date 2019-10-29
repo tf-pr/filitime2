@@ -10,6 +10,7 @@ import { GlobalDataService } from './services/global-data.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  public isOffline = false;
   private isLoggedIn = false;
   private isLoading = false;
 
@@ -42,7 +43,7 @@ export class AppComponent {
         this.loggedInSetter = value;
       },
       error: err => {
-        console.error('Error: 31351351 | ' + err);
+        console.error('Error: 31351351' + ' | ' + err);
       }
     });
 
@@ -52,5 +53,9 @@ export class AppComponent {
         this.isLoading = value;
       }
     });
+
+    this.isOffline = this.globalData.getIsOffline();
+    this.globalData.isOfflineSateChange.subscribe({ next: val => { this.isOffline = val; console.log(val);
+     } });
   }
 }

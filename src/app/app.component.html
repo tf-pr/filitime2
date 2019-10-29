@@ -1,3 +1,4 @@
 <app-navigator *ngIf="!showLoginForm"></app-navigator>
 <app-login *ngIf="!!showLoginForm"></app-login>
 <app-loading-screen *ngIf="isLoadingGetter"></app-loading-screen>
+<mat-icon *ngIf="!!isOffline" class="isOfflineIcon">cloud_off</mat-icon>

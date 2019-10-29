@@ -36,86 +36,87 @@ export class DbiService {
         this.setIsLoggedInState = value;
       },
       error: err => {
-        console.error('Error: 46843546 | ' + err );
+        console.error('Error: 46843546' + ' | ' + err );
       }
     });
+
+    // HIER => Handler dein dpo selber!
+    // this.fsi.projectListChange.subscribe({
+    //   next: projectList => {
+    //     this.dpo.emptyProjectList();
+    //     projectList.forEach(project => {
+    //       this.dpo.addProject(project);
+    //     });
+    //   }
+    // });
   }
 
   public logIn(email: string, pw: string): Promise<boolean|string> {
     return new Promise<boolean | string>((res, rej) => {
-      this.fsi.logIn(email, pw).then(value => {
-        res(value);
-      }).catch(err => {
-        console.error('Error: 89466354');
-        rej(err);
-      });
+      this.fsi.logIn(email, pw)
+        .then(value => { res(value); })
+        .catch(err => {
+          console.error('Error: 89466354');
+          rej(err);
+        });
     });
   }
 
   public logOut(): Promise<void|string> {
     return new Promise<void | string>((res, rej) => {
-      this.fsi.logOut().then(() => {
-        res();
-      }).catch(err => {
-        console.error('Error: 89466354');
-        rej(err);
-      });
+      this.fsi.logOut()
+        .then(() => { res(); })
+        .catch(err => {
+          console.error('Error: 89466354');
+          rej(err);
+        });
     });
   }
 
-  public addNewProject(projectData: {}): Promise<any> {
-    return new Promise<any>((res, rej) => {
-      this.fsi.addNewProject(projectData).then(val => {
-        console.log('dbi-addNewProject-res');
-        console.log(val);
-        res();
-      }).catch(err => {
-        console.error('Error: 2354131352' + ' | ' + err);
-        rej(err);
-      });
+  public addProjectToDB(identifier: string,
+                        name: string,
+                        duration: number,
+                        endless: boolean,
+                        color: string,
+                        marker: string,
+                        markerColor: string,
+                        note: string,
+                        reserved: boolean,
+                        folder: string): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.fsi.addProjectToDb(identifier, name, duration, endless, color, marker,
+                             markerColor, note, reserved, folder)
+        .then(val => {
+          console.log(val);
+          res();
+        })
+        .catch(err => {
+          console.error('Error: 2354131352' + ' | ' + err);
+          rej(err);
+        });
     });
   }
 
-  public addMultipleProjects(projectDataList: {}[]): Promise<any> {
-    return new Promise<any>((res, rej) => {
-      this.fsi.addMultipleProjects(projectDataList).then(val => {
-        console.log('dbi-addMultipleProject-res');
-        console.log(val);
-        res();
-      }).catch(err => {
-        console.error('Error: 43435453' + ' | ' + err);
-        rej(err);
-      });
-    });
-  }
+  public startSyncProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts', startAt: Date, endBefore: Date) {
+      this.dpo.stopSyncProjects();
 
-  private tempSub: Subscription;
+      const subsTuple = this.fsi.syncQueriedProjects(
+        orderedBy,
+        startAt,
+        endBefore,
+        addedProjects => {
+          console.log('addedProjects');
+          this.dpo.addProjects(addedProjects);
+        },
+        modifiedProjects => {
+          console.log('modifiedProjects');
+          this.dpo.modifyProjects(modifiedProjects);
+        },
+        removedProjects => {
+          console.log('removedProjects');
+          this.dpo.removeProjects(removedProjects);
+        });
 
-  public syncAlLPrOjEcTs() {
-    if (!!this.tempSub) {
-      console.log('this.stopSyncAlLPrOjEcTs();')
-      this.stopSyncAlLPrOjEcTs();
-    }
-
-    console.log('this.tempSub = this.fsi.getAlLPrOjEcTs_Added().subscribe({');
-    this.tempSub = this.fsi.getAlLPrOjEcTs_Added().subscribe({
-      next: val => {
-        console.log('this.dpo.addProjects(val);');
-        console.log('val:');
-        console.log(val);
-        console.log('this.dpo.addProjects(val);');
-        this.dpo.addProjects(val);
-      },
-      error: err => {
-        console.error('JOHN CENA' + ' | ' + err);
-      }
-    });
-  }
-
-  public stopSyncAlLPrOjEcTs() {
-    if (!!this.tempSub) {
-      this.tempSub.unsubscribe();
-      this.tempSub = undefined;
-    }
+      this.dpo.startSyncProjects(subsTuple[0], subsTuple[1], subsTuple[2]);
   }
 }

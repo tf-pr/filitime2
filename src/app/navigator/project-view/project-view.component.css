@@ -24,8 +24,9 @@
     }
 
     .controlPanelButtonLayer {
-        display: inline-block;
-        background: royalblue;
+        /* display: inline-block; */
+        /* background: royalblue; /* color4test */
+        padding: 4px 3px;
     }
 
     .controlPanelHelper {
@@ -84,6 +85,10 @@
     .project-card-header {
     }
 
+    .project-card-subtitle {
+        color: unset;
+    }
+
     .project-card-content {
 
     }
@@ -94,6 +99,23 @@
         margin: 10px;
         max-width: 30%;
         min-width: 300px;
+    }
+
+    .cbidd {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: 400;
+        line-height: 1.42857143;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .textSucheSeinVatter {
+        margin-right: 10px;
+        padding: 4px 7px;
+        background: white;
+        border-radius: 10px;
     }
 }
 

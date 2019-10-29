@@ -33,18 +33,48 @@ export class ProjectViewComponent implements OnInit {
   public currProjectId: string = undefined;
   private projectList: Project[] = [];
 
-  public projectListFnS: Project[] = [];
+  private projectListFiltered: Project[] = [];
+  private projectListSorted: Project[] = [];
+  public projectListPaginated: Project[] = [];
 
   public filterReserved = false;
   public filterZeroTTA = false;
   public filterCompleted = true;
+  public sortBy = 'createdAt';
   public sortDesc = false;
+  private currTextSearch: string;
 
+  private syncProjOrderBy: 'create_ts' | 'edit_ts' | 'use_ts' = 'create_ts';
+  private syncProjStartAt = new Date( Date.now() - 30 * Helper.msPerDay );
+  // private syncProjEndBefore = new Date( Date.now() ); // HIER
+  private syncProjEndBefore = new Date( Date.now() + Helper.msPerDay );
+  public displayProjectOrder: string;
+
+  private currOrderBy: 'name' | 'identifier' | 'createdAt' = 'createdAt';
+  private currOrderDirection: 'asc' | 'desc' = 'asc';
+
+  public disablePaginators = true;
+  public disableBottomPaginator = true;
   public paginatorLength = 0;
-  public paginatorPageSizeOptions: number[] = [5, 10, 25, 100, 200];
-  public paginatorPageSize = this.paginatorPageSizeOptions[1];
+  public paginatorPageSizeOptions: number[] = [5, 10, 25, 50, 100, 200];
+  public paginatorPageSize = this.paginatorPageSizeOptions[3];
   public paginatorPageEvent: PageEvent;
   public paginatorPageIndex = 0;
+
+  public getMostReadableFontColor(bgColor: string): string {
+    const bgIsDark = Helper.isColorDark(bgColor);
+    return bgIsDark ? '#eeeeee' : '#000000';
+  }
+
+  public get textSearch(): string {
+    return this.currTextSearch;
+  }
+
+  public set textSearch(value: string) {
+    if (this.currTextSearch === value) { return; }
+    this.currTextSearch = value;
+    this.textSearchChanged();
+  }
 
   public changeCurrFolder(value: string) {
     const newDeepLinkObj = this.buildDeepLinkObj(value, undefined);
@@ -72,6 +102,56 @@ export class ProjectViewComponent implements OnInit {
     this.router.navigate( ['projects/' + encodedObjStr]);
   }
 
+  public reservedFilterChange() {
+    this.queryProjctList('filter');
+  }
+
+  public zeroFilterChange() {
+    this.queryProjctList('filter');
+  }
+
+  public completedFilterChange() {
+    this.queryProjctList('filter');
+  }
+
+  public textSearchChanged() {
+    this.queryProjctList('filter');
+  }
+
+  public sortDirectionChanged() {
+    const newDirection = this.sortDesc ? 'desc' : 'asc';
+    if ( this.currOrderDirection === newDirection ) { return; }
+    this.currOrderDirection = newDirection;
+    console.log('newDirection: ' + newDirection);
+    this.queryProjctList('sort');
+  }
+
+  public sortChanged() {
+    console.log(this.sortBy);
+    console.log('sort by: ' + this.sortBy);
+    let newSortBy: 'name' | 'identifier' | 'createdAt';
+
+    switch (this.sortBy) {
+      case 'name':
+        newSortBy = 'name';
+        break;
+      case 'identifier':
+        newSortBy = 'identifier';
+        break;
+      case 'createdAt':
+      default:
+        newSortBy = 'createdAt';
+        break;
+    }
+
+    if (this.currOrderBy === newSortBy) {
+      return;
+    }
+
+    this.currOrderBy = newSortBy;
+    this.queryProjctList('sort');
+  }
+
   constructor(private route: ActivatedRoute,
               private router: Router,
               private location: Location,
@@ -86,36 +166,6 @@ export class ProjectViewComponent implements OnInit {
     this.globalData.isLandscapeSateChange.subscribe({ next: val => { this.isLandscape = val; } });
 
     this.initProjectListSubscription();
-  }
-
-  private initProjectListSubscription() {
-    this.projectList = this.dpo.getProjectList();
-    this.filterAndSortProjectList();
-    this.paginatorLength = this.projectList.length;
-    this.dpo.projectListChange.subscribe({
-      next: val => {
-        this.projectList = val;
-        this.filterAndSortProjectList();
-      }
-    });
-  }
-
-  private filterAndSortProjectList() {
-    // filter here
-    // sort here
-
-    // projectIsFilterdIn
-    // debugger
-
-    const filterdList = this.projectList.filter((project) => {
-      return this.projectIsFilterdIn(project);
-    });
-
-    const sliceFrom: number = this.paginatorPageIndex * this.paginatorPageSize;
-    const sliceTo: number = (this.paginatorPageIndex + 1) * this.paginatorPageSize;
-    const slicedList = filterdList.slice( sliceFrom, sliceTo);
-
-    this.projectListFnS = slicedList;
   }
 
   ngOnInit() {
@@ -141,28 +191,129 @@ export class ProjectViewComponent implements OnInit {
         this.currProjectId = undefined;
       }
 
-      this.filterAndSortProjectList();
+      this.queryProjctList('filter');
+    });
+
+    let newDisplayStr = '';
+    switch (this.syncProjOrderBy) {
+      case 'create_ts':
+        newDisplayStr = 'erstellt';
+        break;
+      case 'edit_ts':
+        newDisplayStr = 'verändert';
+        break;
+      case 'use_ts':
+        newDisplayStr = 'benutzt';
+        break;
+    }
+    this.displayProjectOrder =
+      newDisplayStr +
+      ' vom ' +
+      Helper.getEuropeanDateString(this.syncProjStartAt, true) +
+      ' bis ' +
+      Helper.getEuropeanDateString(this.syncProjEndBefore, true);
+
+    this.dbi.startSyncProjects(
+      this.syncProjOrderBy,
+      this.syncProjStartAt,
+      this.syncProjEndBefore);
+  }
+
+  private initProjectListSubscription() {
+    this.projectList = this.dpo.getProjectList();
+    this.queryProjctList('filter');
+
+    this.paginatorLength = this.projectList.length;
+    this.disablePaginators = this.paginatorLength === 0;
+    this.disableBottomPaginator = this.paginatorPageSize <= 5;
+
+    this.dpo.projectListChange.subscribe({
+      next: val => {
+        this.projectList = val;
+        this.queryProjctList('filter');
+      }
     });
   }
 
+  private filterProjectList(projects: Project[]): Project[] {
+    return projects.filter((project) => {
+      return this.projectIsFilterdIn(project);
+    });
+  }
+
+  private projectIsFilterdIn(project: Project): boolean {
+    if (!!this.currTextSearch) {
+      if ((!project.name || !project.name.toUpperCase().includes(this.currTextSearch.toUpperCase())) &&
+          (!project.identifier || !project.identifier.toUpperCase().includes(this.currTextSearch.toUpperCase())) &&
+          (!project.note || !project.note.toUpperCase().includes(this.currTextSearch.toUpperCase()))) {
+        return false;
+      }
+    }
+
+    if (      !!this.currFolder && project.folder !== this.currFolder)        { return false; }
+    if (   !!this.currProjectId && project.identifier !== this.currProjectId) { return false; }
+    if ( !!this.filterCompleted && project.finished === false)                { return false; }
+    if (  !!this.filterReserved && project.reserved === false)                { return false; }
+    if (   !!this.filterZeroTTA && project.timeToAllocate === 0)              { return false; }
+    return true;
+  }
+
+  private sortProjectList(projects: Project[]): Project[] {
+    const newProjects =  projects.slice(0);
+    newProjects.sort((a, b ) => {
+      switch (this.currOrderBy) {
+        case 'identifier':
+            return (a.identifier.toUpperCase() > b.identifier.toUpperCase()) ? 1 :
+              (a.identifier.toUpperCase() < b.identifier.toUpperCase()) ? -1 : 0;
+        case 'name':
+          return (a.name.toUpperCase() > b.name.toUpperCase()) ? 1 :
+            (a.name.toUpperCase() < b.name.toUpperCase()) ? -1 : 0;
+        case 'createdAt':
+        default:
+            return (a.createTS > b.createTS) ? 1 :
+              (a.createTS < b.createTS) ? -1 : 0;
+      }
+    });
+
+    return ( this.currOrderDirection === 'desc' ) ? newProjects.reverse() : newProjects;
+  }
+
+  private paginateProjectList(projects: Project[]): Project[] {
+    const sliceFrom: number = this.paginatorPageIndex * this.paginatorPageSize;
+    const sliceTo: number = (this.paginatorPageIndex + 1) * this.paginatorPageSize;
+    return projects.slice( sliceFrom, sliceTo);
+  }
+
+  public queryProjctList(queryTyp: 'filter' | 'sort' | 'paginate') {
+    const oldLength = this.projectListFiltered.length;
+    switch (queryTyp) {
+      case 'filter':
+        this.projectListFiltered = this.filterProjectList(this.projectList);
+      // tslint:disable-next-line:no-switch-case-fall-through
+      case 'sort':
+        this.projectListSorted = this.sortProjectList(this.projectListFiltered);
+      // tslint:disable-next-line:no-switch-case-fall-through
+      case 'paginate':
+        this.projectListPaginated = this.paginateProjectList(this.projectListSorted);
+        if ( this.projectListFiltered.length !== oldLength ) {
+          this.paginatorLength = this.projectListFiltered.length;
+          this.disablePaginators = this.paginatorLength === 0;
+        }
+    }
+  }
+
   public paginatorChanged(event) {
+    console.log('paginatorChanged');
+    console.log(this.paginatorPageEvent);
+
     this.paginatorPageEvent = event;
     this.paginatorPageIndex = event.pageIndex;
     this.paginatorPageSize = event.pageSize;
 
-    this.filterAndSortProjectList();
-  }
+    this.disablePaginators = this.paginatorLength === 0;
+    this.disableBottomPaginator = this.paginatorPageSize <= 5;
 
-  private projectIsFilterdIn(project: Project): boolean {
-    if (!this.currFolder && !this.currProjectId) {
-      return true;
-    }
-
-    if (!!this.currProjectId) {
-      return project.identifier === this.currProjectId;
-    }
-
-    return project.folder === this.currFolder;
+    this.queryProjctList('paginate');
   }
 
   private buildDeepLinkObj(folder: string, projectId: string): {} {
@@ -197,62 +348,45 @@ export class ProjectViewComponent implements OnInit {
   }
 
   public addProjectButtonClicked() {
-    // const dialog = this.dialog.open(CreateProjectDialogComponent, {
-    //   width: '250px',
-    //   data: {
-    //     folder: this.currFolder,
-    //     reserved: this.filterReserved,
-    //   }
-    // });
+    const data = {};
+    if (!!this.currFolder) { data[Project.folderKeyStr] = this.currFolder; }
+    if (!!this.filterReserved) { data[Project.reservedKeyStr] = this.filterReserved; }
 
-    // dialog.afterClosed().subscribe(result => {
-    //   console.log(result);
-    // });
-
-
-
-    // const randomProjectData = this.buildRandomProjectData();
-    // console.log(randomProjectData);
-    // this.dbi.addNewProject(randomProjectData).then(val => {
-    //   console.log('addNewProject');
-    //   console.log(val);
-    // }).catch(err => {
-    //   console.error('Error: 51351351' + ' | ' + err);
-    // });
-
-
-    const projectDataList: {}[] = [];
-
-    for (let i = 0; i < 500; i++) {
-      projectDataList.push(this.buildRandomProjectData());
-    }
-    this.dbi.addMultipleProjects(projectDataList);
-
-    /*
-    const projectData = {
-      identifier: '91312365',
-      name: 'Achtelstraße 8H',
-      duration: 9180,
-      endless: false,
-      timeToAllocate: 0,
-      isConflicted: false,
-      color: '#cce3b9',
-      marker: null,
-      markerColor: null,
-      note: '*insert link here*',
-      reserved: false,
-      // blockCode: undefined,
-      finished: false,
-      folder: 'Ordner1'
-    };
-
-    this.dbi.addNewProject(projectData).then(val => {
-      console.log('addNewProject');
-      console.log(val);
-    }).catch(err => {
-      console.error('Error: 51351351' + ' | ' + err);
+    const dialog = this.dialog.open(CreateProjectDialogComponent, {
+      width: '250px',
+      data
     });
-    */
+
+    dialog.afterClosed().subscribe(result => {
+      if (!result) {
+        console.warn('Ok ciao...');
+        return;
+      }
+      console.log( 'pls add this to the db... ok... thx' );
+      console.log(result);
+      const projIdentifier = result[Project.identifierKeyStr];
+      const projName = result[Project.nameKeyStr];
+      const projDuration = result[Project.durationKeyStr];
+      const projEndless = result[Project.endlessKeyStr];
+      const projColor = result[Project.colorKeyStr];
+      const projMarker = result[Project.markerKeyStr];
+      const projMarkerColor = result[Project.markerColorKeyStr];
+      const projNote = result[Project.noteKeyStr];
+      const projReserved = result[Project.reservedKeyStr];
+      const projFolder = result[Project.folderKeyStr];
+
+      if (!projName || !projIdentifier || ( !projDuration && !projEndless ) ) {
+        return;
+      }
+
+      this.dbi.addProjectToDB(projIdentifier, projName, projDuration, projEndless, projColor, projMarker,
+                             projMarkerColor, projNote, projReserved, projFolder)
+        .then(() => { console.warn('throw a toast'); })
+        .catch(err => {
+          console.error('Error: 31436414' + ' | ' + err);
+          console.warn('throw a toast');
+        });
+    });
   }
 
   private buildRandomProjectData(): {} {
@@ -340,7 +474,8 @@ export class ProjectViewComponent implements OnInit {
         'Heinemann',
         'Heinemann Putz',
         'Hellmiß',
-        'Helzle'];
+        'Helzle'
+      ];
     const noteList = [
       // tslint:disable-next-line:max-line-length
       'Epplestr. Praxis Kögel Fliesen https://malergiese-my.sharepoint.com/:f:/g/personal/info_malergiese_onmicrosoft_com/EvMAdCWUvsVJnaO9rAsf_CABecrxy5ID-c54DmgRD7EgOw?e=kU8grD ',
@@ -581,19 +716,8 @@ export class ProjectViewComponent implements OnInit {
       reserved: randomBoolean3,
       // blockCode: undefined,
       finished: randomBoolean4,
-      folder: randomFolder
+      folder: randomFolder,
     };
-  }
-
-  public async syncProjects() {
-    console.log('this.dbi.syncAlLPrOjEcTs');
-    this.dbi.syncAlLPrOjEcTs();
-
-    console.log('await delay(3000)');
-    await delay(3000);
-
-    console.log('initProjectListSubscription()');
-    this.initProjectListSubscription();
   }
 }
 
@@ -602,11 +726,29 @@ export class ProjectViewComponent implements OnInit {
   templateUrl: 'create-project-dialog.html',
 })
 export class CreateProjectDialogComponent {
-  public readonly projectNameStrKey = 'projName';
-  public readonly projectColorStrKey = 'projColor';
+  public projIdentifierKeyStr = Project.identifierKeyStr;
+  public projNameKeyStr = Project.nameKeyStr;
+  public projDurationKeyStr = Project.durationKeyStr;
+  public projEndlessKeyStr = Project.endlessKeyStr;
+  public projColorKeyStr = Project.colorKeyStr;
+  public projMarkerKeyStr = Project.markerKeyStr;
+  public projMarkerColorKeyStr = Project.markerColorKeyStr;
+  public projNoteKeyStr = Project.noteKeyStr;
+  public projReservedKeyStr = Project.reservedKeyStr;
+  public projFolderKeyStr = Project.folderKeyStr;
 
   constructor(public dialogRef: MatDialogRef<CreateProjectDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: DialogData) {
+    data[this.projNameKeyStr] = '';
+    data[this.projIdentifierKeyStr] = '';
+    data[this.projEndlessKeyStr] = false;
+    data[this.projDurationKeyStr] = undefined;
+    data[this.projColorKeyStr] = '#ff0000';
+    data[this.projMarkerKeyStr] = '';
+    data[this.projMarkerColorKeyStr] = '#00ff00';
+    data[this.projNoteKeyStr] = '';
+    data[this.projReservedKeyStr] = false;
+    data[this.projFolderKeyStr] = '';
   }
 
   onNoClick(): void {

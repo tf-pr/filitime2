@@ -99,6 +99,8 @@
         margin: 10px;
         max-width: 30%;
         min-width: 300px;
+        /* animation: wobble-hor-bottom 0.4s both; */
+        /* animation: fade-out 1s ease-out both; */
     }
 
     .cbidd {
@@ -116,6 +118,30 @@
         padding: 4px 7px;
         background: white;
         border-radius: 10px;
+    }
+
+    @keyframes wobble-hor-bottom {
+        20% {
+            transform: rotate(-1deg);
+        }
+        40% {
+            transform: rotate(1deg);
+        }
+        60% {
+            transform: rotate(-1deg);
+        }
+        80% {
+            transform: rotate(1deg);
+        }
+    }
+
+    @keyframes fade-out {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
     }
 }
 

@@ -61,6 +61,8 @@ export class ProjectViewComponent implements OnInit {
   public paginatorPageEvent: PageEvent;
   public paginatorPageIndex = 0;
 
+  public projectIdsToDelete: string[] = [];
+
   public getMostReadableFontColor(bgColor: string): string {
     const bgIsDark = Helper.isColorDark(bgColor);
     return bgIsDark ? '#eeeeee' : '#000000';
@@ -219,18 +221,58 @@ export class ProjectViewComponent implements OnInit {
       this.syncProjEndBefore);
   }
 
+  public isDeleting(projectDocId: string) {
+    return this.projectIdsToDelete.indexOf(projectDocId) !== -1;
+  }
+
   private initProjectListSubscription() {
-    this.projectList = this.dpo.getProjectList();
-    this.queryProjctList('filter');
+    // this.projectList = this.dpo.getProjectList();
+    // this.queryProjctList('filter');
 
-    this.paginatorLength = this.projectList.length;
-    this.disablePaginators = this.paginatorLength === 0;
-    this.disableBottomPaginator = this.paginatorPageSize <= 5;
+    // this.paginatorLength = this.projectList.length;
+    // this.disablePaginators = this.paginatorLength === 0;
+    // this.disableBottomPaginator = this.paginatorPageSize <= 5;
 
-    this.dpo.projectListChange.subscribe({
+    this.dpo.projectAdd.subscribe({
       next: val => {
-        this.projectList = val;
+        const project = val[0];
+        this.projectList.push(project);
         this.queryProjctList('filter');
+      }
+    });
+
+    this.dpo.projectModify.subscribe({
+      next: val => {
+        const project = val[0];
+        console.log('mod me:');
+        console.log(project);
+        for (let i = 0; i < this.projectList.length; i++) {
+          if (this.projectList[i].docId === project.docId) {
+            this.projectList[i] = project;
+            // this.projectList.splice(i, 1, project);
+            console.log('chaged!');
+            this.queryProjctList('filter');
+            break;
+          }
+        }
+      }
+    });
+
+    this.dpo.projectRemove.subscribe({
+      next: val => {
+        const project = val[0];
+        this.projectIdsToDelete.push( project.docId );
+        setTimeout(() => {
+          for (let i = 0; i < this.projectList.length; i++) {
+            if (this.projectList[i].docId === project.docId) {
+              this.projectList.splice(i, 1);
+              this.queryProjctList('filter');
+              break;
+            }
+          }
+          const i2 = this.projectIdsToDelete.indexOf(project.docId);
+          this.projectIdsToDelete.splice(i2, 1);
+        }, 800);
       }
     });
   }

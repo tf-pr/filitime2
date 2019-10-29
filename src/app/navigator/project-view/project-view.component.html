@@ -85,7 +85,7 @@
                     (page)="paginatorChanged($event)">
                 </mat-paginator>
                 <ng-container *ngFor="let project of projectListPaginated">
-                    <mat-card class="project-card" [style.color]="getMostReadableFontColor(project.color)"
+                    <mat-card class="project-card" [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'" [style.color]="getMostReadableFontColor(project.color)"
                         [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'">
                         <mat-card-header class="project-card-header">
                             <mat-card-title>{{project.name}}</mat-card-title>

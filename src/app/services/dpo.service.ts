@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Project } from '../helper';
+import { Project, Employee } from '../helper';
 import { Observable, Subscription } from 'rxjs';
 
 @Injectable({
@@ -33,12 +33,13 @@ export class DpoService {
     //
   }
 
-  public get usersEmployeeId(): string {
-    return '1YUxaezJagyTIL1AUmB8'; // HIER
-  }
-
-  public get usersEmployeeName(): string {
-    return 'Chef'; // HIER
+  /**
+   * do not use this
+   */
+  public reset() {
+    this.stopSyncProjects();
+    this.projectList = [];
+    this.projectIdList = [];
   }
 
   //#region projectView getter&setter
@@ -46,6 +47,12 @@ export class DpoService {
   public getProjectList(): Project[] {
     return this.projectList;
   }
+
+  //#endregion
+
+  //#region profileView methods
+
+
 
   //#endregion
 

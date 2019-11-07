@@ -2,7 +2,7 @@ import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { FsiService } from './fsi.service';
 import { Observable, Subscription } from 'rxjs';
-import { Helper, Project } from '../helper';
+import { Helper, Project, Employee } from '../helper';
 import { DpoService } from './dpo.service';
 
 
@@ -14,13 +14,35 @@ export class DbiService {
   private isLoggedInEmitter = new EventEmitter<boolean>();
   public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
+  private usersEmployee;
+  private usersEmployeeEmitter = new EventEmitter<Employee>();
+  public usersEmployeeChange: Observable<Employee> = this.usersEmployeeEmitter.asObservable();
+
   public getLoggedInState(): boolean {
     return this.isLoggedIn;
+  }
+
+  public getUsersEMail(): string {
+    return this.fsi.email;
+  }
+
+  public getUsersEmployee(): Employee {
+    return this.usersEmployee;
   }
 
   private set setIsLoggedInState(value: boolean) {
     this.isLoggedIn = value;
     this.isLoggedInEmitter.emit(this.isLoggedIn);
+  }
+
+  private set setUsersEmployee(employee: Employee) {
+    if (Employee.employeesAreEqual(this.usersEmployee, employee)) { return; }
+    this.usersEmployee = employee;
+
+    console.warn(3135135211);
+    console.warn(this.usersEmployee);
+
+    this.usersEmployeeEmitter.emit(this.usersEmployee);
   }
 
   constructor(private fsi: FsiService,
@@ -40,15 +62,14 @@ export class DbiService {
       }
     });
 
-    // HIER => Handler dein dpo selber!
-    // this.fsi.projectListChange.subscribe({
-    //   next: projectList => {
-    //     this.dpo.emptyProjectList();
-    //     projectList.forEach(project => {
-    //       this.dpo.addProject(project);
-    //     });
-    //   }
-    // });
+    this.setUsersEmployee = fsi.getUsersEmployee();
+    fsi.usersEmployeeChange.subscribe({
+      next: val => {
+        this.setUsersEmployee = val;
+        console.warn(5343514354110);
+        console.warn(this.usersEmployee);
+      }
+    });
   }
 
   public logIn(email: string, pw: string): Promise<boolean|string> {
@@ -65,12 +86,20 @@ export class DbiService {
   public logOut(): Promise<void|string> {
     return new Promise<void | string>((res, rej) => {
       this.fsi.logOut()
-        .then(() => { res(); })
+        .then(() => {
+          this.reset();
+          res();
+        })
         .catch(err => {
           console.error('Error: 89466354');
           rej(err);
         });
     });
+  }
+
+  private reset() {
+    this.isLoggedIn = false;
+    this.dpo.reset();
   }
 
   public addProjectToDB(identifier: string,

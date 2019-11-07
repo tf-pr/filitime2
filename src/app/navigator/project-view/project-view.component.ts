@@ -221,6 +221,51 @@ export class ProjectViewComponent implements OnInit {
       this.syncProjEndBefore);
   }
 
+  //#region HIER
+
+  private setAnimationState(pdId: string, aniState: 'addAni' | 'changeAni' | 'removedAni' | 'noAni') {
+    /* THIS */
+
+    // const i = getIndexOfProject( pdId );
+    // this.projectAniList[i] = aniState;
+
+    // if (aniState === 'noAni') { return; }
+
+    // setTimeout( () => {
+    //   this.projectAniList[i] = 'noAni';
+    // }, 1000 );
+
+    /* OR THAT */
+
+    // const i = getIndexOfProject( pdId );
+    // if ( this.projectAniList[i] !== aniState || aniState === 'noAni' ) {
+    //   this.projectAniList[i] = aniState;
+    // } else {
+    //   this.projectAniList[i] = 'noAni';
+    //   setTimeout(() => {
+    //     this.projectAniList[i] = aniState;
+    //   }, 100);
+    // }
+  }
+
+  public getAnimationState(porjDocId: string) {
+    // const i = getIndexOfProject( pdId );
+    // const aniState = this.projectAniList[i];
+    // switch (this.projectAniList[i]) {
+    //   case 'addAni':
+    //     return '';
+    //   case 'changeAni':
+    //     return '';
+    //   case 'removedAni':
+    //     return '';
+    //   case 'noAni':
+    //   default:
+    //     return 'unset' or 'none' kp...;
+    // }
+  }
+
+  //#endregion
+
   public isDeleting(projectDocId: string) {
     return this.projectIdsToDelete.indexOf(projectDocId) !== -1;
   }

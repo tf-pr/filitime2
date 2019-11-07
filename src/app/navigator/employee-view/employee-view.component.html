@@ -1,6 +1,120 @@
 <ng-container *ngIf="!isMobile">
     <div class="employeeViewBG">
-        <p>employee-view works on desk!</p>
+        <mat-card class="employee-folder-card">
+            <mat-card-content class="employee-folder-card-content">
+                <div class="controlPanel">
+                    <div class="controlPanelButtonLayer">
+                        <mat-form-field class="textSucheSeinVatter"><input matInput [(ngModel)]="textSearch"
+                                placeholder="Textsuche"></mat-form-field>
+                        <div class="btn-group" dropdown [insideClick]="true">
+                            <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                                Filtern <span class="caret"></span>
+                            </button>
+                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <!-- HIER -->
+                                <!-- <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
+                                        <span style="font-weight: normal">unter Vorbehalt</span>
+                                    </mat-checkbox>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
+                                        <span style="font-weight: normal">Planbedarf</span>
+                                    </mat-checkbox>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted"
+                                        (change)="completedFilterChange()">
+                                        <span style="font-weight: normal">Beendet</span>
+                                    </mat-checkbox>
+                                </li> -->
+                            </ul>
+                        </div>
+                        <div class="btn-group" dropdown [insideClick]="true">
+                            <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                                Sortieren <span class="caret"></span>
+                            </button>
+                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <mat-radio-group [(ngModel)]="sortBy" (change)="sortChanged()">
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'name'">
+                                            <span style="font-weight: normal">alphabtisch</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'createdAt'">
+                                            <span style="font-weight: normal">chronologisch</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'identifier'">
+                                            <span style="font-weight: normal">nach Identifikator</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'dept'">
+                                            <span style="font-weight: normal">nach Abteilung</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'group'">
+                                            <span style="font-weight: normal">nach Gruppe</span>
+                                        </mat-radio-button>
+                                    </li>
+                                </mat-radio-group>
+                                <li class="divider dropdown-divider"></li>
+                                <mat-radio-group [(ngModel)]="sortDesc" (change)="sortDirectionChanged()">
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="false">
+                                            <span style="font-weight: normal">aufsteigend</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="true">
+                                            <span style="font-weight: normal">absteigend</span>
+                                        </mat-radio-button>
+                                    </li>
+                                </mat-radio-group>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="controlPanelButtonLayer">
+                        <button mat-raised-button color="primary" (click)="addEmployeeButtonClicked()">
+                            <mat-icon>add_circle_outline</mat-icon>Mitarbeiter hinzufügen
+                        </button>
+                    </div>
+                </div>
+                <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                    [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                    (page)="paginatorChanged($event)">
+                </mat-paginator>
+                <ng-container *ngFor="let employee of employeeListPaginated">
+                        <mat-card class="employee-card" [style.color]="getMostReadableFontColor(employee.deptColor)"
+                        [style.background]="'linear-gradient(45deg, ' + employee.deptColor + ' 84%, ' + (!!employee.groupColor?employee.groupColor:employee.deptColor) + ' 0)'">
+                        <mat-card-header class="project-card-header">
+                            <mat-card-title>{{project.name}}</mat-card-title>
+                            <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
+                        </mat-card-header>
+                        <mat-divider></mat-divider><br>
+                        <mat-card-content>
+                            <span>HIER</span>
+                            <span>MA Daten</span>
+
+
+                        </mat-card-content>
+                        <mat-card-actions>
+                            <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                        </mat-card-actions>
+                    </mat-card>
+
+
+                </ng-container>
+                <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                    [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                    (page)="paginatorChanged($event)">
+                </mat-paginator>
+            </mat-card-content>
+        </mat-card>
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">

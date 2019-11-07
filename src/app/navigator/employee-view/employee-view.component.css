@@ -6,6 +6,135 @@
         height: 100%;
         /* background: linear-gradient(164deg, steelblue, skyblue); /* color4test */
     }
+
+    .controlPanel {
+        background: lightblue;
+        width: 100%;
+        min-height: 50px;
+        border-radius: 4px;
+        padding: 6px;
+    }
+
+    .controlPanelButtonLayer {
+        /* display: inline-block; */
+        /* background: royalblue; /* color4test */
+        padding: 4px 3px;
+    }
+
+    .controlPanelHelper {
+        display: inline-block;
+        background:saddlebrown;
+        width: 100%;
+    }
+
+    .controlPanelFilterLayer {
+        display: inline-block;
+        vertical-align: top;
+        background: seagreen;
+        min-width: 600px;
+        height: 50px;
+    }
+
+    .controlPanelLineIconLayer {
+        vertical-align: top;
+        text-align: center;
+        width: 130px;
+        height: 50px;
+        line-height: 50px;
+        display: inline-block;
+        background: chocolate;
+    }
+
+    .controlPanelLineIcon {
+        vertical-align: middle;
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .controlPanelLineIconLabel {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .contentLayer {
+        width: calc( 100% - 130px );
+        vertical-align: top;
+        height: 50px;
+        display: inline-block;
+        background: darkviolet;
+    }
+
+    .controlPanelLine {
+        display: inline-block;
+        vertical-align: top;
+        background: violet;
+        min-width: 600px;
+        max-width: 100%;
+        height: 50px;
+    }
+    
+    .employee-card-header {
+    }
+
+    .employee-card-subtitle {
+        color: unset;
+    }
+
+    .employee-card-content {
+
+    }
+
+    .employee-card {
+        display: inline-block;
+        vertical-align: top;
+        margin: 10px;
+        max-width: 30%;
+        min-width: 300px;
+        /* animation: wobble-hor-bottom 0.4s both; */
+        /* animation: fade-out 1s ease-out both; */
+    }
+
+    .cbidd {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: 400;
+        line-height: 1.42857143;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .textSucheSeinVatter {
+        margin-right: 10px;
+        padding: 4px 7px;
+        background: white;
+        border-radius: 10px;
+    }
+
+    @keyframes wobble-hor-bottom {
+        20% {
+            transform: rotate(-1deg);
+        }
+        40% {
+            transform: rotate(1deg);
+        }
+        60% {
+            transform: rotate(-1deg);
+        }
+        80% {
+            transform: rotate(1deg);
+        }
+    }
+
+    @keyframes fade-out {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+    }
 }
 
 /* smartphone in portrait */

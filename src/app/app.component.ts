@@ -3,6 +3,7 @@ import { DbiService } from './services/dbi.service';
 import { Helper } from './helper';
 import { LoadingHandlerService } from './services/loading-handler.service';
 import { GlobalDataService } from './services/global-data.service';
+import { TesterService } from './services/tester.service';
 
 @Component({
   selector: 'app-root',
@@ -32,7 +33,10 @@ export class AppComponent {
     this.globalData.setDeviceScreenVar(target.innerWidth, target.innerHeight);
   }
 
-  constructor(private globalData: GlobalDataService, private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
+  constructor(private testerService: TesterService,
+              private globalData: GlobalDataService,
+              private dbi: DbiService,
+              private loadingHandler: LoadingHandlerService) {
     this.loggedInSetter = dbi.getLoggedInState();
     dbi.loggedInStateChange.subscribe({
       next: value => {
@@ -55,7 +59,13 @@ export class AppComponent {
     });
 
     this.isOffline = this.globalData.getIsOffline();
-    this.globalData.isOfflineSateChange.subscribe({ next: val => { this.isOffline = val; console.log(val);
-     } });
+    this.globalData.isOfflineSateChange.subscribe({
+      next: val => {
+        this.isOffline = val;
+        if ( val === true )  { console.log('u r on the line!'); }
+        if ( val === false ) { console.log('u r off the line!'); }
+        if ( val !== true && val !== false ) { console.log('ur line is broken!'); }
+      }
+    });
   }
 }

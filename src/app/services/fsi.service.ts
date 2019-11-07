@@ -1,17 +1,24 @@
 import { Injectable, EventEmitter, Output, NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { Helper, Project } from '../helper';
+import { Helper, Project, Employee } from '../helper';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, Action, DocumentSnapshot } from '@angular/fire/firestore';
 import { Timestamp } from '@firebase/firestore-types';
 import * as firebase from 'firebase/app';
 import { DpoService } from './dpo.service';
+import { async } from 'q';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FsiService {
+  private readonly usersColKeyStr = 'uesrs';
+  private readonly userDocClientIdKeyStr = 'clientId';
+  private readonly userDocEmailKeyStr = 'email';
+  private readonly userDocEmployeeIdKeyStr = 'employeeId';
+  private readonly userDocUidIdKeyStr = 'uid';
   private readonly clientDataColKeyStr = 'clientData';
+  private readonly employeesColKeyStr = 'employees';
   private readonly projectsColKeyStr = 'projects';
   private readonly docIdKeyStr = 'docId';
 
@@ -19,21 +26,23 @@ export class FsiService {
   private isLoggedInEmitter = new EventEmitter<boolean>();
   public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
 
-  private isOffline = false;
-  private isOfflineEmitter = new EventEmitter<boolean>();
-  public isOfflineStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+  private usersUserId: string;
+  private usersEmail: string;
+  private usersClientId: string;
+  private usersEmployeeId: string;
 
-  private clientId = 'imCvgvkLoPiori2KptQo'; // private clientId: string;
+  private usersEmployee: Employee;
+  private usersEmployeeSub: Subscription;
+  private usersEmployeeEmitter = new EventEmitter<Employee>();
+  public usersEmployeeChange: Observable<Employee> = this.usersEmployeeEmitter.asObservable();
 
-  private firstProjInNameOrderSub: Subscription;
-  private firstProjInNameOrder: Project;
-  private firstProjInNameOrderEmitter = new EventEmitter<boolean>();
-  public firstProjInNameOrderStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+  private usersEmployeeName: string;
+  private usersEmployeeNameEmitter = new EventEmitter<string>();
+  public usersEmployeeNameChange: Observable<string> = this.usersEmployeeNameEmitter.asObservable();
 
-  private lastProjInNameOrderSub: Subscription;
-  private lastProjInNameOrder: Project;
-  private lastProjInNameOrderEmitter = new EventEmitter<boolean>();
-  public lastProjInNameOrderStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
+  public get email(): string {
+    return this.usersEmail;
+  }
 
   private static convertDBObjToProject(projectDbObj: {}): Project {
     let returnValue: Project;
@@ -72,6 +81,35 @@ export class FsiService {
     return returnValue;
   }
 
+  private static convertDBObjToEmployee(employeeDbObj: {}): Employee {
+    let returnValue: Employee;
+    try {
+      returnValue = new Employee(
+        employeeDbObj[Employee.docIdKeyStr],
+        employeeDbObj[Employee.identifierKeyStr],
+        employeeDbObj[Employee.nameKeyStr],
+        employeeDbObj[Employee.deptKeyStr],
+        employeeDbObj[Employee.deptColorKeyStr],
+        employeeDbObj[Employee.groupKeyStr],
+        employeeDbObj[Employee.groupColorKeyStr],
+        employeeDbObj[Employee.userKeyStr],
+        employeeDbObj[Employee.schedulerKeyStr],
+        employeeDbObj[Employee.selfEditKeyStr],
+        employeeDbObj[Employee.createTSKeyStr],
+        employeeDbObj[Employee.createIdKeyStr],
+        employeeDbObj[Employee.createNameKeyStr],
+        employeeDbObj[Employee.editTSKeyStr],
+        employeeDbObj[Employee.editIdKeyStr],
+        employeeDbObj[Employee.editNameKeyStr]
+      );
+    } catch (error) {
+      console.error('Error: 45165445' + ' | ' + error);
+      returnValue = undefined;
+    }
+
+    return returnValue;
+  }
+
   private static generatePushId(): string {
     let pushId = '';
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -87,16 +125,8 @@ export class FsiService {
     return this.isLoggedIn;
   }
 
-  public getIsOfflineInState() {
-    return this.isOffline;
-  }
-
-  public getFirstProjInNameOrderEmitter() {
-    return this.firstProjInNameOrderEmitter;
-  }
-
-  public getLastProjInNameOrderEmitter() {
-    return this.lastProjInNameOrderEmitter;
+  public getUsersEmployee(): Employee {
+    return this.usersEmployee;
   }
 
   private set setIsLoggedInState(value: boolean) {
@@ -105,10 +135,18 @@ export class FsiService {
     this.isLoggedInEmitter.emit(this.isLoggedIn);
   }
 
-  private set setIsOfflineInState(value: boolean) {
-    if (this.isOffline === value) { return; }
-    this.isOffline = value;
-    this.isOfflineEmitter.emit(this.isOffline);
+  private set setUsersEmployee(employee: Employee) {
+    if (Employee.employeesAreEqual(this.usersEmployee, employee)) { return; }
+    this.usersEmployee = employee;
+    this.usersEmployeeEmitter.emit(this.usersEmployee);
+    console.warn(213131152);
+    console.warn(this.usersEmployee);
+  }
+
+  private set setUsersEmployeeName(employeeName: string) {
+    if (this.usersEmployeeName === employeeName) { return; }
+    this.usersEmployeeName = employeeName;
+    this.usersEmployeeNameEmitter.emit(this.usersEmployeeName);
   }
 
   constructor(private dpo: DpoService,
@@ -118,9 +156,32 @@ export class FsiService {
     angFireAuth.auth.onAuthStateChanged(user => {
       console.log(user);
       if (!!user) {
-        this.zone.run(() => { this.setIsLoggedInState = true; });
+        this.zone.run(() => {
+          this.usersUserId = user.uid;
+          this.usersEmail = user.email;
+          console.log('userId: ' + this.usersUserId);
+          console.log('email: ' + this.email);
+          this.getUserData()
+            .then(() => {
+              this.setIsLoggedInState = true;
+            })
+            .catch(err => {
+              console.error('Error: 16473834' + ' | ' + err);
+              this.setIsLoggedInState = false;
+            });
+        });
       }
     });
+  }
+
+  private reset() {
+    this.stopSyncUserEmployeeProfile();
+    this.usersUserId = undefined;
+    this.usersEmail = undefined;
+    this.usersClientId = undefined;
+    this.usersEmployeeId = undefined;
+    this.usersEmployee = undefined;
+    this.usersEmployeeName = undefined;
   }
 
   public logIn(email: string, pw: string): Promise<boolean|string> {
@@ -137,8 +198,19 @@ export class FsiService {
       this.angFireAuth.auth.signInWithEmailAndPassword(email, pw)
         .then(auth => {
           if (auth) {
-            this.setIsLoggedInState = true;
-            res(true);
+            console.log(auth);
+            this.usersUserId = auth.user.uid;   console.log('userId: ' + this.usersUserId);
+            this.usersEmail = auth.user.email;  console.log('email: ' + this.email);
+
+            this.getUserData()
+              .then(() => {
+                this.setIsLoggedInState = true;
+                res(true);
+              })
+              .catch(err => {
+                this.setIsLoggedInState = false;
+                rej(err);
+              });
           } else {
             this.setIsLoggedInState = false;
             rej('????');
@@ -172,6 +244,7 @@ export class FsiService {
       this.angFireAuth.auth.signOut()
         .then(() => {
           this.setIsLoggedInState = false;
+          this.reset();
           res();
         })
         .catch(err => {
@@ -182,18 +255,58 @@ export class FsiService {
     });
   }
 
+  private getUserData(): Promise<any> {
+    return new Promise<any>((res, rej) => {
+      const userDocPath = this.buildUserDocPath();
+      this.getDocDataFromDbAtDocPath(userDocPath)
+        .then(userDocData => {
+          const clientId = userDocData[this.userDocClientIdKeyStr];
+          const employeeId = userDocData[this.userDocEmployeeIdKeyStr];
+
+          if ( !clientId || !employeeId ) {
+            console.error('FATALERROR:438');
+            rej('userdoc data invalid');
+            return;
+          }
+
+          this.usersClientId = clientId;
+          this.usersEmployeeId = employeeId;
+          console.log('ClientId: ' + this.usersClientId);
+          console.log('EmployeeId: ' + this.usersEmployeeId);
+          this.startSyncUserEmployeeProfile();
+          res();
+        })
+        .catch(err => {
+          console.error('Error: 14647313');
+          rej(err);
+        });
+    });
+  }
+
+  private buildUserDocPath(): string {
+    return this.usersColKeyStr + '/' + this.usersUserId;
+  }
+
+  private buildEmployeeDocPath( employeeId: string ): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.employeesColKeyStr + '/' + employeeId;
+  }
+
+  private buildEmployeeColPath(): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.employeesColKeyStr;
+  }
+
   private buildProjectDocPath( projectId: string ): string {
-    return this.clientDataColKeyStr + '/' + this.clientId + '/' + this.projectsColKeyStr + '/' + projectId;
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.projectsColKeyStr + '/' + projectId;
   }
 
   private buildProjectsColPath(): string {
-    return this.clientDataColKeyStr + '/' + this.clientId + '/' + this.projectsColKeyStr;
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.projectsColKeyStr;
   }
 
   private addCreateDataToDbObj(dbObj: {}, docId?: string): string {
     dbObj[Project.createTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
-    dbObj[Project.createIdKeyStr] = this.dpo.usersEmployeeId;
-    dbObj[Project.createNameKeyStr] = this.dpo.usersEmployeeName;
+    dbObj[Project.createIdKeyStr] = this.usersEmployeeId;
+    dbObj[Project.createNameKeyStr] = this.usersEmployeeName;
 
     if ( !docId ) { docId = FsiService.generatePushId(); }
     dbObj[this.docIdKeyStr] = docId;
@@ -203,14 +316,14 @@ export class FsiService {
 
   private addChangeDataToDbObj(dbObj: {}): void {
     dbObj[Project.editTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
-    dbObj[Project.editIdKeyStr] = this.dpo.usersEmployeeId;
-    dbObj[Project.editNameKeyStr] = this.dpo.usersEmployeeName;
+    dbObj[Project.editIdKeyStr] = this.usersEmployeeId;
+    dbObj[Project.editNameKeyStr] = this.usersEmployeeName;
   }
 
   private addUseInfoToDbObj(dbObj: {}): void {
     dbObj[Project.useTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
-    dbObj[Project.useIdKeyStr] = this.dpo.usersEmployeeId;
-    dbObj[Project.useNameKeyStr] = this.dpo.usersEmployeeName;
+    dbObj[Project.useIdKeyStr] = this.usersEmployeeId;
+    dbObj[Project.useNameKeyStr] = this.usersEmployeeName;
   }
 
   public addProjectToDb(identifier: string,
@@ -290,12 +403,53 @@ export class FsiService {
   |    endBefore | Results end before the provided document (exclusive).            |
   |_________________________________________________________________________________|
 */
+  private startSyncUserEmployeeProfile(): void {
+    this.stopSyncUserEmployeeProfile();
+
+    const usersEmployeePath = this.buildEmployeeDocPath(this.usersEmployeeId);
+    // this.usersEmployeeSub = this.angFirestore.doc(usersEmployeePath).valueChanges().subscribe({
+    //   next: docData => {
+    //     const employee = FsiService.convertDBObjToEmployee(docData);
+    //     if ( !employee ) {
+    //       console.error('Error: 74544149');
+    //     }
+    //     this.setUsersEmployee = employee;
+    //     this.setUsersEmployeeName = this.usersEmployee.name;
+    //     console.warn(21313535351);
+    //     console.warn(this.usersEmployee);
+    //   }
+    // });
+
+    this.usersEmployeeSub = this.syncDocValueChangesFromDbAtDocPath(
+      usersEmployeePath,
+      docData => {
+        const employee = FsiService.convertDBObjToEmployee(docData);
+        if ( !employee ) {
+          console.error('Error: 74544149');
+        }
+        this.setUsersEmployee = employee;
+        this.setUsersEmployeeName = this.usersEmployee.name;
+        console.warn(21313535351);
+        console.warn(this.usersEmployee);
+      },
+      err => {
+        console.error('Error: 42864475' + ' | ' + err);
+      });
+  }
+
+  private stopSyncUserEmployeeProfile() {
+    if (!!this.usersEmployeeSub) {
+      this.usersEmployeeSub.unsubscribe();
+      this.usersEmployeeSub = undefined;
+    }
+  }
 
   public getQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts',
                             startAt: Date,
                             endBefore: Date): Promise<{}[]> {
     return new Promise<{}[]>((res, rej) => {
       const projectColPath = this.buildProjectsColPath();
+      console.log({projectColPath});
       const queriedCol = this.angFirestore.collection(projectColPath, ref => ref.orderBy(orderedBy).startAt(startAt).endBefore(endBefore));
 
       queriedCol.get().toPromise()
@@ -323,6 +477,9 @@ export class FsiService {
     console.log(' endBefore:' + endBefore);
 
     const projectColPath = this.buildProjectsColPath();
+
+    console.log({projectColPath});
+
     const queriedCol = this.angFirestore.collection(projectColPath, ref => ref.orderBy(orderedBy).startAt(startAt).endBefore(endBefore));
     const addedSub = queriedCol.stateChanges(['added']).subscribe({
       next: snaps => {
@@ -376,7 +533,7 @@ export class FsiService {
     return [addedSub, modifiedSub, removedSub];
   }
 
-  private addDocToDbAtColPath( colPath: string, data: any): Promise<firebase.firestore.DocumentReference | any> {
+  private addDocToDbAtColPath(colPath: string, data: any): Promise<firebase.firestore.DocumentReference | any> {
     return new Promise<firebase.firestore.DocumentReference | any>((res, rej) => {
       this.angFirestore.collection(colPath).add(data)
         .then(val => {
@@ -388,11 +545,59 @@ export class FsiService {
     });
   }
 
-  private addDocToDbAtDocPath( docPath: string, data: any ): Promise<void> {
+  private addDocToDbAtDocPath(docPath: string, data: any): Promise<void> {
     return new Promise<void>((res, rej) => {
       this.angFirestore.doc(docPath).set(data)
         .then(() => { res(); })
         .catch(err => { rej(err); });
+    });
+  }
+
+  private syncDocValueChangesFromDbAtDocPath(docPath: string,
+                                             cb: (unknown) => void,
+                                             errCB: (err: string) => void
+                                            ): Subscription {
+    const sub = this.angFirestore.doc(docPath).valueChanges().subscribe({
+      next: val => { cb(val); },
+      error: err => { errCB(err); }
+    });
+    return sub;
+  }
+
+  private syncDocSnapshotChangesFromDbAtDocPath(docPath: string,
+                                                cb: (snap: Action<DocumentSnapshot<unknown>>) => void,
+                                                errCB: (err: string) => void
+                                               ): Subscription {
+    const sub = this.angFirestore.doc(docPath).snapshotChanges().subscribe({
+      next: val => { cb(val); },
+      error: err => { errCB(err); }
+    });
+    return sub;
+  }
+
+  private getDocDataFromDbAtDocPath(docPath: string): Promise<firebase.firestore.DocumentData> {
+    return new Promise<firebase.firestore.DocumentData>((res, rej) => {
+      this.getDocSnapFromDbAtDocPath(docPath)
+        .then(val => {
+          res(val.data());
+        })
+        .catch(err => {
+          console.error('Error: 87986431');
+          rej(err);
+        });
+    });
+  }
+
+  private getDocSnapFromDbAtDocPath(docPath: string): Promise<firebase.firestore.DocumentSnapshot> {
+    return new Promise<firebase.firestore.DocumentSnapshot>((res, rej) => {
+      this.angFirestore.doc(docPath).get().toPromise()
+        .then(val => {
+          res(val);
+        })
+        .catch(err => {
+          console.error('Error: 87986431');
+          rej(err);
+        });
     });
   }
 }

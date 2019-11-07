@@ -150,32 +150,31 @@ export class Helper {
     }
 }
 
-
 export class Project {
-    public static readonly docIdKeyStr = 'docId';
-    public static readonly identifierKeyStr = 'identifier';
-    public static readonly nameKeyStr = 'name';
-    public static readonly durationKeyStr = 'duration';
-    public static readonly endlessKeyStr = 'endless';
+    public static readonly docIdKeyStr          = 'docId';
+    public static readonly identifierKeyStr     = 'identifier';
+    public static readonly nameKeyStr           = 'name';
+    public static readonly durationKeyStr       = 'duration';
+    public static readonly endlessKeyStr        = 'endless';
     public static readonly timeToAllocateKeyStr = 'timeToAllocate';
-    public static readonly isConflictedKeyStr = 'isConflicted';
-    public static readonly colorKeyStr = 'color';
-    public static readonly markerKeyStr = 'marker';
-    public static readonly markerColorKeyStr = 'markerColor';
-    public static readonly noteKeyStr = 'note';
-    public static readonly reservedKeyStr = 'reserved';
-    public static readonly blockCodeKeyStr = 'blockCode';
-    public static readonly finishedKeyStr = 'finished';
-    public static readonly folderKeyStr = 'folder';
-    public static readonly createTsKeyStr = 'create_ts';
-    public static readonly createIdKeyStr = 'create_id';
-    public static readonly createNameKeyStr = 'create_name';
-    public static readonly editTsKeyStr = 'edit_ts';
-    public static readonly editIdKeyStr = 'edit_id';
-    public static readonly editNameKeyStr = 'edit_name';
-    public static readonly useTsKeyStr = 'use_ts';
-    public static readonly useIdKeyStr = 'use_id';
-    public static readonly useNameKeyStr = 'use_name';
+    public static readonly isConflictedKeyStr   = 'isConflicted';
+    public static readonly colorKeyStr          = 'color';
+    public static readonly markerKeyStr         = 'marker';
+    public static readonly markerColorKeyStr    = 'markerColor';
+    public static readonly noteKeyStr           = 'note';
+    public static readonly reservedKeyStr       = 'reserved';
+    public static readonly blockCodeKeyStr      = 'blockCode';
+    public static readonly finishedKeyStr       = 'finished';
+    public static readonly folderKeyStr         = 'folder';
+    public static readonly createTsKeyStr       = 'createTS';
+    public static readonly createIdKeyStr       = 'createId';
+    public static readonly createNameKeyStr     = 'createName';
+    public static readonly editTsKeyStr         = 'editTS';
+    public static readonly editIdKeyStr         = 'editId';
+    public static readonly editNameKeyStr       = 'editName';
+    public static readonly useTsKeyStr          = 'useTS';
+    public static readonly useIdKeyStr          = 'useId';
+    public static readonly useNameKeyStr        = 'useName';
 
     public docId: string;
     public identifier: string;
@@ -251,16 +250,132 @@ export class Project {
         this.useId = useId;
         this.useName = useName;
     }
+
+    public static projectsAreEqual(project1: Project, project2: Project): boolean {
+        if (!project1 && !project2) { return true; }
+        if (!project1 || !project2) { return false; }
+
+        return (
+            project1.docId === project2.docId
+            && project1.identifier === project2.identifier
+            && project1.name === project2.name
+            && project1.duration === project2.duration
+            && project1.endless === project2.endless
+            && project1.timeToAllocate === project2.timeToAllocate
+            && project1.isConflicted === project2.isConflicted
+            && project1.color === project2.color
+            && project1.marker === project2.marker
+            && project1.markerColor === project2.markerColor
+            && project1.note === project2.note
+            && project1.reserved === project2.reserved
+            && project1.blockCode === project2.blockCode
+            && project1.finished === project2.finished
+            && project1.folder === project2.folder
+            && project1.createTS === project2.createTS
+            && project1.createId === project2.createId
+            && project1.createName === project2.createName
+            && project1.editTS === project2.editTS
+            && project1.editId === project2.editId
+            && project1.editName === project2.editName
+            && project1.useTS === project2.useTS
+            && project1.useId === project2.useId
+            && project1.useName === project2.useName
+        );
+    }
 }
 
 export class Employee {
-    name: string;
-    number: string;
-    dept: string;
-    group: string;
-    user: boolean;
-    scheduler: boolean;
-    selfEdit: boolean;
+    public static docIdKeyStr      = 'docId';
+    public static identifierKeyStr = 'identifier';
+    public static nameKeyStr       = 'name';
+    public static deptKeyStr       = 'dept';
+    public static deptColorKeyStr  = 'deptColor';
+    public static groupKeyStr      = 'group';
+    public static groupColorKeyStr = 'groupColor';
+    public static userKeyStr       = 'user';
+    public static schedulerKeyStr  = 'scheduler';
+    public static selfEditKeyStr   = 'selfEdit';
+    public static createTSKeyStr   = 'createTS';
+    public static createIdKeyStr   = 'createId';
+    public static createNameKeyStr = 'createName';
+    public static editTSKeyStr     = 'editTS';
+    public static editIdKeyStr     = 'editId';
+    public static editNameKeyStr   = 'editName';
+
+    public docId: string;
+    public identifier: string;
+    public name: string;
+    public dept: string;
+    public deptColor: string;
+    public group: string;
+    public groupColor: string;
+    public user: boolean;
+    public scheduler: boolean;
+    public selfEdit: boolean;
+    public createTS: Date;
+    public createId: string;
+    public createName: string;
+    public editTS: Date;
+    public editId: string;
+    public editName: string;
+
+    constructor(docId: string,
+                identifier: string,
+                name: string,
+                dept: string,
+                deptColor: string,
+                group: string,
+                groupColor: string,
+                user: boolean,
+                scheduler: boolean,
+                selfEdit: boolean,
+                createTS: Date,
+                createId: string,
+                createName: string,
+                editTS: Date,
+                editId: string,
+                editName: string) {
+        this.docId = docId;
+        this.identifier = identifier;
+        this.name = name;
+        this.dept = dept;
+        this.deptColor = deptColor;
+        this.group = group;
+        this.groupColor = groupColor;
+        this.user = user;
+        this.scheduler = scheduler;
+        this.selfEdit = selfEdit;
+        this.createTS = createTS;
+        this.createId = createId;
+        this.createName = createName;
+        this.editTS = editTS;
+        this.editId = editId;
+        this.editName = editName;
+    }
+
+    public static employeesAreEqual(employee1: Employee, employee2: Employee): boolean {
+        if (!employee1 && !employee2) { return true; }
+        if (!employee1 || !employee2) { return false; }
+
+        return (
+            employee1.docId === employee2.docId
+            && employee1.identifier === employee2.identifier
+            && employee1.name === employee2.name
+            && employee1.dept === employee2.dept
+            && employee1.deptColor === employee2.deptColor
+            && employee1.group === employee2.group
+            && employee1.groupColor === employee2.groupColor
+            && employee1.user === employee2.user
+            && employee1.scheduler === employee2.scheduler
+            && employee1.selfEdit === employee2.selfEdit
+            && employee1.createTS === employee2.createTS
+            && employee1.createId === employee2.createId
+            && employee1.createName === employee2.createName
+            && employee1.editTS === employee2.editTS
+            && employee1.editId === employee2.editId
+            && employee1.editName === employee2.editName
+        );
+    }
 }
 
 export class Assignment {

@@ -1,8 +1,18 @@
+import { DbiService } from './services/dbi.service';
+import { LoggerService } from './services/logger.service';
+
 export class Helper {
     public static readonly msPerDay: number = 86400000;
     public static readonly msPerHour: number = 3600000;
     public static readonly msPerMinute: number = 60000;
     private static readonly regExpEMail = new RegExp('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$');
+    private static logger: LoggerService;
+
+    constructor(private dbi: DbiService, private logger: LoggerService) {
+        if (!Helper.logger) {
+            Helper.logger = logger;
+        }
+    }
 
     public static checkForValidBoolean(val: any): boolean {
         if (typeof val !== 'boolean') {
@@ -69,7 +79,7 @@ export class Helper {
         }
 
         if (!!stringifyFailed) {
-            console.error('Error: 54635463');
+            Helper.logger.logError(54635463);
             return undefined;
         }
 
@@ -82,7 +92,7 @@ export class Helper {
         }
 
         if (!!uriDecodingFailed) {
-            console.error('Error: 63543473');
+            Helper.logger.logError(63543473);
             return undefined;
         }
 
@@ -95,7 +105,7 @@ export class Helper {
         try {
             decodedStr = decodeURIComponent(dataStr);
         } catch (error) {
-            console.error('Error: 89436435');
+            Helper.logger.logError(89436435);
             uriDecodingFailed = true;
         }
 
@@ -108,7 +118,7 @@ export class Helper {
         try {
             paresedObj = JSON.parse(decodedStr);
         } catch (error) {
-            console.error('Error: 68354867');
+            Helper.logger.logError(68354867);
             jsonParseingFailed = true;
         }
 
@@ -156,7 +166,7 @@ export class Project {
     public static readonly nameKeyStr           = 'name';
     public static readonly durationKeyStr       = 'duration';
     public static readonly endlessKeyStr        = 'endless';
-    public static readonly timeToAllocateKeyStr = 'timeToAllocate';
+    public static readonly allocatedTimeKeyStr  = 'allocatedTime';
     public static readonly isConflictedKeyStr   = 'isConflicted';
     public static readonly colorKeyStr          = 'color';
     public static readonly markerKeyStr         = 'marker';
@@ -181,7 +191,7 @@ export class Project {
     public name: string;
     public duration: number;
     public endless: boolean;
-    public timeToAllocate: number;
+    public allocatedTime: number;
     public isConflicted: boolean;
     public color: string;
     public marker: string;
@@ -206,7 +216,7 @@ export class Project {
                 name: string,
                 duration: number,
                 endless: boolean,
-                timeToAllocate: number,
+                allocatedTime: number,
                 isConflicted: boolean,
                 color: string,
                 marker: string,
@@ -230,7 +240,7 @@ export class Project {
         this.name = name;
         this.duration = duration;
         this.endless = endless;
-        this.timeToAllocate = timeToAllocate;
+        this.allocatedTime = allocatedTime;
         this.isConflicted = isConflicted;
         this.color = color;
         this.marker = marker;
@@ -261,7 +271,7 @@ export class Project {
             && project1.name === project2.name
             && project1.duration === project2.duration
             && project1.endless === project2.endless
-            && project1.timeToAllocate === project2.timeToAllocate
+            && project1.allocatedTime === project2.allocatedTime
             && project1.isConflicted === project2.isConflicted
             && project1.color === project2.color
             && project1.marker === project2.marker

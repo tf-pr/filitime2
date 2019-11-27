@@ -4,6 +4,7 @@ import { FsiService } from './fsi.service';
 import { Observable, Subscription } from 'rxjs';
 import { Helper, Project, Employee } from '../helper';
 import { DpoService } from './dpo.service';
+import { LoggerService } from './logger.service';
 
 
 @Injectable({
@@ -17,6 +18,37 @@ export class DbiService {
   private usersEmployee;
   private usersEmployeeEmitter = new EventEmitter<Employee>();
   public usersEmployeeChange: Observable<Employee> = this.usersEmployeeEmitter.asObservable();
+
+  public isLatestAppVersion(currVersion: string): Promise<boolean> {
+    return new Promise<boolean>((res, rej) => {
+      this.fsi.isLatestAppVersion(currVersion)
+        .then(val => { res(val); })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  public logError(code: string|number, details?: string) {
+    this.fsi.logError(code, details);
+  }
+
+  public logInputs(tsInputTupleList: [number, string][]): void {
+      this.fsi.logInputs(tsInputTupleList);
+  }
+
+  public setUpNewClient(email: string,
+                        password: string,
+                        employeeId: string,
+                        clientId: string,
+                        lang: string,
+                        company: string,
+                        phone: string,
+                        poc: string) {
+    return new Promise<any>((res, rej) => {
+      this.fsi.setUpNewClient(email, password, employeeId, clientId, lang, company, phone, poc)
+        .then(() => { res(); })
+        .catch(err => { rej(err); });
+    });
+  }
 
   public getLoggedInState(): boolean {
     return this.isLoggedIn;
@@ -39,26 +71,26 @@ export class DbiService {
     if (Employee.employeesAreEqual(this.usersEmployee, employee)) { return; }
     this.usersEmployee = employee;
 
-    console.warn(3135135211);
-    console.warn(this.usersEmployee);
-
     this.usersEmployeeEmitter.emit(this.usersEmployee);
   }
 
   constructor(private fsi: FsiService,
-              private dpo: DpoService) {
+              private dpo: DpoService,
+              private logger: LoggerService) {
+    logger.setDbi = this;
+
     this.setIsLoggedInState = fsi.getIsLoggedInState();
     fsi.loggedInStateChange.subscribe({
       next: value => {
         if (!Helper.checkForValidBoolean(value)) {
-          console.error('Error: 35134354');
+          this.logger.logError(35134354);
           return;
         }
 
         this.setIsLoggedInState = value;
       },
       error: err => {
-        console.error('Error: 46843546' + ' | ' + err );
+        this.logger.logError(46843546, err);
       }
     });
 
@@ -66,8 +98,6 @@ export class DbiService {
     fsi.usersEmployeeChange.subscribe({
       next: val => {
         this.setUsersEmployee = val;
-        console.warn(5343514354110);
-        console.warn(this.usersEmployee);
       }
     });
   }
@@ -77,7 +107,7 @@ export class DbiService {
       this.fsi.logIn(email, pw)
         .then(value => { res(value); })
         .catch(err => {
-          console.error('Error: 89466354');
+          this.logError(89466354, err);
           rej(err);
         });
     });
@@ -91,7 +121,7 @@ export class DbiService {
           res();
         })
         .catch(err => {
-          console.error('Error: 89466354');
+          this.logError(94374963, err);
           rej(err);
         });
     });
@@ -120,7 +150,7 @@ export class DbiService {
           res();
         })
         .catch(err => {
-          console.error('Error: 2354131352' + ' | ' + err);
+          this.logError(2354131352, err);
           rej(err);
         });
     });
@@ -135,6 +165,7 @@ export class DbiService {
         endBefore,
         addedProjects => {
           console.log('addedProjects');
+          console.log(JSON.stringify(addedProjects));
           this.dpo.addProjects(addedProjects);
         },
         modifiedProjects => {

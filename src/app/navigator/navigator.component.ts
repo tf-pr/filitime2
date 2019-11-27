@@ -4,6 +4,7 @@ import { slideInAnimation } from '../animations';
 import { DbiService } from '../services/dbi.service';
 import { LoadingHandlerService } from '../services/loading-handler.service';
 import { GlobalDataService } from '../services/global-data.service';
+import { LoggerService } from '../services/logger.service';
 
 @Component({
   selector: 'app-navigator',
@@ -21,7 +22,12 @@ export class NavigatorComponent implements OnInit {
   public navigatorPageIndex = 0;
   public colapsed = false;
 
-  constructor(private globalData: GlobalDataService, private dbi: DbiService, private loadingHandler: LoadingHandlerService) {
+  constructor(private globalData: GlobalDataService,
+              private dbi: DbiService,
+              private logger: LoggerService,
+              private loadingHandler: LoadingHandlerService) {
+    this.logger.setDbi = dbi;
+
     this.isMobile = globalData.getIsMobile();
     this.globalData.isMobileSateChange.subscribe({next: val => { this.isMobile = val; }});
 
@@ -45,7 +51,7 @@ export class NavigatorComponent implements OnInit {
     this.dbi.logOut()
       .then(() => { this.loadingHandler.removeWaitCode(waitCode); })
       .catch(err => {
-        console.error('Error: 68343354 | ' + err);
+        this.logger.logError(68343354, err);
         this.loadingHandler.removeWaitCode(waitCode);
       });
   }

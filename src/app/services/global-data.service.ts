@@ -6,6 +6,8 @@ import { Helper } from '../helper';
   providedIn: 'root'
 })
 export class GlobalDataService {
+  public readonly appVersion = '0.2.6';
+
   private isMobile = false;
   private isMobileEmitter = new EventEmitter<boolean>();
   public isMobileSateChange: Observable<boolean> = this.isMobileEmitter.asObservable();

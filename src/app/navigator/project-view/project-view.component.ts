@@ -10,6 +10,7 @@ import { DpoService } from 'src/app/services/dpo.service';
 import { DbiService } from 'src/app/services/dbi.service';
 import { delay } from 'q';
 import { ButtonModule } from 'primeng/button';
+import { LoggerService } from 'src/app/services/logger.service';
 
 export interface DialogData {
   animal: string;
@@ -160,7 +161,10 @@ export class ProjectViewComponent implements OnInit {
               private globalData: GlobalDataService,
               private dpo: DpoService,
               private dbi: DbiService,
+              private logger: LoggerService,
               public dialog: MatDialog) {
+    this.logger.setDbi = dbi;
+
     this.isMobile = globalData.getIsMobile();
     this.globalData.isMobileSateChange.subscribe({ next: val => { this.isMobile = val; } });
 
@@ -341,7 +345,7 @@ export class ProjectViewComponent implements OnInit {
     if (   !!this.currProjectId && project.identifier !== this.currProjectId) { return false; }
     if ( !!this.filterCompleted && project.finished === false)                { return false; }
     if (  !!this.filterReserved && project.reserved === false)                { return false; }
-    if (   !!this.filterZeroTTA && project.timeToAllocate === 0)              { return false; }
+    if (   !!this.filterZeroTTA && project.allocatedTime === 0)              { return false; }
     return true;
   }
 
@@ -470,7 +474,7 @@ export class ProjectViewComponent implements OnInit {
                              projMarkerColor, projNote, projReserved, projFolder)
         .then(() => { console.warn('throw a toast'); })
         .catch(err => {
-          console.error('Error: 31436414' + ' | ' + err);
+          this.logger.logError(31436414, err);
           console.warn('throw a toast');
         });
     });
@@ -794,7 +798,7 @@ export class ProjectViewComponent implements OnInit {
       name: randomName,
       duration: randomDuration,
       endless: false,
-      timeToAllocate: randomDuration,
+      allocatedTime: 0,
       isConflicted: false,
       color: randomColor1,
       marker: randomBoolean1 ? randomColor2 : null,

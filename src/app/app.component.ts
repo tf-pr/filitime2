@@ -4,6 +4,7 @@ import { Helper } from './helper';
 import { LoadingHandlerService } from './services/loading-handler.service';
 import { GlobalDataService } from './services/global-data.service';
 import { TesterService } from './services/tester.service';
+import { LoggerService } from './services/logger.service';
 
 @Component({
   selector: 'app-root',
@@ -36,18 +37,21 @@ export class AppComponent {
   constructor(private testerService: TesterService,
               private globalData: GlobalDataService,
               private dbi: DbiService,
+              private logger: LoggerService,
               private loadingHandler: LoadingHandlerService) {
+    this.logger.setDbi = dbi;
+
     this.loggedInSetter = dbi.getLoggedInState();
     dbi.loggedInStateChange.subscribe({
       next: value => {
         if (!Helper.checkForValidBoolean(value)) {
-          console.error('Error: 46351354');
+          this.logger.logError(46351354);
           return;
         }
         this.loggedInSetter = value;
       },
       error: err => {
-        console.error('Error: 31351351' + ' | ' + err);
+        this.logger.logError(31351351, err);
       }
     });
 

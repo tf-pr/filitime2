@@ -3,6 +3,7 @@ import { DbiService } from '../services/dbi.service';
 import { LoadingHandlerService } from '../services/loading-handler.service';
 import { GlobalDataService } from '../services/global-data.service';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { LoggerService } from '../services/logger.service';
 
 @Component({
   selector: 'app-login',
@@ -21,8 +22,11 @@ export class LoginComponent implements OnInit {
 
   constructor(private globalData: GlobalDataService,
               private dbi: DbiService,
+              private logger: LoggerService,
               private loadingHandler: LoadingHandlerService,
               private formBuilder: FormBuilder) {
+    this.logger.setDbi = dbi;
+
     this.isMobile = globalData.getIsMobile();
     this.globalData.isMobileSateChange.subscribe({next: val => { this.isMobile = val; }});
 
@@ -84,14 +88,14 @@ export class LoginComponent implements OnInit {
       .then(succes => {
         this.loadingHandler.removeWaitCode(waitCode);
         if (!succes) {
-          console.error('Error: 89354343');
+          this.logger.logError(89354343);
           return;
         }
         this.formGroup = undefined;
       })
       .catch(err => {
         const detail: string = err;
-        console.error('Error: 43546853' + ' | ' + detail);
+        this.logger.logError(43546853, detail);
         this.logInErrorMsg = detail;
         this.loadingHandler.removeWaitCode(waitCode);
       });

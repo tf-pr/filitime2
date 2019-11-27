@@ -21,6 +21,25 @@ export class ProfileViewComponent implements OnInit {
   public employeeDataGroup: string;
   public employeeDataGroupColor: string;
 
+
+
+
+
+  public changeEMailClicked(arg0?: any, arg1?: any): any {
+    // HIER
+  }
+
+  public changePasswordClicked(arg0?: any, arg1?: any): any {
+    // HIER
+  }
+
+  public deleteUserClicked(arg0?: any, arg1?: any): any {
+    // HIER
+  }
+
+
+
+
   public set setUsersEmployee(value: Employee) {
     if (Employee.employeesAreEqual(this.usersEmployee, value)) { return; }
 

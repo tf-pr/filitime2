@@ -91,9 +91,9 @@
                 <ng-container *ngFor="let employee of employeeListPaginated">
                         <mat-card class="employee-card" [style.color]="getMostReadableFontColor(employee.deptColor)"
                         [style.background]="'linear-gradient(45deg, ' + employee.deptColor + ' 84%, ' + (!!employee.groupColor?employee.groupColor:employee.deptColor) + ' 0)'">
-                        <mat-card-header class="project-card-header">
-                            <mat-card-title>{{project.name}}</mat-card-title>
-                            <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
+                        <mat-card-header class="employee-card-header">
+                            <mat-card-title>{{employee.name}}</mat-card-title>
+                            <mat-card-subtitle class="employee-card-subtitle">{{employee.identifier}}</mat-card-subtitle>
                         </mat-card-header>
                         <mat-divider></mat-divider><br>
                         <mat-card-content>
@@ -103,7 +103,7 @@
 
                         </mat-card-content>
                         <mat-card-actions>
-                            <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                            <button mat-button (click)="changeCurrEmployeeId(employee.identifier)">Details</button>
                         </mat-card-actions>
                     </mat-card>
 

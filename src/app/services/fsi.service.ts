@@ -2,7 +2,8 @@ import { Injectable, EventEmitter, Output, NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Helper, Project, Employee } from '../helper';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, Action, DocumentSnapshot } from '@angular/fire/firestore';
+import { AngularFirestore, Action, DocumentSnapshot, DocumentChangeAction } from '@angular/fire/firestore';
+import { AngularFireFunctions } from '@angular/fire/functions';
 import { Timestamp } from '@firebase/firestore-types';
 import * as firebase from 'firebase/app';
 import { DpoService } from './dpo.service';
@@ -12,15 +13,29 @@ import { async } from 'q';
   providedIn: 'root'
 })
 export class FsiService {
-  private readonly usersColKeyStr = 'uesrs';
+  //#region  keyStr
+
+  private readonly logErrorCFKeyStr = 'logError';
+  private readonly logInputsCFKeyStr = 'logInputs';
+  private readonly createClientCFKeyStr = 'createClient';
+  private readonly latestVersionCheckCFKeyStr = 'latestVersionCheck';
+
+  private readonly usersColKeyStr = 'users';
   private readonly userDocClientIdKeyStr = 'clientId';
   private readonly userDocEmailKeyStr = 'email';
   private readonly userDocEmployeeIdKeyStr = 'employeeId';
   private readonly userDocUidIdKeyStr = 'uid';
   private readonly clientDataColKeyStr = 'clientData';
   private readonly employeesColKeyStr = 'employees';
+  private readonly accessesColKeyStr = 'accesses';
   private readonly projectsColKeyStr = 'projects';
   private readonly docIdKeyStr = 'docId';
+  private readonly adminColKeyStr = 'adminCol';
+  private readonly adminsDocKeyStr = 'admins';
+
+  //#endregion
+
+  //#region properties
 
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
@@ -30,6 +45,7 @@ export class FsiService {
   private usersEmail: string;
   private usersClientId: string;
   private usersEmployeeId: string;
+  private userIsAdmin: boolean;
 
   private usersEmployee: Employee;
   private usersEmployeeSub: Subscription;
@@ -40,9 +56,9 @@ export class FsiService {
   private usersEmployeeNameEmitter = new EventEmitter<string>();
   public usersEmployeeNameChange: Observable<string> = this.usersEmployeeNameEmitter.asObservable();
 
-  public get email(): string {
-    return this.usersEmail;
-  }
+  //#endregion
+
+  //#region static functios
 
   private static convertDBObjToProject(projectDbObj: {}): Project {
     let returnValue: Project;
@@ -53,7 +69,7 @@ export class FsiService {
         projectDbObj[Project.nameKeyStr],
         projectDbObj[Project.durationKeyStr],
         projectDbObj[Project.endlessKeyStr],
-        projectDbObj[Project.timeToAllocateKeyStr],
+        projectDbObj[Project.allocatedTimeKeyStr],
         projectDbObj[Project.isConflictedKeyStr],
         projectDbObj[Project.colorKeyStr],
         projectDbObj[Project.markerKeyStr],
@@ -110,7 +126,7 @@ export class FsiService {
     return returnValue;
   }
 
-  private static generatePushId(): string {
+  public static generatePushId(): string {
     let pushId = '';
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -121,6 +137,18 @@ export class FsiService {
     return pushId;
   }
 
+  //#endregion
+
+  //#region  getter
+
+  public get email(): string {
+    return this.usersEmail;
+  }
+
+  public get isAdmin(): boolean {
+    return this.userIsAdmin;
+  }
+
   public getIsLoggedInState() {
     return this.isLoggedIn;
   }
@@ -128,6 +156,10 @@ export class FsiService {
   public getUsersEmployee(): Employee {
     return this.usersEmployee;
   }
+
+  //#endregion
+
+  //#region internal setter
 
   private set setIsLoggedInState(value: boolean) {
     if (this.isLoggedIn === value) { return; }
@@ -139,8 +171,6 @@ export class FsiService {
     if (Employee.employeesAreEqual(this.usersEmployee, employee)) { return; }
     this.usersEmployee = employee;
     this.usersEmployeeEmitter.emit(this.usersEmployee);
-    console.warn(213131152);
-    console.warn(this.usersEmployee);
   }
 
   private set setUsersEmployeeName(employeeName: string) {
@@ -149,9 +179,12 @@ export class FsiService {
     this.usersEmployeeNameEmitter.emit(this.usersEmployeeName);
   }
 
+  //#endregion
+
   constructor(private dpo: DpoService,
               private angFireAuth: AngularFireAuth,
               private angFirestore: AngularFirestore,
+              private angFireFunctions: AngularFireFunctions,
               private zone: NgZone) {
     angFireAuth.auth.onAuthStateChanged(user => {
       console.log(user);
@@ -184,80 +217,12 @@ export class FsiService {
     this.usersEmployeeName = undefined;
   }
 
-  public logIn(email: string, pw: string): Promise<boolean|string> {
-    return new Promise<boolean|string>((res, rej) => {
-      email = email.toLowerCase(); // make mail lower case
-      email = email.replace(/\s/g, ''); // delete whitespaces
-
-      if (!Helper.emailFormatCheck(email)) {
-        console.error('Error: 67346271');
-        rej('email invalid');
-        return;
-      }
-
-      this.angFireAuth.auth.signInWithEmailAndPassword(email, pw)
-        .then(auth => {
-          if (auth) {
-            console.log(auth);
-            this.usersUserId = auth.user.uid;   console.log('userId: ' + this.usersUserId);
-            this.usersEmail = auth.user.email;  console.log('email: ' + this.email);
-
-            this.getUserData()
-              .then(() => {
-                this.setIsLoggedInState = true;
-                res(true);
-              })
-              .catch(err => {
-                this.setIsLoggedInState = false;
-                rej(err);
-              });
-          } else {
-            this.setIsLoggedInState = false;
-            rej('????');
-          }
-        })
-        .catch(error => {
-          let errText = ('Login fehlgeschlagen');
-          switch (error.code) {
-            case 'auth/user-not-found':
-              errText = ('E-Mail-Adresse inkorrekt');
-              break;
-            case 'auth/wrong-password':
-              errText = ('Passwort inkorrekt');
-              break;
-            case 'auth/too-many-requests':
-              errText = ('Zu viele Anfragen auf diesen Account. Wenden Sie sich an den Administrator.');
-              break;
-            case 'auth/user-disabled':
-              errText = ('Ihr Account wurde deaktiviert!');
-              break;
-          }
-
-          rej(errText);
-          this.setIsLoggedInState = false;
-        });
-    });
-  }
-
-  public logOut(): Promise<void | string> {
-    return new Promise<void | string>((res, rej) => {
-      this.angFireAuth.auth.signOut()
-        .then(() => {
-          this.setIsLoggedInState = false;
-          this.reset();
-          res();
-        })
-        .catch(err => {
-          // isLoggedInState unchanged i guess?!
-          console.error('Error: 86435489');
-          rej();
-        });
-    });
-  }
+  //#region user data methode
 
   private getUserData(): Promise<any> {
     return new Promise<any>((res, rej) => {
       const userDocPath = this.buildUserDocPath();
+      console.log('PLS GIVE ME ' + userDocPath);
       this.getDocDataFromDbAtDocPath(userDocPath)
         .then(userDocData => {
           const clientId = userDocData[this.userDocClientIdKeyStr];
@@ -283,12 +248,87 @@ export class FsiService {
     });
   }
 
+  private startSyncUserEmployeeProfile(): void {
+    this.stopSyncUserEmployeeProfile();
+
+    const usersEmployeePath = this.buildEmployeeDocPath(this.usersEmployeeId);
+    // this.usersEmployeeSub = this.angFirestore.doc(usersEmployeePath).valueChanges().subscribe({
+    //   next: docData => {
+    //     const employee = FsiService.convertDBObjToEmployee(docData);
+    //     if ( !employee ) {
+    //       console.error('Error: 74544149');
+    //     }
+    //     this.setUsersEmployee = employee;
+    //     this.setUsersEmployeeName = this.usersEmployee.name;
+    //   }
+    // });
+
+    console.log('PLS GIVE ME ' + usersEmployeePath);
+    this.usersEmployeeSub = this.syncDocValueChangesFromDbAtDocPath(
+      usersEmployeePath,
+      docData => {
+        const employee = FsiService.convertDBObjToEmployee(docData);
+        if ( !employee ) {
+          console.error('Error: 74544149');
+        }
+        this.setUsersEmployee = employee;
+        this.setUsersEmployeeName = this.usersEmployee.name;
+      },
+      err => {
+        console.error('Error: 42864475' + ' | ' + err);
+      });
+  }
+
+  private stopSyncUserEmployeeProfile() {
+    if (!!this.usersEmployeeSub) {
+      this.usersEmployeeSub.unsubscribe();
+      this.usersEmployeeSub = undefined;
+    }
+  }
+
+  public getAdminState() {
+    const adminsDocPath = this.buildAminsDocPath();
+    console.log({adminsDocPath});
+    this.getDocDataFromDbAtDocPath(adminsDocPath)
+      .then(val => {
+        console.log('getDocDataFromDbAtDocPath.then');
+        console.log(JSON.stringify(val));
+        console.log(this.usersUserId);
+        console.log(val[this.usersUserId]);
+        console.log(!val[this.usersUserId]);
+
+        const isAdmin = !(val[this.usersUserId]);
+
+        if (!isAdmin) { console.error('Error 97567363'); }
+
+        this.userIsAdmin = isAdmin;
+      })
+      .catch(err => {
+        if (err.code !== '') {
+          console.warn('Warn: 789674' +  ' | unexpected Error code: ' + err.code);
+        }
+        this.userIsAdmin = false;
+      });
+  }
+
+  //#endregion
+
+  //#region path builder
+
   private buildUserDocPath(): string {
     return this.usersColKeyStr + '/' + this.usersUserId;
   }
 
+  private buildAminsDocPath(): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.adminColKeyStr + '/' + this.adminsDocKeyStr;
+  }
+
   private buildEmployeeDocPath( employeeId: string ): string {
     return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.employeesColKeyStr + '/' + employeeId;
+  }
+
+  private buildAccessesDocPath( employeeId: string ): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.accessesColKeyStr + '/' + employeeId;
   }
 
   private buildEmployeeColPath(): string {
@@ -302,6 +342,10 @@ export class FsiService {
   private buildProjectsColPath(): string {
     return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.projectsColKeyStr;
   }
+
+  //#endregion
+
+  //#region dbDataUsage methodes
 
   private addCreateDataToDbObj(dbObj: {}, docId?: string): string {
     dbObj[Project.createTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
@@ -325,6 +369,10 @@ export class FsiService {
     dbObj[Project.useIdKeyStr] = this.usersEmployeeId;
     dbObj[Project.useNameKeyStr] = this.usersEmployeeName;
   }
+
+  //#endregion
+
+  //#region project functions
 
   public addProjectToDb(identifier: string,
                         name: string,
@@ -368,7 +416,7 @@ export class FsiService {
         dataObj[Project.nameKeyStr] = name;
         dataObj[Project.durationKeyStr] = duration;
         dataObj[Project.endlessKeyStr] = !!endless;
-        dataObj[Project.timeToAllocateKeyStr] = duration;
+        dataObj[Project.allocatedTimeKeyStr] = duration;
         dataObj[Project.colorKeyStr] = color;
         if (!!marker) { dataObj[Project.markerKeyStr] = marker; }
         if (!!markerColor) { dataObj[Project.markerColorKeyStr] = markerColor; }
@@ -391,72 +439,89 @@ export class FsiService {
     }
   }
 
-/*
-   _________________________________________________________________________________
-  |                                                                                 |
-  |        where | Create a new query. Can be chained to form complex queries.      |
-  |      orderBy | Sort by the specified field, in descending or ascending order.   |
-  |        limit | Sets the maximum number of items to return.                      |
-  |      startAt | Results start at the provided document (inclusive).              |
-  |   startAfter | Results start after the provided document (exclusive).           |
-  |        endAt | Results end at the provided document (inclusive).                |
-  |    endBefore | Results end before the provided document (exclusive).            |
-  |_________________________________________________________________________________|
-*/
-  private startSyncUserEmployeeProfile(): void {
-    this.stopSyncUserEmployeeProfile();
-
-    const usersEmployeePath = this.buildEmployeeDocPath(this.usersEmployeeId);
-    // this.usersEmployeeSub = this.angFirestore.doc(usersEmployeePath).valueChanges().subscribe({
-    //   next: docData => {
-    //     const employee = FsiService.convertDBObjToEmployee(docData);
-    //     if ( !employee ) {
-    //       console.error('Error: 74544149');
-    //     }
-    //     this.setUsersEmployee = employee;
-    //     this.setUsersEmployeeName = this.usersEmployee.name;
-    //     console.warn(21313535351);
-    //     console.warn(this.usersEmployee);
-    //   }
-    // });
-
-    this.usersEmployeeSub = this.syncDocValueChangesFromDbAtDocPath(
-      usersEmployeePath,
-      docData => {
-        const employee = FsiService.convertDBObjToEmployee(docData);
-        if ( !employee ) {
-          console.error('Error: 74544149');
+  public updateProjectToDb(docId: string,
+                           identifier: string,
+                           name: string,
+                           duration: number,
+                           endless: boolean,
+                           color: string,
+                           marker: string,
+                           markerColor: string,
+                           note: string,
+                           reserved: boolean,
+                           folder: string): Promise<void> {
+    {
+      return new Promise<void>((res, rej) => {
+        // check identifier
+        if (!identifier) {
+          rej('identifier invalid');
+          return;
         }
-        this.setUsersEmployee = employee;
-        this.setUsersEmployeeName = this.usersEmployee.name;
-        console.warn(21313535351);
-        console.warn(this.usersEmployee);
-      },
-      err => {
-        console.error('Error: 42864475' + ' | ' + err);
-      });
-  }
+        // check name
+        if (!name) {
+          rej('name invalid');
+          return;
+        }
+        // check duration
+        if (!duration) {
+          if (!!endless) {
+            duration = 0;
+          } else {
+            rej('duration invalid');
+            return;
+          }
+        }
+        // check color
+        if (!color) {
+          rej('color invalid');
+          return;
+        }
 
-  private stopSyncUserEmployeeProfile() {
-    if (!!this.usersEmployeeSub) {
-      this.usersEmployeeSub.unsubscribe();
-      this.usersEmployeeSub = undefined;
+        const dataObj = {};
+        dataObj[Project.identifierKeyStr] = identifier;
+        dataObj[Project.nameKeyStr] = name;
+        dataObj[Project.durationKeyStr] = duration;
+        dataObj[Project.endlessKeyStr] = !!endless;
+        dataObj[Project.allocatedTimeKeyStr] = duration;
+        dataObj[Project.colorKeyStr] = color;
+        if (!!marker) { dataObj[Project.markerKeyStr] = marker; }
+        if (!!markerColor) { dataObj[Project.markerColorKeyStr] = markerColor; }
+        if (!!note) { dataObj[Project.noteKeyStr] = note; }
+        dataObj[Project.reservedKeyStr] = !!reserved;
+        dataObj[Project.finishedKeyStr] = false;
+        if (!!folder) { dataObj[Project.folderKeyStr] = folder; }
+
+        this.addChangeDataToDbObj(dataObj);
+        this.addUseInfoToDbObj(dataObj);
+        const projDocPath = this.buildProjectDocPath(docId);
+        this.addDocToDbAtDocPath(projDocPath, dataObj)
+          .then(() => { res(); })
+          .catch(err => {
+            console.error('Error: 46534135' + ' | ' + err);
+            rej(err);
+          });
+      });
     }
   }
 
   public getQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts',
                             startAt: Date,
-                            endBefore: Date): Promise<{}[]> {
-    return new Promise<{}[]>((res, rej) => {
+                            endBefore: Date): Promise<Project[]> {
+    return new Promise<Project[]>((res, rej) => {
       const projectColPath = this.buildProjectsColPath();
       console.log({projectColPath});
       const queriedCol = this.angFirestore.collection(projectColPath, ref => ref.orderBy(orderedBy).startAt(startAt).endBefore(endBefore));
 
       queriedCol.get().toPromise()
         .then(snapList => {
-          const projectList: {}[] = [];
+          const projectList: Project[] = [];
           snapList.docs.forEach(doc => {
-            projectList.push(doc.data());
+            const temp = FsiService.convertDBObjToProject(doc.data());
+            if ( !temp ) {
+              console.error('Error: 73458658' + ' | invalid projectdata: ' + doc.data());
+              return; // continue foreach
+            }
+            projectList.push(temp);
           });
           res(projectList);
         })
@@ -533,8 +598,317 @@ export class FsiService {
     return [addedSub, modifiedSub, removedSub];
   }
 
-  private addDocToDbAtColPath(colPath: string, data: any): Promise<firebase.firestore.DocumentReference | any> {
-    return new Promise<firebase.firestore.DocumentReference | any>((res, rej) => {
+  //#endregion
+
+  //#region employee functions
+
+  public getAllEmployees(): Promise<Employee[]> {
+    return new Promise<Employee[]> ((res, rej) => {
+      const employeeColPath = this.buildEmployeeColPath();
+
+      this.getColDataFromDbAtColPath(employeeColPath)
+        .then(dataList => {
+          const returnValue: Employee[] = [];
+          dataList.forEach(data => {
+            const temp = FsiService.convertDBObjToEmployee(data);
+            if (!temp) {
+              console.error('Error: 41321645');
+              return; // continue foreach
+            }
+            returnValue.push(temp);
+          });
+          res(returnValue);
+        })
+        .catch(err => {
+          console.error('Error: 78467359');
+          rej(err);
+        });
+    });
+  }
+
+  public syncAllEmployees(addedCB: (arg0: Employee[]) => void,
+                          modifiedCB: (arg0: Employee[]) => void,
+                          removedCB: (arg0: Employee[]) => void): [Subscription, Subscription, Subscription] {
+    const employeeColPath = this.buildEmployeeColPath();
+
+    const addedSub = this.syncColStateChangesFromDbAtColPath(
+      employeeColPath,
+      snaps => {
+        const empList: Employee[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          empList.push(tempEmp);
+        });
+        addedCB(empList);
+      },
+      err => {
+        console.error('Error: 69527761' + ' | ' + err);
+      },
+      'added',
+      true);
+
+    const modifiedSub = this.syncColStateChangesFromDbAtColPath(
+      employeeColPath,
+      snaps => {
+        const empList: Employee[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          empList.push(tempEmp);
+        });
+        modifiedCB(empList);
+      },
+      err => {
+        console.error('Error: 76346751' + ' | ' + err);
+      },
+      'modified',
+      true);
+
+    const removedSub = this.syncColStateChangesFromDbAtColPath(
+      employeeColPath,
+      snaps => {
+        const empList: Employee[] = [];
+        snaps.forEach(snap => {
+          const docData = snap.payload.doc.data();
+          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          empList.push(tempEmp);
+        });
+        removedCB(empList);
+      },
+      err => {
+        console.error('Error: 75754761' + ' | ' + err);
+      },
+      'removed',
+      true);
+
+    return [addedSub, modifiedSub, removedSub];
+  }
+
+  public getEmployee(employeeId): Promise<Employee> {
+    return new Promise<Employee> ((res, rej) => {
+      const employeeDocPath = this.buildEmployeeDocPath(employeeId);
+
+      this.getDocDataFromDbAtDocPath(employeeDocPath)
+        .then(data => {
+            const employee = FsiService.convertDBObjToEmployee(data);
+            if (!employee) {
+              const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
+              console.error('Error: 94565612' + ' | ' + errMsg);
+              rej(errMsg);
+              return;
+            }
+            res(employee);
+        })
+        .catch(err => {
+          console.error('Error: 78467359');
+          rej(err);
+        });
+    });
+  }
+
+  public syncEmployee(employeeId,
+                      cb: (arg0: Employee) => void,
+                      errCB: (err: string) => void): Subscription {
+    const employeeDocPath = this.buildEmployeeDocPath(employeeId);
+    const sub = this.syncDocValueChangesFromDbAtDocPath(
+      employeeDocPath,
+      data => {
+        const employee = FsiService.convertDBObjToEmployee(data);
+        if (!employee) {
+          const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
+          console.error('Error: 43148673' + ' | ' + errMsg);
+          errCB(errMsg);
+          return;
+        }
+
+        cb(employee);
+      },
+      err => {
+        console.error('Error: 55568421');
+        errCB(err);
+      });
+    return sub;
+  }
+
+  public getEmployeeAccesses(employeeId): Promise<[string, boolean][]> {
+    return new Promise((res, rej) => {
+      const accessesDocPath = this.buildAccessesDocPath(employeeId);
+      this.getDocDataFromDbAtDocPath(accessesDocPath)
+        .then(data => {
+          const empIds = Object.keys(data);
+          const accesses: [string, boolean][] = [];
+          empIds.forEach(empId => {
+            accesses.push([empId, data[empId] === true]);
+          });
+          res(accesses);
+        })
+        .catch(err => {
+          rej(err);
+        });
+    });
+  }
+
+  public syncEmployeeAccesses(employeeId,
+                              cb: (arg0: [string, boolean][]) => void,
+                              errCB: (err: string) => void): Subscription {
+    const accessesDocPath = this.buildAccessesDocPath(employeeId);
+    const sub = this.syncDocValueChangesFromDbAtDocPath(
+      accessesDocPath,
+      data => {
+        const empIds = Object.keys(data);
+        const accesses: [string, boolean][] = [];
+        empIds.forEach(empId => {
+          accesses.push([empId, data[empId] === true]);
+        });
+        cb(accesses);
+      },
+      err => {
+        console.error('Error: 72851185');
+        errCB(err);
+      }
+    );
+    return sub;
+  }
+
+  //#endregion
+
+  //#region essential FS functions
+
+  public isLatestAppVersion(currVersion: string): Promise<boolean> {
+    return new Promise<boolean>((res, rej) => {
+      this.latestVersionCheck(currVersion)
+        .then(val => {
+          if (typeof val === 'boolean') {
+            res(val);
+          } else { rej(val); }
+        })
+        .catch(err => {
+          rej(err);
+        });
+    });
+  }
+
+  public logIn(email: string, pw: string): Promise<boolean|string> {
+    return new Promise<boolean|string>((res, rej) => {
+      email = email.toLowerCase(); // make mail lower case
+      email = email.replace(/\s/g, ''); // delete whitespaces
+
+      if (!Helper.emailFormatCheck(email)) {
+        console.error('Error: 67346271');
+        rej('email invalid');
+        return;
+      }
+
+      this.angFireAuth.auth.signInWithEmailAndPassword(email, pw)
+        .then(auth => {
+          if (auth) {
+            console.log(auth);
+            this.usersUserId = auth.user.uid;   console.log('userId: ' + this.usersUserId);
+            this.usersEmail = auth.user.email;  console.log('email: ' + this.email);
+
+            this.getUserData()
+              .then(() => {
+                this.setIsLoggedInState = true;
+                res(true);
+              })
+              .catch(err => {
+                this.setIsLoggedInState = false;
+                rej(err);
+              });
+          } else {
+            this.setIsLoggedInState = false;
+            rej('????');
+          }
+        })
+        .catch(error => {
+          let errText = ('Login fehlgeschlagen');
+          switch (error.code) {
+            case 'auth/user-not-found':
+              errText = ('E-Mail-Adresse inkorrekt');
+              break;
+            case 'auth/wrong-password':
+              errText = ('Passwort inkorrekt');
+              break;
+            case 'auth/too-many-requests':
+              errText = ('Zu viele Anfragen auf diesen Account. Wenden Sie sich an den Administrator.');
+              break;
+            case 'auth/user-disabled':
+              errText = ('Ihr Account wurde deaktiviert!');
+              break;
+          }
+
+          rej(errText);
+          this.setIsLoggedInState = false;
+        });
+    });
+  }
+
+  public logOut(): Promise<void | string> {
+    return new Promise<void | string>((res, rej) => {
+      this.angFireAuth.auth.signOut()
+        .then(() => {
+          this.setIsLoggedInState = false;
+          this.reset();
+          res();
+        })
+        .catch(err => {
+          // isLoggedInState unchanged i guess?!
+          console.error('Error: 86435489');
+          rej();
+        });
+    });
+  }
+
+  //#endregion
+
+  //#region register  methodes
+
+  private createUser(email: string, password: string): Promise<any> {
+    return new Promise<any>((res, rej) => {
+
+      this.angFireAuth.auth.createUserWithEmailAndPassword(email, password)
+        .then(() => { res(); })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  public setUpNewClient(email: string,
+                        password: string,
+                        employeeId: string,
+                        clientId: string,
+                        lang: string,
+                        company: string,
+                        phone: string,
+                        poc: string): Promise<any> {
+    return new Promise<any>(async (res, rej) => {
+      // if is offline return error
+
+      try {
+        await this.createUser(email, password);
+      } catch (error) {
+        rej('create user failed: ' + error);
+        return;
+      }
+
+      try {
+        await this.createClient(employeeId, clientId, lang, company, phone, poc);
+      } catch (error) {
+        // if fails delete account
+        this.angFireAuth.auth.currentUser.delete().then(() => { /*__*/ });
+        rej('create client failed: ' + error);
+      }
+
+      res();
+    });
+  }
+
+  //#endregion
+
+  //#region generic FS functions
+
+  private addDocToDbAtColPath(colPath: string, data: any): Promise<firebase.firestore.DocumentReference> {
+    return new Promise<firebase.firestore.DocumentReference>((res, rej) => {
       this.angFirestore.collection(colPath).add(data)
         .then(val => {
           console.log('addNewDocToColPath-res');
@@ -548,6 +922,22 @@ export class FsiService {
   private addDocToDbAtDocPath(docPath: string, data: any): Promise<void> {
     return new Promise<void>((res, rej) => {
       this.angFirestore.doc(docPath).set(data)
+        .then(() => { res(); })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  private updateDocInDbAtDocPath(docPath: string, data: any): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.angFirestore.doc(docPath).update(data)
+        .then(() => { res(); })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  private deleteDocFromDbAtDocPath(docPath: string): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.angFirestore.doc(docPath).delete()
         .then(() => { res(); })
         .catch(err => { rej(err); });
     });
@@ -595,9 +985,212 @@ export class FsiService {
           res(val);
         })
         .catch(err => {
-          console.error('Error: 87986431');
+          console.error('Error: 64465215');
           rej(err);
         });
     });
   }
+
+  private syncColValueChangesFromDbAtColPath(colPath,
+                                             cb: (snaps: unknown[]) => void,
+                                             errCB: (err: string) => void,
+                                             checkForEmptyCol?: boolean
+                                            ): Subscription {
+    if ( checkForEmptyCol === true ) {
+      this.getColSnapFromDbAtColPath(colPath)
+        .then(snaps => { if (snaps.size === 0) { cb([]); } })
+        .catch(err => {
+          console.error( 'Error: 56676159' );
+          errCB(err);
+        });
+    }
+
+    const sub = this.angFirestore.collection(colPath).valueChanges().subscribe({
+      next: val => { cb(val); },
+      error: err => { errCB(err); }
+    });
+    return sub;
+  }
+
+  private syncColSnapshotChangesFromDbAtColPath(colPath,
+                                                cb: (snaps: DocumentChangeAction<unknown>[]) => void,
+                                                errCB: (err: string) => void,
+                                                docCahngeType?: firebase.firestore.DocumentChangeType,
+                                                checkForEmptyCol?: boolean
+                                               ): Subscription {
+    if ( checkForEmptyCol === true ) {
+      this.getColSnapFromDbAtColPath(colPath)
+        .then(snaps => { if (snaps.size === 0) { cb([]); } })
+        .catch(err => {
+          console.error( 'Error: 56733436' );
+          errCB(err);
+        });
+    }
+
+    const docCahngeTypes = !docCahngeType ? undefined : [docCahngeType];
+    const sub = this.angFirestore.collection(colPath).snapshotChanges(docCahngeTypes).subscribe({
+      next: val => { cb(val); },
+      error: err => { errCB(err); }
+    });
+    return sub;
+  }
+
+  private syncColStateChangesFromDbAtColPath(colPath,
+                                             cb: (snaps: DocumentChangeAction<unknown>[]) => void,
+                                             errCB: (err: string) => void,
+                                             docCahngeType?: firebase.firestore.DocumentChangeType,
+                                             checkForEmptyCol?: boolean
+                                            ): Subscription {
+    if ( checkForEmptyCol === true ) {
+      this.getColSnapFromDbAtColPath(colPath)
+        .then(snaps => { if (snaps.size === 0) { cb([]); } })
+        .catch(err => {
+          console.error( 'Error: 13984641' );
+          errCB(err);
+        });
+    }
+
+    const docCahngeTypes = !docCahngeType ? undefined : [docCahngeType];
+    const sub = this.angFirestore.collection(colPath).stateChanges(docCahngeTypes).subscribe({
+      next: val => { cb(val); },
+      error: err => { errCB(err); }
+    });
+    return sub;
+  }
+
+  private getColDataFromDbAtColPath(colPath: string): Promise<firebase.firestore.DocumentData[]> {
+    return new Promise<firebase.firestore.DocumentData[]>((res, rej) => {
+      this.getColSnapFromDbAtColPath(colPath)
+        .then(val => {
+          const returnVal: firebase.firestore.DocumentData[] = [];
+          val.forEach(snap => {
+            returnVal.push(snap.data());
+          });
+          res(returnVal);
+        })
+        .catch(err => {
+          console.error('Error: 59415573');
+          rej(err);
+        });
+    });
+  }
+
+  private getColSnapFromDbAtColPath(colPath: string): Promise<firebase.firestore.QuerySnapshot> {
+    return new Promise<firebase.firestore.QuerySnapshot>((res, rej) => {
+      this.angFirestore.collection(colPath).get().toPromise()
+        .then(val => {
+          res(val);
+        })
+        .catch(err => {
+          console.error('Error: 84153773');
+          rej(err);
+        });
+    });
+  }
+
+  //#endregion
+
+  //#region Clod Functions
+
+  private latestVersionCheck(currVersion: string): Promise<boolean> {
+    return new Promise<boolean>((res, rej) => {
+      const latestVersionCheckCF = this.angFireFunctions.functions.httpsCallable(this.latestVersionCheckCFKeyStr);
+      if (!latestVersionCheckCF) {
+        console.error('FATALERROR:753');
+        rej('server not available');
+        return;
+      }
+
+      latestVersionCheckCF({ version: currVersion })
+        .then(serRes => { res(serRes.data); })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  public logError(code: string|number, details?: string) {
+    const data = {};
+    const codeKeyStr = 'errCode';
+    data[codeKeyStr] = code + '';
+
+    if (!!details) {
+      const msgKeyStr = 'errMsg';
+      data[msgKeyStr] = details;
+    }
+
+    const logErrorCF = this.angFireFunctions.functions.httpsCallable(this.logErrorCFKeyStr);
+
+    if (!logErrorCF) {
+      console.error('FATALERROR:514');
+      return;
+    }
+
+    logErrorCF(data)
+      .then(res => {
+        if (res.data === 200) { return; }
+        console.error('FATALERROR:978' + ' | ' + res.data);
+      })
+      .catch(err => {
+        console.error('FATALERROR:379' + ' | ' + err);
+      });
+  }
+
+  public logInputs(tsInputTupleList): void {
+    const tsNow = Date.now();
+    const data: {} = {};
+
+    for (let i = 0; i < tsInputTupleList.length; i++) {
+      data[i] = ({
+        delay: (tsNow - tsInputTupleList[i][0]),
+        input: tsInputTupleList[i][1]
+      });
+    }
+
+    const logInputsCF = this.angFireFunctions.functions.httpsCallable(this.logInputsCFKeyStr);
+
+    if (!logInputsCF) {
+      console.error('FATALERROR:514');
+      return;
+    }
+
+    logInputsCF(data)
+      .then(res => {
+        if (res.data === 200) { return; }
+        console.error('FATALERROR:464' + ' | ' + res.data);
+      })
+      .catch(err => {
+        console.error('FATALERROR:379' + ' | ' + err);
+      });
+  }
+
+  private createClient(employeeId: string, clientId: string, lang: string, company: string, phone: string, poc: string): Promise<any> {
+    return new Promise<any>((res, rej) => {
+      const createClientCF = this.angFireFunctions.functions.httpsCallable(this.createClientCFKeyStr);
+      if (!createClientCF) {
+        console.error('FATALERROR:344');
+        rej('server not available');
+        return;
+      }
+
+      const data = {
+        employeeId,
+        clientId,
+        lang,
+        company,
+        phone,
+        poc,
+      };
+
+      createClientCF(data)
+        .then(serRes => {
+          if (serRes.data === 200) {
+            res();
+            return;
+          }
+          rej(serRes.data);
+        })
+        .catch(err => { rej(err); });
+    });
+  }
+
+  //#endregion
 }

@@ -1,5 +1,334 @@
 <ng-container *ngIf="!isMobile">
     <div class="projectViewBG">
+        <!--
+        <div class="project-folder-card-content">
+            <div class="controlPanel">
+                <div class="controlPanelButtonLayer">
+                    <mat-form-field class="textSucheSeinVatter"><input matInput [(ngModel)]="textSearch" placeholder="Textsuche"></mat-form-field>
+                    <div class="btn-group" dropdown [insideClick]="true">
+                        <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                            Filtern <span class="caret"></span>
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                            <li role="menuitem">
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
+                                    <span style="font-weight: normal">unter Vorbehalt</span>
+                                </mat-checkbox>
+                            </li>
+                            <li role="menuitem">
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
+                                    <span style="font-weight: normal">Planbedarf</span>
+                                </mat-checkbox>
+                            </li>
+                            <li role="menuitem">
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted" (change)="completedFilterChange()">
+                                    <span style="font-weight: normal">Beendet</span>
+                                </mat-checkbox>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="btn-group" dropdown [insideClick]="true">
+                        <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                            Sortieren <span class="caret"></span>
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                            <mat-radio-group [(ngModel)]="sortBy" (change)="sortChanged()">
+                                <li role="menuitem">
+                                    <mat-radio-button class="cbidd" [value]="'createdAt'">
+                                        <span style="font-weight: normal">chronologisch</span>
+                                    </mat-radio-button>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-radio-button class="cbidd" [value]="'name'">
+                                        <span style="font-weight: normal">alphabtisch</span>
+                                    </mat-radio-button>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-radio-button class="cbidd" [value]="'identifier'">
+                                        <span style="font-weight: normal">nach Identifikator</span>
+                                    </mat-radio-button>
+                                </li>
+                            </mat-radio-group>
+                            <li class="divider dropdown-divider"></li>
+                            <mat-radio-group [(ngModel)]="sortDesc" (change)="sortDirectionChanged()">
+                                <li role="menuitem">
+                                    <mat-radio-button class="cbidd" [value]="false">
+                                        <span style="font-weight: normal">aufsteigend</span>
+                                    </mat-radio-button>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-radio-button class="cbidd" [value]="true">
+                                        <span style="font-weight: normal">absteigend</span>
+                                    </mat-radio-button>
+                                </li>
+                            </mat-radio-group>
+                        </ul>
+                    </div>
+                </div>
+                <div class="controlPanelButtonLayer">
+                    <button mat-raised-button color="primary" (click)="addProjectButtonClicked()">
+                        <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
+                    </button>
+                </div>
+            </div>
+            <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                (page)="paginatorChanged($event)">
+            </mat-paginator>
+            <ng-container *ngFor="let project of projectListPaginated">
+                <mat-card class="project-card" [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'" [style.color]="getMostReadableFontColor(project.color)"
+                    [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'">
+                    <mat-card-header class="project-card-header">
+                        <mat-card-title>{{project.name}}</mat-card-title>
+                        <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-divider></mat-divider><br>
+                    <mat-card-content>
+                        <span>duration: {{project.duration}}</span><br>
+                        <span>endless: {{project.endless}}</span><br>
+                        <span>allocatedTime: {{project.allocatedTime}}</span><br>
+                        <span>isConflicted: {{project.isConflicted}}</span><br>
+                        <span>color: {{project.color}}</span><br>
+                        <span>marker: {{project.marker}}</span><br>
+                        <span>markerColor: {{project.markerColor}}</span><br>
+                        <span>note: {{project.note}}</span><br>
+                        <span>reserved: {{project.reserved}}</span><br>
+                        <span>blockCode: {{project.blockCode}}</span><br>
+                        <span>finished: {{project.finished}}</span><br>
+                        <span (click)="changeCurrFolder(project.folder)">folder: {{project.folder}}</span><br>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                    </mat-card-actions>
+                </mat-card>
+            </ng-container>
+            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                (page)="paginatorChanged($event)">
+            </mat-paginator>
+        </div>
+        -->
+
+        <ng-container *ngIf="!currProjectId">
+            <div>
+                <div *ngIf="!!currFolder">
+                    <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                        <mat-icon>arrow_back</mat-icon>
+                    </button>
+                    <h4 style="display: inline-block;" *ngIf="!!currFolder">Ordner: {{currFolder}}</h4>
+                </div>
+                <button mat-raised-button color="primary" (click)="changeProjectQueryoptionsClicked()">
+                    <mat-icon>build</mat-icon>Projekte erstellt zwischen {{projStartAtDispStr}} - {{projEndAtDispStr}}
+                </button>
+            </div>
+            <div>
+                <div style="display: inline-block; vertical-align: top;">
+                    <h3>
+                        <mat-icon>search</mat-icon>Textsuche
+                    </h3>
+                    <div style="padding-left: 10px;">
+                        <mat-form-field class="textSucheSeinVatter"><input matInput [(ngModel)]="textSearch" placeholder="Suchbegriff">
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div style="display: inline-block; vertical-align: top;">
+                    <h3>
+                        <mat-icon>filter</mat-icon>Filter
+                    </h3>
+                    <div style="padding-left: 10px;">
+                        <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
+                            <span style="font-weight: normal">unter Vorbehalt</span>
+                        </mat-checkbox>
+                        <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
+                            <span style="font-weight: normal">Planbedarf</span>
+                        </mat-checkbox>
+                        <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted" (change)="completedFilterChange()">
+                            <span style="font-weight: normal">Beendet</span>
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <div style="display: inline-block; vertical-align: top;">
+                    <h3>
+                        <mat-icon>unfold_more</mat-icon>Sortieren
+                    </h3>
+                    <div style="padding-left: 10px;">
+                        <div style="display: inline-block; vertical-align: top;">
+                            <mat-radio-group [(ngModel)]="sortBy" (change)="sortChanged()">
+                                <mat-radio-button class="cbidd" [value]="'createdAt'">
+                                    <span style="font-weight: normal">chronologisch</span>
+                                </mat-radio-button>
+                                <mat-radio-button class="cbidd" [value]="'name'">
+                                    <span style="font-weight: normal">alphabtisch</span>
+                                </mat-radio-button>
+                                <mat-radio-button class="cbidd" [value]="'identifier'">
+                                    <span style="font-weight: normal">nach Identifikator</span>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <div style="display: inline-block; vertical-align: top;">
+                            <mat-radio-group [(ngModel)]="sortDesc" (change)="sortDirectionChanged()">
+                                <mat-radio-button class="cbidd" [value]="false">
+                                    <span style="font-weight: normal">aufsteigend</span>
+                                </mat-radio-button>
+                                <mat-radio-button class="cbidd" [value]="true">
+                                    <span style="font-weight: normal">absteigend</span>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button mat-raised-button color="primary" (click)="addProjectButtonClicked()">
+                    <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
+                </button>
+            </div>
+            <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                (page)="paginatorChanged($event)">
+            </mat-paginator>
+            <ng-container *ngFor="let project of projectListPaginated">
+                <mat-card class="project-card"
+                    [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
+                    [style.color]="getMostReadableFontColor(project.color)"
+                    [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'"
+                    matBadgeHidden="{{!project.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                    matBadgePosition="before">
+                    <mat-card-header class="project-card-header" matBadgeHidden="{{!project.reserved}}" matBadge="?"
+                        matBadgeSize="large">
+                        <mat-card-title>{{project.name}}</mat-card-title>
+                        <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-divider></mat-divider><br>
+                    <mat-card-content>
+                        <div style="padding: 3px; cursor:pointer;" (click)="changeCurrFolder(project.folder)">
+                            <span *ngIf="!!project.folder">Ordner</span>
+                            <div style="padding-left: 10px">
+                                <span>{{project.folder}}</span>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>Dauer</span>
+                            <div style="padding-left: 10px">
+                                <span *ngIf="!!project.endless">endlos</span>
+                                <span *ngIf="!project.endless">{{project.duration}}</span>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>verplante Dauer</span>
+                            <div style="padding-left: 10px">
+                                <span>{{project.allocatedTime}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!!project.note" style="padding: 3px;">
+                            <span>Notiz</span>
+                            <div style="padding-left: 10px;">
+                                <p style="word-break: break-all;">{{project.note}}</p>
+                            </div>
+                        </div>
+                        <span *ngIf="project.finished">Abgeschlossen</span>
+                        <span>blockCode: {{project.blockCode}}</span><br>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                    </mat-card-actions>
+                </mat-card>
+            </ng-container>
+            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                (page)="paginatorChanged($event)">
+            </mat-paginator>
+        </ng-container>
+        <ng-container *ngIf="!!currProjectId">
+            <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div *ngIf="projectListPaginated.length == 0">
+                <h3>Projektnummer "{{currProjectId}}" nicht bekannt</h3>
+            </div>
+            <div *ngIf="projectListPaginated.length != 0">
+                <mat-card class="project-detail-card" [style.color]="getMostReadableFontColor(projectListPaginated[0].color)"
+                    [style.background]="'linear-gradient(45deg, ' + projectListPaginated[0].color + ' 84%, ' + (!!projectListPaginated[0].markerColor?projectListPaginated[0].markerColor:projectListPaginated[0].color) + ' 0)'"
+                    matBadgeHidden="{{!projectListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                    matBadgePosition="before">
+                    <mat-card-header class="project-card-header" matBadgeHidden="{{!projectListPaginated[0].reserved}}" matBadge="?" matBadgeSize="large">
+                        <mat-card-title>{{projectListPaginated[0].name}}</mat-card-title>
+                        <mat-card-subtitle class="project-card-subtitle">{{projectListPaginated[0].identifier}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-divider></mat-divider><br>
+                    <mat-card-content>
+                        <div style="padding: 3px; cursor:pointer;" (click)="changeCurrFolder(projectListPaginated[0].folder)">
+                            <span *ngIf="!!projectListPaginated[0].folder">Ordner</span>
+                            <div style="padding-left: 10px">
+                                <span>{{projectListPaginated[0].folder}}</span>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>Dauer</span>
+                            <div style="padding-left: 10px;">
+                                <span *ngIf="!!projectListPaginated[0].endless">endlos</span>
+                                <span *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].duration}}</span>
+                            </div>
+                        </div>
+                        <div  *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>verplante Kapa.</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].allocatedTime}}</span>
+                            </div>
+                        </div>
+                        <div  *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>Offene Kapa.</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].duration - projectListPaginated[0].duration}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!!projectListPaginated[0].note" style="padding: 3px;">
+                            <span>Notiz</span>
+                            <div style="padding-left: 10px;">
+                                <p style="word-break: break-all;">{{projectListPaginated[0].note}}</p>
+                            </div>
+                        </div>
+                        <span *ngIf="projectListPaginated[0].finished">Abgeschlossen</span>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>Erstellt</span>
+                            <div style="padding-left: 10px;">
+                                <span>{{projectListPaginated[0].createdTS}}</span>
+                            </div>
+                        </div>
+                        <div  *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>Zuletzt geändert</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span>{{projectListPaginated[0].editTS}}</span>
+                            </div>
+                        </div>
+                        <div  *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>zuletzt verwendet</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span>{{projectListPaginated[0].editTS}}</span>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button>Bearbeiten</button>
+                    </mat-card-actions>
+                </mat-card>
+                <mat-card>
+                    <mat-card-header>Projektübersicht</mat-card-header>
+                    <mat-card-content>Ist noch in Arbeit (;D)</mat-card-content>
+                </mat-card>
+
+
+
+                
+
+
+            </div>
+            <div>
+
+            </div>
+        </ng-container>
+
+        <!-- 
         <mat-card class="project-folder-card">
             <mat-card-title *ngIf="!currProjectId" class="project-folder-card-header">
                 <button *ngIf="!!currFolder" mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
@@ -116,6 +445,9 @@
                 </mat-paginator>
             </mat-card-content>
         </mat-card>
+        <!-- -->
+
+
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">
@@ -125,6 +457,219 @@
 </ng-container>
 <ng-container *ngIf="isMobile && !isLandscape">
     <div class="projectViewBG">
-        <p>project-view works on spp!</p>
+        <ng-container *ngIf="!currProjectId">
+            <div class="settingsContainer">
+                <div>
+                    <div style="display: inline-block;" *ngIf="!!currFolder">
+                        <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                            <mat-icon>arrow_back</mat-icon>
+                        </button>
+                        <h4 style="display: inline-block;" *ngIf="!!currFolder">Ordner: {{currFolder}}</h4>
+                    </div>
+                    <button mat-raised-button color="primary" (click)="changeProjectQueryoptionsClicked()">
+                        <mat-icon>build</mat-icon>
+                    </button>
+                </div>
+                <div>
+                    <div style="display: inline-block">
+                        <mat-form-field class="textSucheSeinVatter"><input matInput [(ngModel)]="textSearch"
+                                placeholder="Suchbegriff">
+                        </mat-form-field>
+                    </div>
+                    <div style="display: inline-block">
+                        <div class="btn-group" dropdown [insideClick]="true">
+                            <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                                Filtern <span class="caret"></span>
+                            </button>
+                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
+                                        <span style="font-weight: normal">unter Vorbehalt</span>
+                                    </mat-checkbox>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
+                                        <span style="font-weight: normal">Planbedarf</span>
+                                    </mat-checkbox>
+                                </li>
+                                <li role="menuitem">
+                                    <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted" (change)="completedFilterChange()">
+                                        <span style="font-weight: normal">Beendet</span>
+                                    </mat-checkbox>
+                                </li>
+                            </ul>
+                        </div>
+                        <br>
+                        <div class="btn-group" dropdown [insideClick]="true">
+                            <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+                                Sortieren <span class="caret"></span>
+                            </button>
+                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <mat-radio-group [(ngModel)]="sortBy" (change)="sortChanged()">
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'createdAt'">
+                                            <span style="font-weight: normal">chronologisch</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'name'">
+                                            <span style="font-weight: normal">alphabtisch</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="'identifier'">
+                                            <span style="font-weight: normal">nach Identifikator</span>
+                                        </mat-radio-button>
+                                    </li>
+                                </mat-radio-group>
+                                <li class="divider dropdown-divider"></li>
+                                <mat-radio-group [(ngModel)]="sortDesc" (change)="sortDirectionChanged()">
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="false">
+                                            <span style="font-weight: normal">aufsteigend</span>
+                                        </mat-radio-button>
+                                    </li>
+                                    <li role="menuitem">
+                                        <mat-radio-button class="cbidd" [value]="true">
+                                            <span style="font-weight: normal">absteigend</span>
+                                        </mat-radio-button>
+                                    </li>
+                                </mat-radio-group>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button mat-raised-button color="primary" (click)="addProjectButtonClicked()">
+                        <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
+                    </button>
+                </div>
+            </div>
+            <div class="project-card-container">
+                <ng-container *ngFor="let project of projectListPaginated">
+                    <mat-card class="project-card"
+                        [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
+                        [style.color]="getMostReadableFontColor(project.color)"
+                        [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'"
+                        matBadgeHidden="{{!project.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                        matBadgePosition="before">
+                        <mat-card-header class="project-card-header" matBadgeHidden="{{!project.reserved}}" matBadge="?"
+                            matBadgeSize="large">
+                            <mat-card-title>{{project.name}}</mat-card-title>
+                            <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
+                        </mat-card-header>
+                        <mat-divider></mat-divider><br>
+                        <mat-card-content>
+                            <div style="padding: 3px; cursor:pointer;" (click)="changeCurrFolder(project.folder)">
+                                <span *ngIf="!!project.folder">Ordner</span>
+                                <div style="padding-left: 10px">
+                                    <span>{{project.folder}}</span>
+                                </div>
+                            </div>
+                            <div style="display: inline-block; padding: 3px;">
+                                <span>Dauer</span>
+                                <div style="padding-left: 10px">
+                                    <span *ngIf="!!project.endless">endlos</span>
+                                    <span *ngIf="!project.endless">{{project.duration}}</span>
+                                </div>
+                            </div>
+                            <div style="display: inline-block; padding: 3px;">
+                                <span>verplante Dauer</span>
+                                <div style="padding-left: 10px">
+                                    <span>{{project.allocatedTime}}</span>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                        <mat-card-actions>
+                            <button mat-button (click)="changeCurrProjectId(project.identifier)">Details</button>
+                        </mat-card-actions>
+                    </mat-card>
+                </ng-container>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!!currProjectId">
+            <div *ngIf="projectListPaginated.length == 0">
+                <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+                <br>
+                <h3>Projektnummer "{{currProjectId}}" nicht bekannt</h3>
+            </div>
+            <div *ngIf="projectListPaginated.length != 0">
+                <mat-card class="project-detail-card" [style.color]="getMostReadableFontColor(projectListPaginated[0].color)"
+                    [style.background]="'linear-gradient(45deg, ' + projectListPaginated[0].color + ' 84%, ' + (!!projectListPaginated[0].markerColor?projectListPaginated[0].markerColor:projectListPaginated[0].color) + ' 0)'"
+                    matBadgeHidden="{{!projectListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn"
+                    matBadgeSize="large" matBadgePosition="before">
+                    <mat-card-header class="project-card-header" matBadgeHidden="{{!projectListPaginated[0].reserved}}" matBadge="?"
+                        matBadgeSize="large">
+                        <mat-card-title>
+                            <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                                <mat-icon>arrow_back</mat-icon>
+                            </button>
+                            {{projectListPaginated[0].name}}
+                        </mat-card-title>
+                        <mat-card-subtitle class="project-card-subtitle">{{projectListPaginated[0].identifier}}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-divider></mat-divider><br>
+                    <mat-card-content>
+                        <div style="padding: 3px; cursor:pointer;" (click)="changeCurrFolder(projectListPaginated[0].folder)">
+                            <span *ngIf="!!projectListPaginated[0].folder">Ordner</span>
+                            <div style="padding-left: 10px">
+                                <span>{{projectListPaginated[0].folder}}</span>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>Dauer</span>
+                            <div style="padding-left: 10px;">
+                                <span *ngIf="!!projectListPaginated[0].endless">endlos</span>
+                                <span *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].duration}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>verplante Kapa.</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].allocatedTime}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>Offene Kapa.</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span
+                                    *ngIf="!projectListPaginated[0].endless">{{projectListPaginated[0].duration - projectListPaginated[0].duration}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!!projectListPaginated[0].note" style="padding: 3px;">
+                            <span>Notiz</span>
+                            <div style="padding-left: 10px;">
+                                <p style="word-break: break-all;">{{projectListPaginated[0].note}}</p>
+                            </div>
+                        </div>
+                        <span *ngIf="projectListPaginated[0].finished">Abgeschlossen</span>
+                        <div style="display: inline-block; padding: 3px;">
+                            <span>Erstellt</span>
+                            <div style="padding-left: 10px;">
+                                <span>{{projectListPaginated[0].createdTS}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>Zuletzt geändert</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span>{{projectListPaginated[0].editTS}}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                            <span>zuletzt verwendet</span>
+                            <div style="display: inline-block; padding-left: 10px;">
+                                <span>{{projectListPaginated[0].editTS}}</span>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button>Projektübersicht</button>
+                        <button mat-button>Bearbeiten</button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+        </ng-container>
     </div>
 </ng-container>

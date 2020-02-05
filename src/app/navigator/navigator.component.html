@@ -1,7 +1,7 @@
 <ng-container *ngIf="!isMobile">
     <div class="navigatorViewBG">
         <mat-drawer-container class="example-container" autosize>
-            <mat-drawer mode="side" opened disableClose>
+            <mat-drawer mode="side" opened="{{!hideNavBar}}" disableClose>
                 <div class="example-container2">
                     <div *ngIf="!colapsed" class="expandLogoContainer">
                         <h2>FT FiliTime</h2>
@@ -130,7 +130,7 @@
         <button mat-icon-button (click)="snav.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
-        <span>Mitarbeiter</span>
+        <span>{{currTabName}}</span>
         <button mat-button class="optionsButton" [matMenuTriggerFor]="beforeMenu">
             <mat-icon>more_vert</mat-icon>
         </button>
@@ -182,7 +182,7 @@
         <button mat-icon-button (click)="snav.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
-        <span>Mitarbeiter</span>
+        <span>{{currTabName}}</span>
         <button mat-button class="optionsButton" [matMenuTriggerFor]="beforeMenu">
             <mat-icon>more_vert</mat-icon>
         </button>

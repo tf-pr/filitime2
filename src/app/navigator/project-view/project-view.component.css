@@ -4,6 +4,7 @@
         display: inline-block;
         width: 100%;
         height: 100%;
+        padding: 10px;
         /* background: linear-gradient(164deg, sienna, skyblue); /* color4test */
         overflow: auto;
     }
@@ -97,8 +98,7 @@
         display: inline-block;
         vertical-align: top;
         margin: 10px;
-        max-width: 30%;
-        min-width: 300px;
+        width: calc( 100% / 3 - 20px ); /* 3 shall be replaced by math.floor( window.width / 400 ) o.d.s. */
         /* animation: wobble-hor-bottom 0.4s both; */
         /* animation: fade-out 1s ease-out both; */
     }
@@ -119,6 +119,12 @@
         background: white;
         border-radius: 10px;
     }
+
+    .project-detail-card {
+        display: block;
+        margin: 10px;
+    }
+
 
     @keyframes wobble-hor-bottom {
         20% {
@@ -152,8 +158,30 @@
         width: 100%;
         height: 100%;
         /* background: linear-gradient(164deg, sienna, lightsalmon); /* color4test */
+        overflow-x: auto;
+    }
 
-    }    
+    .settingsContainer {
+        height: 160px;
+    }
+
+    .project-card-container {
+        height: calc( 100% - 160px );
+        overflow-x: auto;
+    }
+
+    .project-card {
+        margin: 20px 6px;
+        padding-bottom: 0;
+    }
+
+    .mat-card-actions, .mat-card-content, .mat-card-subtitle {
+        margin-bottom: 0;
+    }
+
+    .project-detail-card {
+        max-height: 100%;
+    }
 }
 
 /* smartphone in landscape */
@@ -163,5 +191,5 @@
         width: 100%;
         height: 100%;
         /* background: linear-gradient(164deg, sienna, lightgreen); /* color4test */
-    }    
+    }
 }

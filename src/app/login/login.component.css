@@ -9,15 +9,29 @@
         padding: 10px;
     }
 
-    .loginFormContainer {
+    .registerButtonContainer {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+
+    .registerSideText {
+        margin-right: 10px;
+        font-weight: 500;
+        color: white;
+        text-shadow: 1px 1px 5px black;
+    }
+
+    .formContainer {
         width: 400px;
-        max-height: 500px;
+        max-height: calc( 100% - 12px );
         overflow: hidden;
-        margin: 0 auto;
-        top: calc( 50% - 500px /2 - 20px );
-        position: relative;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         /* background: darkturquoise; /* color4test */
-        animation: cardAni 1s;
+        /* animation: cardAni 1s; */
     }
 
     .filitimeLogo {
@@ -26,7 +40,7 @@
         /* margin-left: calc( ( 100% - 111px ) / 2 ); */
         margin-left: calc( ( 100% - 111px - 220px ) / 2 );
         overflow: hidden;
-        animation: logoAni 1s;
+        /* animation: logoAni 1s; */
     }
       
     .form {
@@ -39,11 +53,11 @@
         width: 100%;
     }
 
-    .logInError {
+    .submitError {
         margin-top: 5px;
     }
     
-    .loginButton {
+    .wideButton {
         margin-top: 20px;
         width: 100%;
     }
@@ -55,17 +69,29 @@
             margin-left: calc( ( 100% - 111px ) / 2 );
             width: 111px;
         }
-        50% {
+        30% {
             opacity: 1;
             transform: scale(1) rotate(0);
             margin-left: calc( ( 100% - 111px ) / 2 );
             width: 111px;
         }
-        100% {
+        60% {
             opacity: 1;
             transform: scale(1) rotate(0);
             margin-left: calc( ( 100% - 111px - 220px ) / 2 );
             width: 111px;
+        }
+        61% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: unset;
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: unset;
         }
     }
     
@@ -73,7 +99,7 @@
         0% {
             max-height: 144px;
         }
-        60% {
+        45% {
             max-height: 144px;
         }
         100% {
@@ -88,9 +114,100 @@
         display: inline-block;
         width: 100%;
         height: 100%;
+        background: linear-gradient(164deg, #a7e3ff, #e6f5fb)
         /* background: linear-gradient(164deg, white, lightsalmon); /* color4test */
-        padding: 10px;
     }
+
+    .registerButtonContainer {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+    }
+
+    .registerSideText {
+        margin-right: 10px;
+        font-weight: 500;
+        color: white;
+        text-shadow: 1px 1px 5px black;
+    }
+
+    .formContainer {
+        width: 100%;
+        height: calc( 100% - 65px );
+        overflow: hidden;
+        position: absolute;
+        top: 65px;
+        /* background: darkturquoise; /* color4test */
+        /* animation: cardAni 1s; */
+    }
+
+    .filitimeLogo {
+        /* width: 111px; */
+        height: 111px;
+        /* margin-left: calc( ( 100% - 111px ) / 2 ); */
+        margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+        overflow: hidden;
+        /* animation: logoAni 1s; */
+    }
+
+    .form {
+        width: 100%;
+        padding: 65px 17px 0px 17px;
+    }
+
+    .form-element {
+        width: 100%;
+    }
+
+    .submitError {
+
+    }
+
+    .wideButton {
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .resetPwButton {
+        position: absolute;
+        left: 6px;
+        bottom: 6px;
+    }
+
+    @keyframes logoAni {
+        0% { 
+            opacity: 0.6;
+            transform: scale(0) rotate(270deg);
+            margin-left: calc( ( 100% - 111px ) / 2 );
+            width: 111px;
+        }
+        30% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px ) / 2 );
+            width: 111px;
+        }
+        60% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: 111px;
+        }
+        61% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: unset;
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            margin-left: calc( ( 100% - 111px - 220px ) / 2 );
+            width: unset;
+        }
+    }
+    
+    @keyframes cardAni {}
 }
 
 /* smartphone in landscape */

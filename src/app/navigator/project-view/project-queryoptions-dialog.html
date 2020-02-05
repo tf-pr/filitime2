@@ -1,0 +1,24 @@
+<mat-form-field>
+  <mat-label>Select an option</mat-label>
+  <mat-select [(value)]="data['queryBy']">
+    <mat-option value="create">Erstellt</mat-option>
+    <mat-option value="edit">Bearbeitet</mat-option>
+    <mat-option value="used">Verwendet</mat-option>
+  </mat-select>
+</mat-form-field>
+<mat-form-field>
+  <input matInput [matDatepicker]="pickerFrom" placeholder="von" [(value)]="data['queryFrom']">
+  <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+  <mat-datepicker #pickerFrom></mat-datepicker>
+</mat-form-field>
+<mat-form-field>
+  <input matInput [matDatepicker]="pickerTo" placeholder="bis" [(value)]="data['queryTo']">
+  <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+  <mat-datepicker #pickerTo></mat-datepicker>
+</mat-form-field>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Abbrechen</button>
+  <button mat-button
+    disabled="{{!data[queryBy] || !data[queryFrom] || !data[queryTo]"
+    [mat-dialog-close]="data">Ok</button>
+</div>

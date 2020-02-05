@@ -1,33 +1,268 @@
 <ng-container *ngIf="!isMobile">
     <div class="loginViewBG">
-        <mat-card class="loginFormContainer">
+        <div *ngIf="currMode == 'login'" class="registerButtonContainer">
+            <span class="registerSideText">neu hier?</span><!-- HIER -->
+            <button mat-raised-button color="primary" (click)="changeMode('register')">Registrieren</button>
+        </div>
+
+        <mat-card *ngIf="currMode == 'login'" class="formContainer" [style.animation]="showAni ? 'cardAni 1s' : 'unset'">
             <mat-card-content>
-                <div class="filitimeLogo">
+                <div class="filitimeLogo" [style.animation]="showAni ? 'logoAni 1s' : 'unset'">
                     <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
                     <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
                 </div>
-                <form [formGroup]="formGroup" (ngSubmit)="loginClicked()" class="form">
+                <form [formGroup]="formGroupLogin" (ngSubmit)="loginClicked()" class="form">
                     <mat-form-field class="form-element">
-                        <input matInput placeholder="E-Mail-Adresse" formControlName="email">
-                        <mat-error *ngIf="!formGroup.controls['email'].valid && formGroup.controls['email'].touched">
+                        <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                        <mat-error *ngIf="!formGroupLogin.controls['email'].valid && formGroupLogin.controls['email'].touched">
                             {{ getErrorEmail() }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="form-element">
                         <input matInput placeholder="Passwort" formControlName="password" type="password">
-                        <mat-error *ngIf="!formGroup.controls['password'].valid && formGroup.controls['password'].touched">
+                        <mat-error *ngIf="!formGroupLogin.controls['password'].valid && formGroupLogin.controls['password'].touched">
                             {{ getErrorPassword() }}
                         </mat-error>
                     </mat-form-field>
-                    <div *ngIf="!!logInErrorMsg" class="logInError">
+                    <div *ngIf="!!logInErrorMsg" class="submitError">
                         <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
                     </div>
                     <div class="form-element">
-                        <button mat-raised-button color="primary" type="submit" class="loginButton" [disabled]="!formGroup.valid">Login</button>
+                        <button mat-raised-button color="primary" type="submit" class="wideButton" [disabled]="!formGroupLogin.valid">Login</button>
+                    </div>
+                    <br>
+                    <a (click)="changeMode('resetPassword')">Password vergessen?</a>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'resetPassword'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <form [formGroup]="formGroupResetPW" (ngSubmit)="resetPasswordClicked()" class="form">
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                        <mat-error *ngIf="!formGroupResetPW.controls['email'].valid && formGroupResetPW.controls['email'].touched">
+                            {{ getErrorEmail() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <div *ngIf="!!resetPasswordErrorMsg" class="submitError">
+                        <alert *ngIf="!!resetPassword" type="danger"><strong>{{resetPassword}}</strong></alert>
+                    </div>
+                    <div class="form-element">
+                        <button mat-raised-button color="primary" type="submit" class="wideButton"
+                            [disabled]="!formGroupResetPW.valid">Passwort zurücksetzen</button>
+                    </div>
+                    <br><a (click)="changeMode('login')">zurück</a>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'register'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <br><br>
+                <mat-radio-group [(ngModel)]="registerMode">
+                    <mat-radio-button [value]="'registerCompany'">Unternehmensaccount erstellen</mat-radio-button>
+                    <br><br>
+                    <mat-radio-button [value]="'registerEmployee'">Mitarbeiteraccount erstellen</mat-radio-button>
+                </mat-radio-group>
+                <br><br><br>
+                <div>
+                    <button mat-raised-button class="backButton" (click)="changeMode('login')">zurück</button>
+                    <button mat-raised-button style="float: right;"
+                        [disabled]="(registerMode != 'registerCompany') && (registerMode != 'registerEmployee')" class="nextButton"
+                        (click)="registerModeNextClicked()">weiter</button>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerCompany'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <form [formGroup]="formGroupRegisterC" (ngSubmit)="registerCompany()" class="form">
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                        <mat-error *ngIf="!formGroupRegisterC.controls['email'].valid && formGroupRegisterC.controls['email'].touched">
+                            {{ getErrorEmail() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Passwort" formControlName="password" type="password">
+                        <mat-error *ngIf="!formGroupRegisterC.controls['password'].valid && formGroupRegisterC.controls['password'].touched">
+                            {{ getErrorPassword() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Passwort wiederholen" formControlName="repeatPassword" type="password">
+                        <mat-error *ngIf="!formGroupRegisterC.controls['password'].valid && formGroupRegisterC.controls['password'].touched">
+                            {{ getErrorPassword() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Unternehmen" formControlName="companyName">
+                        <!-- <mat-error *ngIf="!formGroupRegisterC.controls['companyName'].valid && formGroupRegisterC.controls['companyName'].touched">
+                            {{ getErrorXY() }}
+                        </mat-error> -->
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Vor- und Zuname" formControlName="fullName">
+                        <!-- <mat-error *ngIf="!formGroupRegisterC.controls['fullName'].valid && formGroupRegisterC.controls['fullName'].touched">
+                            {{ getErrorXY() }}
+                        </mat-error> -->
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Telefonnummer" formControlName="phoneNumber">
+                        <!-- <mat-error *ngIf="!formGroupRegisterC.controls['phoneNumber'].valid && formGroupRegisterC.controls['phoneNumber'].touched">
+                            {{ getErrorXY() }}
+                        </mat-error> -->
+                    </mat-form-field>
+                    <!-- <div *ngIf="!!logInErrorMsg" class="submitError">
+                        <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                    </div> -->
+                    <div>
+                        <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
+                        <button mat-raised-button type="submit" style="float: right;"
+                            class="nextButton">weiter</button>
                     </div>
                 </form>
             </mat-card-content>
         </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerCompany2'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <h3 style="text-align: center">Fast geschafft!</h3>
+                <p style="text-align: center">Um den Einstieg n die Digitale Plantafel, zu erleichtern, empfehlen wir gleich hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
+                <div style="text-align: right">
+                    <button mat-raised-button class="nextButton" (click)="startQuickStart()">weiter</button>
+                </div>
+                <br><a (click)="cancelQuickStart()">überspringen</a>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerCompany3'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <div style="margin-top: 20px; margin-bottom: 20px;">
+                    <div *ngFor="let employeeName of employeesToAdd; let i = index">
+                        <button mat-icon-button aria-label="entfernen" (click)="removeEmployeeToAdd(i)">
+                            <mat-icon>remove_circle_outline</mat-icon>
+                        </button>
+                        <span>{{employeeName}}</span>
+                    </div>
+                </div>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Name des Mitarbeiters" [(ngModel)]="employeeNameToAdd">
+                </mat-form-field>
+                <button mat-raised-button style="width: 100%" aria-label="hinzufügen" (click)="addEmployeeToAdd(employeeNameToAdd)">
+                    <mat-icon>add_circle_outline</mat-icon>Mitarbeiter hinzufügen
+                </button>
+                <div style="text-align: right; margin-top: 30px;">
+                    <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
+                </div>
+                <br><a (click)="cancelQuickStart()">überspringen</a>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerCompany4'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <div style="margin-top: 20px; margin-bottom: 20px;">
+                    <div *ngFor="let projectName of projectsToAdd; let i = index">
+                        <button mat-icon-button aria-label="entfernen" (click)="removeProjectToAdd(i)">
+                            <mat-icon>remove_circle_outline</mat-icon>
+                        </button>
+                        <span>{{projectName}}</span>
+                    </div>
+                </div>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Name des Projekts" [(ngModel)]="projectNameToAdd">
+                </mat-form-field>
+                <button mat-raised-button style="width: 100%" aria-label="hinzufügen" (click)="addProjectToAdd(projectNameToAdd)">
+                    <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
+                </button>
+                <div style="text-align: right; margin-top: 30px;">
+                    <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
+                </div>
+                <br><a (click)="finishQuickStart()">überspringen</a>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerEmployee'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <form [formGroup]="formGroupRegisterE" (ngSubmit)="checkEmployeeMail()" class="form">
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="E-Mail-Adresse" formControlName="email">
+                        <mat-error *ngIf="!formGroupRegisterE.controls['email'].valid && formGroupRegisterE.controls['email'].touched">
+                            {{ getErrorEmail() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <div class="form-element">
+                        <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
+                        <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                            class="nextButton">weiter</button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="currMode == 'registerEmployee2'" class="formContainer">
+            <mat-card-content>
+                <div class="filitimeLogo">
+                    <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                    <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+                </div>
+                <form [formGroup]="formGroupRegisterE2" (ngSubmit)="registerEmployee()" class="form">
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="E-Mail-Adresse" [disabled]="true" formControlName="email">
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Passwort" formControlName="password" type="password">
+                        <mat-error *ngIf="!formGroupRegisterE2.controls['password'].valid && formGroupRegisterE2.controls['password'].touched">
+                            {{ getErrorPassword() }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-element">
+                        <input matInput placeholder="Passwort wiederholen" formControlName="repeatPassword" type="password">
+                        <!-- <mat-error *ngIf="!formGroupRegisterE2.controls['password'].valid && formGroupRegisterE2.controls['password'].touched">
+                            {{ getErrorPassword() }}
+                        </mat-error> -->
+                    </mat-form-field>
+                    <!-- <div *ngIf="!!logInErrorMsg" class="submitError">
+                        <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                    </div> -->
+                    <div class="form-element">
+                        <button mat-raised-button class="backButton" (click)="changeMode('registerEmployee')">zurück</button>
+                        <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                            class="nextButton">weiter</button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
     </div>    
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">
@@ -38,7 +273,268 @@
 </ng-container>
 <ng-container *ngIf="isMobile && !isLandscape">
     <div class="loginViewBG">
-        <p>Hi Portrait-Smartphone-User, Please log in!</p>
-        <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
-    </div>  
+        <div *ngIf="currMode == 'login'" class="registerButtonContainer">
+            <span class="registerSideText">neu hier?</span><!-- HIER -->
+            <button mat-raised-button color="primary" (click)="changeMode('register')">Registrieren</button>
+        </div>
+    
+        <div *ngIf="currMode == 'login'" class="formContainer" [style.animation]="showAni ? 'cardAni 1s' : 'unset'">
+            <div class="filitimeLogo" [style.animation]="showAni ? 'logoAni 1s' : 'unset'">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <form [formGroup]="formGroupLogin" (ngSubmit)="loginClicked()" class="form">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                    <mat-error *ngIf="!formGroupLogin.controls['email'].valid && formGroupLogin.controls['email'].touched">
+                        {{ getErrorEmail() }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Passwort" formControlName="password" type="password">
+                    <mat-error
+                        *ngIf="!formGroupLogin.controls['password'].valid && formGroupLogin.controls['password'].touched">
+                        {{ getErrorPassword() }}
+                    </mat-error>
+                </mat-form-field>
+                <div *ngIf="!!logInErrorMsg" class="submitError">
+                    <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                </div>
+                <div class="form-element">
+                    <button mat-raised-button color="primary" type="submit" class="wideButton"
+                        [disabled]="!formGroupLogin.valid">Login</button>
+                </div>
+                <br>
+                <a class="resetPwButton" (click)="changeMode('resetPassword')">Password vergessen?</a>
+            </form>
+        </div>
+    
+        <div *ngIf="currMode == 'resetPassword'" class="formContainer">
+            <div class="filitimeLogo" [style.animation]="showAni ? 'logoAni 1s' : 'unset'">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <form [formGroup]="formGroupResetPW" (ngSubmit)="resetPasswordClicked()" class="form">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                    <mat-error
+                        *ngIf="!formGroupResetPW.controls['email'].valid && formGroupResetPW.controls['email'].touched">
+                        {{ getErrorEmail() }}
+                    </mat-error>
+                </mat-form-field>
+                <div *ngIf="!!resetPasswordErrorMsg" class="submitError">
+                    <alert *ngIf="!!resetPassword" type="danger"><strong>{{resetPassword}}</strong></alert>
+                </div>
+                <div class="form-element">
+                    <button mat-raised-button color="primary" type="submit" class="wideButton"
+                        [disabled]="!formGroupResetPW.valid">Passwort zurücksetzen</button>
+                </div>
+                <br><a (click)="changeMode('login')">zurück</a>
+            </form>
+        </div>
+    
+        <div *ngIf="currMode == 'register'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <div class="form">
+                <mat-radio-group [(ngModel)]="registerMode">
+                    <mat-radio-button [value]="'registerCompany'">Unternehmensaccount erstellen</mat-radio-button>
+                    <br><br>
+                    <mat-radio-button [value]="'registerEmployee'">Mitarbeiteraccount erstellen</mat-radio-button>
+                </mat-radio-group>
+                <br><br><br>
+                <div>
+                    <button mat-raised-button class="backButton" (click)="changeMode('login')">zurück</button>
+                    <button mat-raised-button style="float: right;"
+                        [disabled]="(registerMode != 'registerCompany') && (registerMode != 'registerEmployee')" class="nextButton"
+                        (click)="registerModeNextClicked()">weiter</button>
+                </div>
+            </div>
+        </div>
+    
+        <div *ngIf="currMode == 'registerCompany'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <form [formGroup]="formGroupRegisterC" (ngSubmit)="registerCompany()" class="form">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="E-Mail-Adresse" formControlName="email" appMdFocusOnInit>
+                    <mat-error
+                        *ngIf="!formGroupRegisterC.controls['email'].valid && formGroupRegisterC.controls['email'].touched">
+                        {{ getErrorEmail() }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Passwort" formControlName="password" type="password">
+                    <mat-error
+                        *ngIf="!formGroupRegisterC.controls['password'].valid && formGroupRegisterC.controls['password'].touched">
+                        {{ getErrorPassword() }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Passwort wiederholen" formControlName="repeatPassword" type="password">
+                    <mat-error
+                        *ngIf="!formGroupRegisterC.controls['password'].valid && formGroupRegisterC.controls['password'].touched">
+                        {{ getErrorPassword() }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Unternehmen" formControlName="companyName">
+                    <!-- <mat-error *ngIf="!formGroupRegisterC.controls['companyName'].valid && formGroupRegisterC.controls['companyName'].touched">
+                                            {{ getErrorXY() }}
+                                        </mat-error> -->
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Vor- und Zuname" formControlName="fullName">
+                    <!-- <mat-error *ngIf="!formGroupRegisterC.controls['fullName'].valid && formGroupRegisterC.controls['fullName'].touched">
+                                            {{ getErrorXY() }}
+                                        </mat-error> -->
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Telefonnummer" formControlName="phoneNumber">
+                    <!-- <mat-error *ngIf="!formGroupRegisterC.controls['phoneNumber'].valid && formGroupRegisterC.controls['phoneNumber'].touched">
+                                            {{ getErrorXY() }}
+                                        </mat-error> -->
+                </mat-form-field>
+                <!-- <div *ngIf="!!logInErrorMsg" class="submitError">
+                                        <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                                    </div> -->
+                <div>
+                    <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
+                    <button mat-raised-button type="submit" style="float: right;" class="nextButton">weiter</button>
+                </div>
+            </form>
+        </div>
+    
+        <div *ngIf="currMode == 'registerCompany2'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <div class="form">
+                <h3 style="text-align: center">Fast geschafft!</h3>
+                <p style="text-align: center">Um den Einstieg n die Digitale Plantafel, zu erleichtern, empfehlen wir gleich
+                    hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
+                <div style="text-align: right">
+                    <button mat-raised-button class="nextButton" (click)="startQuickStart()">weiter</button>
+                </div>
+                <br>
+                <a class="resetPwButton" (click)="cancelQuickStart()">überspringen</a>
+            </div>
+        </div>
+    
+        <div *ngIf="currMode == 'registerCompany3'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <div class="form">
+                <div style="margin-top: 20px; margin-bottom: 20px;">
+                    <div *ngFor="let employeeName of employeesToAdd; let i = index">
+                        <button mat-icon-button aria-label="entfernen" (click)="removeEmployeeToAdd(i)">
+                            <mat-icon>remove_circle_outline</mat-icon>
+                        </button>
+                        <span>{{employeeName}}</span>
+                    </div>
+                </div>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Name des Mitarbeiters" [(ngModel)]="employeeNameToAdd">
+                </mat-form-field>
+                <button mat-raised-button style="width: 100%" aria-label="hinzufügen" (click)="addEmployeeToAdd(employeeNameToAdd)">
+                    <mat-icon>add_circle_outline</mat-icon>Mitarbeiter hinzufügen
+                </button>
+                <div style="text-align: right; margin-top: 30px;">
+                    <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
+                </div>
+                <br>
+                <a class="form" (click)="cancelQuickStart()">überspringen</a>
+            </div>
+        </div>
+
+        <div *ngIf="currMode == 'registerCompany4'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <div class="form">
+                <div style="margin-top: 20px; margin-bottom: 20px;">
+                    <div *ngFor="let projectName of projectsToAdd; let i = index">
+                        <button mat-icon-button aria-label="entfernen" (click)="removeProjectToAdd(i)">
+                            <mat-icon>remove_circle_outline</mat-icon>
+                        </button>
+                        <span>{{projectName}}</span>
+                    </div>
+                </div>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Name des Projekts" [(ngModel)]="projectNameToAdd">
+                </mat-form-field>
+                <button mat-raised-button style="width: 100%" aria-label="hinzufügen"
+                    (click)="addProjectToAdd(projectNameToAdd)">
+                    <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
+                </button>
+                <div style="text-align: right; margin-top: 30px;">
+                    <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
+                </div>
+                <br>
+                <a class="form" (click)="finishQuickStart()">überspringen</a>
+            </div>
+        </div>
+    
+        <div *ngIf="currMode == 'registerEmployee'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <form [formGroup]="formGroupRegisterE" (ngSubmit)="checkEmployeeMail()" class="form">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="E-Mail-Adresse" formControlName="email">
+                    <mat-error
+                        *ngIf="!formGroupRegisterE.controls['email'].valid && formGroupRegisterE.controls['email'].touched">
+                        {{ getErrorEmail() }}
+                    </mat-error>
+                </mat-form-field>
+                <div class="form-element">
+                    <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
+                    <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                        class="nextButton">weiter</button>
+                </div>
+            </form>
+        </div>
+    
+        <div *ngIf="currMode == 'registerEmployee2'" class="formContainer">
+            <div class="filitimeLogo">
+                <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
+                <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
+            </div>
+            <form [formGroup]="formGroupRegisterE2" (ngSubmit)="registerEmployee()" class="form">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="E-Mail-Adresse" [disabled]="true" formControlName="email">
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Passwort" formControlName="password" type="password">
+                    <mat-error
+                        *ngIf="!formGroupRegisterE2.controls['password'].valid && formGroupRegisterE2.controls['password'].touched">
+                        {{ getErrorPassword() }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Passwort wiederholen" formControlName="repeatPassword" type="password">
+                    <!-- <mat-error *ngIf="!formGroupRegisterE2.controls['password'].valid && formGroupRegisterE2.controls['password'].touched">
+                                            {{ getErrorPassword() }}
+                                        </mat-error> -->
+                </mat-form-field>
+                <!-- <div *ngIf="!!logInErrorMsg" class="submitError">
+                                        <alert *ngIf="!!logInErrorMsg" type="danger"><strong>{{logInErrorMsg}}</strong></alert>
+                                    </div> -->
+                <div class="form-element">
+                    <button mat-raised-button class="backButton" (click)="changeMode('registerEmployee')">zurück</button>
+                    <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                        class="nextButton">weiter</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </ng-container>

@@ -12,17 +12,22 @@ import { LoggerService } from './services/logger.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  private fiddlify = false;
+
   public isOffline = false;
-  private isLoggedIn = false;
+  // private isLoggedIn = false;
   private isLoading = false;
+  private qucikStartOpened = false;
 
-  public showLoginForm = true;
+  // public showLoginForm = true;
 
-  private set loggedInSetter(value) {
-    if (this.isLoggedIn === value) { return; }
-    this.isLoggedIn = value;
-    this.showLoginForm = !value;
-  }
+  // private set loggedInSetter(value) {
+  //   if (this.isLoggedIn === value) { return; }
+  //   this.isLoggedIn = value;
+
+
+  //   // this.checkShowLoginFormState();
+  // }
 
   public get isLoadingGetter(): boolean {
     return this.isLoading;
@@ -41,19 +46,28 @@ export class AppComponent {
               private loadingHandler: LoadingHandlerService) {
     this.logger.setDbi = dbi;
 
-    this.loggedInSetter = dbi.getLoggedInState();
-    dbi.loggedInStateChange.subscribe({
-      next: value => {
-        if (!Helper.checkForValidBoolean(value)) {
-          this.logger.logError(46351354);
-          return;
-        }
-        this.loggedInSetter = value;
-      },
-      error: err => {
-        this.logger.logError(31351351, err);
-      }
-    });
+    // this.qucikStartOpened = this.globalData.getQucikStartOpened();
+    // this.globalData.qucikStartOpenedChange.subscribe({
+    //   next: val => {
+    //     this.qucikStartOpened = val;
+    //     // this.checkShowLoginFormState();
+    //   }
+    // });
+
+    // this.loggedInSetter = dbi.getLoggedInState();
+    // // this.checkShowLoginFormState();
+    // dbi.loggedInStateChange.subscribe({
+    //   next: value => {
+    //     if (!Helper.checkForValidBoolean(value)) {
+    //       this.logger.logError(46351354);
+    //       return;
+    //     }
+    //     this.loggedInSetter = value;
+    //   },
+    //   error: err => {
+    //     this.logger.logError(31351351, err);
+    //   }
+    // });
 
     this.isLoading = loadingHandler.getIsLoading();
     loadingHandler.loadingSateChange.subscribe({
@@ -72,4 +86,12 @@ export class AppComponent {
       }
     });
   }
+
+  // private checkShowLoginFormState() {
+  //   if (!!this.qucikStartOpened) {
+  //     this.showLoginForm = true;
+  //     return;
+  //   }
+  //   this.showLoginForm = !this.isLoggedIn;
+  // }
 }

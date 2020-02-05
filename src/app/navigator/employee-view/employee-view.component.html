@@ -1,6 +1,258 @@
 <ng-container *ngIf="!isMobile">
     <div class="employeeViewBG">
-        <mat-card class="employee-folder-card">
+
+
+            <ng-container *ngIf="!currEmployeeId">
+                    <div>
+                        <div *ngIf="!!currDept">
+                            <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                                <mat-icon>arrow_back</mat-icon>
+                            </button>
+                            <h4 style="display: inline-block;" *ngIf="!!currDept">Abteilung: {{currDept}}</h4>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: inline-block; vertical-align: top;">
+                            <h3>
+                                <mat-icon>search</mat-icon>Textsuche
+                            </h3>
+                            <div style="padding-left: 10px;">
+                                <mat-form-field class="textSucheSeinVatter"><input matInput [(ngModel)]="textSearch" placeholder="Suchbegriff">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; vertical-align: top;">
+                            <h3>
+                                <mat-icon>filter</mat-icon>Filter
+                            </h3>
+                            <div style="padding-left: 10px;">
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
+                                    <span style="font-weight: normal">unter Vorbehalt</span>
+                                </mat-checkbox>
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
+                                    <span style="font-weight: normal">Planbedarf</span>
+                                </mat-checkbox>
+                                <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted" (change)="completedFilterChange()">
+                                    <span style="font-weight: normal">Beendet</span>
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; vertical-align: top;">
+                            <h3>
+                                <mat-icon>unfold_more</mat-icon>Sortieren
+                            </h3>
+                            <div style="padding-left: 10px;">
+                                <div style="display: inline-block; vertical-align: top;">
+                                    <mat-radio-group [(ngModel)]="sortBy" (change)="sortChanged()">
+                                        <mat-radio-button class="cbidd" [value]="'createdAt'">
+                                            <span style="font-weight: normal">chronologisch</span>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="cbidd" [value]="'name'">
+                                            <span style="font-weight: normal">alphabtisch</span>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="cbidd" [value]="'identifier'">
+                                            <span style="font-weight: normal">nach Identifikator</span>
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div style="display: inline-block; vertical-align: top;">
+                                    <mat-radio-group [(ngModel)]="sortDesc" (change)="sortDirectionChanged()">
+                                        <mat-radio-button class="cbidd" [value]="false">
+                                            <span style="font-weight: normal">aufsteigend</span>
+                                        </mat-radio-button>
+                                        <mat-radio-button class="cbidd" [value]="true">
+                                            <span style="font-weight: normal">absteigend</span>
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button mat-raised-button color="primary" (click)="addEmployeeButtonClicked()">
+                            <mat-icon>add_circle_outline</mat-icon>Mitarbeiter hinzufügen
+                        </button>
+                    </div>
+                    <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                        [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                        (page)="paginatorChanged($event)">
+                    </mat-paginator>
+                    <ng-container *ngFor="let employee of employeeListPaginated">
+                        <mat-card class="employee-card" [style.color]="getMostReadableFontColor(!!employee.deptColor?employee.deptColor:'#ffffff')"
+                            [style.background]="'linear-gradient(45deg, ' + !!employee.deptColor?employee.deptColor:'#ffffff' + ' 84%, ' + (!!employee.groupColor?employee.groupColor:employee.deptColor) + ' 0)'">
+                            <mat-card-header class="employee-card-header">
+                                <mat-card-title>{{employee.name}}</mat-card-title>
+                                <mat-card-subtitle class="employee-card-subtitle">{{employee.identifier}}</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-divider></mat-divider><br>
+                            <mat-card-content>
+                    
+                                <span>docId: {{employee.docId}}</span><br>
+                                <span>identifier: {{employee.identifier}}</span><br>
+                                <span>name: {{employee.name}}</span><br>
+                                <span>dept: {{employee.dept}}</span><br>
+                                <span>deptColor: {{employee.deptColor}}</span><br>
+                                <span>group: {{employee.group}}</span><br>
+                                <span>groupColor: {{employee.groupColor}}</span><br>
+                                <span>user: {{employee.user}}</span><br>
+                                <span>scheduler: {{employee.scheduler}}</span><br>
+                                <span>selfEdit: {{employee.selfEdit}}</span><br>
+                                <span>createTS: {{employee.createTS}}</span><br>
+                                <span>createId: {{employee.createId}}</span><br>
+                                <span>createName: {{employee.createName}}</span><br>
+                                <span>editTS: {{employee.editTS}}</span><br>
+                                <span>editId: {{employee.editId}}</span><br>
+                                <span>editName: {{employee.editName}}</span><br>
+                    
+                    
+                            </mat-card-content>
+                            <mat-card-actions>
+                                <button mat-button (click)="changeCurrEmployeeId(employee.identifier)">Details</button>
+                            </mat-card-actions>
+                        </mat-card>
+                        <!-- <mat-card class="employee-card"
+                            [style.animation]="!isDeleting(employee.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
+                            [style.color]="getMostReadableFontColor(employee.color)"
+                            [style.background]="'linear-gradient(45deg, ' + employee.color + ' 84%, ' + (!!employee.markerColor?employee.markerColor:employee.color) + ' 0)'"
+                            matBadgeHidden="{{!employee.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                            matBadgePosition="before">
+                            <mat-card-header class="employee-card-header" matBadgeHidden="{{!employee.reserved}}" matBadge="?"
+                                matBadgeSize="large">
+                                <mat-card-title>{{employee.name}}</mat-card-title>
+                                <mat-card-subtitle class="employee-card-subtitle">{{employee.identifier}}</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-divider></mat-divider><br>
+                            <mat-card-content>
+                                <div style="padding: 3px; cursor:pointer;" (click)="changeCurrDept(employee.dept)">
+                                    <span *ngIf="!!employee.currDept">Abteilung</span>
+                                    <div style="padding-left: 10px">
+                                        <span>{{employee.dept}}</span>
+                                    </div>
+                                </div>
+                                <div style="display: inline-block; padding: 3px;">
+                                    <span>Dauer</span>
+                                    <div style="padding-left: 10px">
+                                        <span *ngIf="!!employee.endless">endlos</span>
+                                        <span *ngIf="!employee.endless">{{employee.duration}}</span>
+                                    </div>
+                                </div>
+                                <div style="display: inline-block; padding: 3px;">
+                                    <span>verplante Dauer</span>
+                                    <div style="padding-left: 10px">
+                                        <span>{{employee.allocatedTime}}</span>
+                                    </div>
+                                </div>
+                                <div *ngIf="!!employee.note" style="padding: 3px;">
+                                    <span>Notiz</span>
+                                    <div style="padding-left: 10px;">
+                                        <p style="word-break: break-all;">{{employee.note}}</p>
+                                    </div>
+                                </div>
+                                <span *ngIf="employee.finished">Abgeschlossen</span>
+                                <span>blockCode: {{employee.blockCode}}</span><br>
+                            </mat-card-content>
+                            <mat-card-actions>
+                                <button mat-button (click)="changeCurrEmployeeId(employee.identifier)">Details</button>
+                            </mat-card-actions>
+                        </mat-card> -->
+                    </ng-container>
+                    <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                        [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
+                        (page)="paginatorChanged($event)">
+                    </mat-paginator>
+                </ng-container>
+                <ng-container *ngIf="!!currEmployeeId">
+                    <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
+                        <mat-icon>arrow_back</mat-icon>
+                    </button>
+                    <div *ngIf="employeeListPaginated.length == 0">
+                        <h3>Mitarbeiter "{{currEmployeeId}}" nicht bekannt</h3>
+                    </div>
+                    <div *ngIf="employeeListPaginated.length != 0">
+                        <mat-card class="employee-detail-card" [style.color]="getMostReadableFontColor(employeeListPaginated[0].color)"
+                            [style.background]="'linear-gradient(45deg, ' + employeeListPaginated[0].color + ' 84%, ' + (!!employeeListPaginated[0].markerColor?employeeListPaginated[0].markerColor:employeeListPaginated[0].color) + ' 0)'"
+                            matBadgeHidden="{{!employeeListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                            matBadgePosition="before">
+                            <mat-card-header class="employee-card-header" matBadgeHidden="{{!employeeListPaginated[0].reserved}}" matBadge="?" matBadgeSize="large">
+                                <mat-card-title>{{employeeListPaginated[0].name}}</mat-card-title>
+                                <mat-card-subtitle class="employee-card-subtitle">{{employeeListPaginated[0].identifier}}</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-divider></mat-divider><br>
+                            <mat-card-content>
+                                <div style="padding: 3px; cursor:pointer;" (click)="changeCurrDept(employeeListPaginated[0].dept)">
+                                    <span *ngIf="!!employeeListPaginated[0].dept">Ordner</span>
+                                    <div style="padding-left: 10px">
+                                        <span>{{employeeListPaginated[0].dept}}</span>
+                                    </div>
+                                </div>
+                                <div style="display: inline-block; padding: 3px;">
+                                    <span>Dauer</span>
+                                    <div style="padding-left: 10px;">
+                                        <span *ngIf="!!employeeListPaginated[0].endless">endlos</span>
+                                        <span *ngIf="!employeeListPaginated[0].endless">{{employeeListPaginated[0].duration}}</span>
+                                    </div>
+                                </div>
+                                <div  *ngIf="!employeeListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                                    <span>verplante Kapa.</span>
+                                    <div style="display: inline-block; padding-left: 10px;">
+                                        <span *ngIf="!employeeListPaginated[0].endless">{{employeeListPaginated[0].allocatedTime}}</span>
+                                    </div>
+                                </div>
+                                <div  *ngIf="!employeeListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                                    <span>Offene Kapa.</span>
+                                    <div style="display: inline-block; padding-left: 10px;">
+                                        <span *ngIf="!employeeListPaginated[0].endless">{{employeeListPaginated[0].duration - employeeListPaginated[0].duration}}</span>
+                                    </div>
+                                </div>
+                                <div *ngIf="!!employeeListPaginated[0].note" style="padding: 3px;">
+                                    <span>Notiz</span>
+                                    <div style="padding-left: 10px;">
+                                        <p style="word-break: break-all;">{{employeeListPaginated[0].note}}</p>
+                                    </div>
+                                </div>
+                                <span *ngIf="employeeListPaginated[0].finished">Abgeschlossen</span>
+                                <div style="display: inline-block; padding: 3px;">
+                                    <span>Erstellt</span>
+                                    <div style="padding-left: 10px;">
+                                        <span>{{employeeListPaginated[0].createdTS}}</span>
+                                    </div>
+                                </div>
+                                <div  *ngIf="!employeeListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                                    <span>Zuletzt geändert</span>
+                                    <div style="display: inline-block; padding-left: 10px;">
+                                        <span>{{employeeListPaginated[0].editTS}}</span>
+                                    </div>
+                                </div>
+                                <div  *ngIf="!employeeListPaginated[0].endless" style="display: inline-block; padding: 3px;">
+                                    <span>zuletzt verwendet</span>
+                                    <div style="display: inline-block; padding-left: 10px;">
+                                        <span>{{employeeListPaginated[0].editTS}}</span>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                            <mat-card-actions>
+                                <button mat-button>Bearbeiten</button>
+                            </mat-card-actions>
+                        </mat-card>
+        
+        
+        
+                        
+        
+        
+                    </div>
+                    <div>
+        
+                    </div>
+                </ng-container>
+
+
+
+
+
+
+
+        <!-- <mat-card class="employee-folder-card">
             <mat-card-content class="employee-folder-card-content">
                 <div class="controlPanel">
                     <div class="controlPanelButtonLayer">
@@ -11,23 +263,7 @@
                                 Filtern <span class="caret"></span>
                             </button>
                             <ul *dropdownMenu class="dropdown-menu" role="menu">
-                                <!-- HIER -->
-                                <!-- <li role="menuitem">
-                                    <mat-checkbox class="cbidd" [(ngModel)]="filterReserved" (change)="reservedFilterChange()">
-                                        <span style="font-weight: normal">unter Vorbehalt</span>
-                                    </mat-checkbox>
-                                </li>
-                                <li role="menuitem">
-                                    <mat-checkbox class="cbidd" [(ngModel)]="filterZeroTTA" (change)="zeroFilterChange()">
-                                        <span style="font-weight: normal">Planbedarf</span>
-                                    </mat-checkbox>
-                                </li>
-                                <li role="menuitem">
-                                    <mat-checkbox class="cbidd" [(ngModel)]="filterCompleted"
-                                        (change)="completedFilterChange()">
-                                        <span style="font-weight: normal">Beendet</span>
-                                    </mat-checkbox>
-                                </li> -->
+
                             </ul>
                         </div>
                         <div class="btn-group" dropdown [insideClick]="true">
@@ -97,8 +333,23 @@
                         </mat-card-header>
                         <mat-divider></mat-divider><br>
                         <mat-card-content>
-                            <span>HIER</span>
-                            <span>MA Daten</span>
+
+                            <span>docId:  {{employee.docId}}</span><br>
+                            <span>identifier:  {{employee.identifier}}</span><br>
+                            <span>name:  {{employee.name}}</span><br>
+                            <span>dept:  {{employee.dept}}</span><br>
+                            <span>deptColor:  {{employee.deptColor}}</span><br>
+                            <span>group:  {{employee.group}}</span><br>
+                            <span>groupColor:  {{employee.groupColor}}</span><br>
+                            <span>user:  {{employee.user}}</span><br>
+                            <span>scheduler:  {{employee.scheduler}}</span><br>
+                            <span>selfEdit:  {{employee.selfEdit}}</span><br>
+                            <span>createTS:  {{employee.createTS}}</span><br>
+                            <span>createId:  {{employee.createId}}</span><br>
+                            <span>createName:  {{employee.createName}}</span><br>
+                            <span>editTS:  {{employee.editTS}}</span><br>
+                            <span>editId:  {{employee.editId}}</span><br>
+                            <span>editName:  {{employee.editName}}</span><br>
 
 
                         </mat-card-content>
@@ -114,7 +365,14 @@
                     (page)="paginatorChanged($event)">
                 </mat-paginator>
             </mat-card-content>
-        </mat-card>
+        </mat-card> -->
+
+
+
+
+
+
+
     </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">

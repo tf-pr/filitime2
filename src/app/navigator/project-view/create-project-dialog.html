@@ -1,34 +1,47 @@
 <h1 mat-dialog-title>Projekt hinzufügen</h1>
-<div mat-dialog-content>
-  <mat-form-field>
+<div mat-dialog-content style="width: 400px; max-width: calc( 80vw - 48px );">
+  <mat-form-field style="display: block">
     <input cdkFocusInitial matInput placeholder="Name" [(ngModel)]="data[projNameKeyStr]" required>
     <mat-error>Bitte geben Sie einen Namen an</mat-error>
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-field style="display: block">
     <input matInput placeholder="Kennziffer" [(ngModel)]="data[projIdentifierKeyStr]" required>
     <mat-error>Bitte geben Sie eine Kennziffer an</mat-error>
+  </mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput placeholder="Ordner" [(ngModel)]="data[projFolderKeyStr]">
   </mat-form-field>
   <mat-checkbox [(ngModel)]="data[projEndlessKeyStr]">
     <span style="font-weight: normal">Bearbeitungsdauer unbegrenzt</span>
   </mat-checkbox>
-  <mat-form-field>
-    <input matInput type="number" placeholder="Dauer (in Min)" [(ngModel)]="data[projDurationKeyStr]" required>
+  <h3>Dauer</h3>
+  <mat-form-field style="display: block">
+    <input matInput type="number" placeholder="Tage (8 Stunden)" [(ngModel)]="data[projDurationKeyStr]" required>
     <mat-error>Bitte geben Sie eine Dauer an</mat-error>
   </mat-form-field>
-  <span>Farbe</span><p-colorPicker [(ngModel)]="data[projColorKeyStr]"></p-colorPicker>
-  <mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput type="number" placeholder="Stunden" [(ngModel)]="data[projDurationKeyStr]" required>
+    <mat-error>Bitte geben Sie eine Dauer an</mat-error>
+  </mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput type="number" placeholder="Minuten" [(ngModel)]="data[projDurationKeyStr]" required>
+    <mat-error>Bitte geben Sie eine Dauer an</mat-error>
+  </mat-form-field>
+  <h3>Farbe</h3>
+  <p-colorPicker [(ngModel)]="data[projColorKeyStr]"></p-colorPicker>
+  <mat-form-field style="display: block">
+     <!-- HIER später matAutocomplete -->
     <input matInput placeholder="Kategorie" [(ngModel)]="data[projMarkerKeyStr]">
   </mat-form-field>
-  <span>Kategoriefarbe</span><p-colorPicker [(ngModel)]="data[projMarkerColorKeyStr]"></p-colorPicker>
-  <mat-form-field>
-    <input matInput placeholder="Notiz" [(ngModel)]="data[projNoteKeyStr]">
+  <!-- <span>Kategoriefarbe</span><p-colorPicker [(ngModel)]="data[projMarkerColorKeyStr]"></p-colorPicker> -->
+  <mat-form-field style="display: block">
+    <!-- <input matInput placeholder="Notiz" [(ngModel)]="data[projNoteKeyStr]"> -->
+    <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
+      cdkAutosizeMaxRows="10" [(ngModel)]="data[projNoteKeyStr]"></textarea>
   </mat-form-field>
   <mat-checkbox [(ngModel)]="data[projReservedKeyStr]">
     <span style="font-weight: normal">unter Vorbehalt</span>
   </mat-checkbox>
-  <mat-form-field>
-    <input matInput placeholder="Ordner" [(ngModel)]="data[projFolderKeyStr]">
-  </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abbrechen</button>

@@ -37,14 +37,12 @@ export class DbiService {
 
   public setUpNewClient(email: string,
                         password: string,
-                        employeeId: string,
-                        clientId: string,
                         lang: string,
                         company: string,
                         phone: string,
                         poc: string) {
     return new Promise<any>((res, rej) => {
-      this.fsi.setUpNewClient(email, password, employeeId, clientId, lang, company, phone, poc)
+      this.fsi.setUpNewClient(email, password, lang, company, phone, poc)
         .then(() => { res(); })
         .catch(err => { rej(err); });
     });
@@ -60,6 +58,10 @@ export class DbiService {
 
   public getUsersEmployee(): Employee {
     return this.usersEmployee;
+  }
+
+  public get isAdmin(): boolean {
+    return this.fsi.isAdmin;
   }
 
   private set setIsLoggedInState(value: boolean) {
@@ -81,10 +83,17 @@ export class DbiService {
 
     this.setIsLoggedInState = fsi.getIsLoggedInState();
     fsi.loggedInStateChange.subscribe({
-      next: value => {
+      next: async (value) => {
         if (!Helper.checkForValidBoolean(value)) {
           this.logger.logError(35134354);
           return;
+        }
+
+        if (this.setIsLoggedInState === value) { return; }
+
+        if ( value === true ) {
+          // Preload data ... iwie sheiße... aber was soll ich machen
+          await this.startSyncEmployeeAccesses();
         }
 
         this.setIsLoggedInState = value;
@@ -156,7 +165,7 @@ export class DbiService {
     });
   }
 
-  public startSyncProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts', startAt: Date, endBefore: Date) {
+  public startSyncProjects(orderedBy: 'createTS' | 'editTS' | 'useTS', startAt: Date, endBefore: Date) {
       this.dpo.stopSyncProjects();
 
       const subsTuple = this.fsi.syncQueriedProjects(
@@ -178,5 +187,157 @@ export class DbiService {
         });
 
       this.dpo.startSyncProjects(subsTuple[0], subsTuple[1], subsTuple[2]);
+  }
+
+  public adminStateChanged() {
+    // HIER
+    // if (this.isAdmin) {
+    //   this.stopSyncEmployeeAccesses();
+    //   setTimeout(() => {
+    //     this.startSyncEmployeeAccesses();
+    //     this.startSyncAllEmployees();
+    //   }, 250);
+    // } else {
+    //   this.stopSyncEmployeeAccesses();
+    //   this.stopSyncAllEmployees();
+    //   setTimeout(() => {
+    //     this.startSyncEmployeeAccesses();
+    //     this.startSyncAllEmployees();
+    //   }, 250);
+    // }
+  }
+
+  public async startSyncEmployeeAccesses(  ) {
+    this.dpo.stopSyncUsersEmployeeAccesses();
+
+    const userIsAdmin = this.isAdmin;
+    if (userIsAdmin) {
+      console.log('Ohh iM aN aDmIn....');
+    } else {
+      console.log('u r nothin!');
+    }
+
+    {
+      // get users emp id
+      const lolamk = await this.fsi.getUsersEmployeeAccesses();
+
+      // check if users accesses are empty
+      if (lolamk.length === 0) {
+        console.error('lolamk-Length is Zero!!!');
+      }
+    }
+
+    // sync users accesses
+    const accessesSub = this.fsi.syncUsersEmployeeAccesses(
+      newAccesses => {
+        console.log({newAccesses});
+
+        const knownAccesses: [string, boolean][] = this.dpo.getUsersEmployeeAccesses();
+        const knownEmpIds = knownAccesses.length === 0 ? [] : knownAccesses.map(access => access[0]);
+        console.log({knownAccesses});
+        console.log({knownEmpIds});
+
+        this.dpo.setUsersEmployeeAccesses( newAccesses );
+        if (userIsAdmin) { return; }
+
+        const newEmpIds = newAccesses.length === 0 ? [] : newAccesses.map(access => access[0]);
+        console.log({newEmpIds});
+
+        const addedAccesses = newAccesses.filter(access => {
+          return knownEmpIds.indexOf(access[0]) === -1;
+        });
+        console.log({addedAccesses});
+
+        const changedAccesses = newAccesses.filter(access => {
+          const i = knownEmpIds.indexOf(access[0]);
+          return i !== -1 && knownAccesses[i][1] !== access[1];
+        });
+        console.log({changedAccesses});
+
+        const unchangedAccesses = newAccesses.filter(access => {
+          const i = knownEmpIds.indexOf(access[0]);
+          return i !== -1 && knownAccesses[i][1] === access[1];
+        });
+        console.log({unchangedAccesses});
+
+        const deletedAccesses = knownAccesses.filter(access => {
+          return newEmpIds.indexOf(access[0]) === -1;
+        });
+        console.log({deletedAccesses});
+
+        // sync / unsync employees based on accesses
+
+        deletedAccesses.forEach(access => {
+          const empId = access[0];
+          this.dpo.stopSyncEmployee(empId);
+          this.dpo.removeEmployee(empId);
+        });
+
+        addedAccesses.forEach(access => {
+          const empId = access[0];
+          const empSub = this.fsi.syncEmployee(
+            access[0],
+            employee => {
+              // console.error('DO SOMTHING WITH THIS!!!');
+              // console.warn(employee);
+              this.dpo.addOrModifyEmployee(employee);
+            },
+            err => {
+              console.error('WTF IS THIS?!?!?');
+            });
+
+          this.dpo.startSyncEmployee(empId, empSub);
+        });
+
+        changedAccesses.forEach(access => {
+          this.dpo.modifyEmployeeAccess(access);
+        });
+
+      },
+      err => {
+        console.error('AHHHHHHH: ' + err);
+      });
+    this.dpo.startSyncUsersEmployeeAccesses(accessesSub);
+
+    if (!userIsAdmin) { return; }
+
+    const blub = this.fsi.syncAllEmployees(
+      (addedEmployees: Employee[]) => {
+        addedEmployees.forEach(employee => {
+          this.dpo.addEmployee(employee);
+        });
+      },
+      (modifiedEmployees: Employee[]) => {
+        modifiedEmployees.forEach(employee => {
+          this.dpo.modifyEmployee(employee);
+        });
+      },
+      (removedEmploye: Employee[]) => {
+        removedEmploye.forEach(employee => {
+          this.dpo.removeEmployee(employee.docId);
+        });
+      }
+    );
+
+    const blub1 = blub[0];  // HIER
+    const blub2 = blub[0];  // HIER
+    const blub3 = blub[0];  // HIER
+    this.dpo.startSyncAllEmployees(blub1, blub2, blub3);
+  }
+
+  public async startSyncAdminEmployeeAccesses(  ) {
+    this.dpo.stopSyncUsersEmployeeAccesses();
+
+    // sync users accesses
+    const accessesSub = this.fsi.syncUsersEmployeeAccesses(
+      newAccesses => {
+        this.dpo.setUsersEmployeeAccesses( newAccesses );
+      },
+      err => {
+        console.error('FUFU: ' + err);
+      });
+    this.dpo.startSyncUsersEmployeeAccesses(accessesSub);
+
+    // sync / unsync employees based on accesses
   }
 }

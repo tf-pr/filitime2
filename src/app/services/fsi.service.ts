@@ -126,6 +126,29 @@ export class FsiService {
     return returnValue;
   }
 
+  private static converEmplyeeToDBObj(employee: Employee): {} {
+    const returnValue = {};
+
+    if ( !!employee.docId )       { returnValue[Employee.docIdKeyStr]      = employee.docId;      }
+    if ( !!employee.identifier )  { returnValue[Employee.identifierKeyStr] = employee.identifier; }
+    if ( !!employee.name )        { returnValue[Employee.nameKeyStr]       = employee.name;       }
+    if ( !!employee.dept )        { returnValue[Employee.deptKeyStr]       = employee.dept;       }
+    if ( !!employee.deptColor )   { returnValue[Employee.deptColorKeyStr]  = employee.deptColor;  }
+    if ( !!employee.group )       { returnValue[Employee.groupKeyStr]      = employee.group;      }
+    if ( !!employee.groupColor )  { returnValue[Employee.groupColorKeyStr] = employee.groupColor; }
+    if ( !!employee.user )        { returnValue[Employee.userKeyStr]       = employee.user;       }
+    if ( !!employee.scheduler )   { returnValue[Employee.schedulerKeyStr]  = employee.scheduler;  }
+    if ( !!employee.selfEdit )    { returnValue[Employee.selfEditKeyStr]   = employee.selfEdit;   }
+    if ( !!employee.createTS )    { returnValue[Employee.createTSKeyStr]   = employee.createTS;   }
+    if ( !!employee.createId )    { returnValue[Employee.createIdKeyStr]   = employee.createId;   }
+    if ( !!employee.createName )  { returnValue[Employee.createNameKeyStr] = employee.createName; }
+    if ( !!employee.editTS )      { returnValue[Employee.editTSKeyStr]     = employee.editTS;     }
+    if ( !!employee.editId )      { returnValue[Employee.editIdKeyStr]     = employee.editId;     }
+    if ( !!employee.editName )    { returnValue[Employee.editNameKeyStr]   = employee.editName;   }
+
+    return returnValue;
+  }
+
   public static generatePushId(): string {
     let pushId = '';
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -196,7 +219,9 @@ export class FsiService {
           console.log('email: ' + this.email);
           this.getUserData()
             .then(() => {
-              this.setIsLoggedInState = true;
+              this.getAdminState().then(() => {
+                this.setIsLoggedInState = true;
+              });
             })
             .catch(err => {
               console.error('Error: 16473834' + ' | ' + err);
@@ -286,29 +311,34 @@ export class FsiService {
     }
   }
 
-  public getAdminState() {
-    const adminsDocPath = this.buildAminsDocPath();
-    console.log({adminsDocPath});
-    this.getDocDataFromDbAtDocPath(adminsDocPath)
-      .then(val => {
-        console.log('getDocDataFromDbAtDocPath.then');
-        console.log(JSON.stringify(val));
-        console.log(this.usersUserId);
-        console.log(val[this.usersUserId]);
-        console.log(!val[this.usersUserId]);
+  public getAdminState(): Promise<boolean> {
+    return new Promise<boolean>((res) => {
+      const adminsDocPath = this.buildAminsDocPath();
+      console.log({ adminsDocPath });
+      this.getDocDataFromDbAtDocPath(adminsDocPath)
+        .then(val => {
+          console.log('getDocDataFromDbAtDocPath.then');
+          console.log(JSON.stringify(val));
+          console.log(this.usersUserId);
+          console.log(val[this.usersUserId]);
+          console.log(!val[this.usersUserId]);
 
-        const isAdmin = !(val[this.usersUserId]);
+          // const isAdmin = !(val[this.usersUserId]);
+          const isAdmin = !!val;
 
-        if (!isAdmin) { console.error('Error 97567363'); }
+          if (!isAdmin) { console.error('Error 97567363'); }
 
-        this.userIsAdmin = isAdmin;
-      })
-      .catch(err => {
-        if (err.code !== '') {
-          console.warn('Warn: 789674' +  ' | unexpected Error code: ' + err.code);
-        }
-        this.userIsAdmin = false;
-      });
+          this.userIsAdmin = isAdmin;
+          res(isAdmin);
+        })
+        .catch(err => {
+          if (err.code !== '') {
+            console.warn('Warn: 789674' + ' | unexpected Error code: ' + err.code);
+          }
+          this.userIsAdmin = false;
+          res(false);
+        });
+    });
   }
 
   //#endregion
@@ -320,7 +350,8 @@ export class FsiService {
   }
 
   private buildAminsDocPath(): string {
-    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.adminColKeyStr + '/' + this.adminsDocKeyStr;
+    // return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.adminColKeyStr + '/' + this.adminsDocKeyStr;
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/adminCol/writable/adminList/' + this.usersUserId;
   }
 
   private buildEmployeeDocPath( employeeId: string ): string {
@@ -416,7 +447,7 @@ export class FsiService {
         dataObj[Project.nameKeyStr] = name;
         dataObj[Project.durationKeyStr] = duration;
         dataObj[Project.endlessKeyStr] = !!endless;
-        dataObj[Project.allocatedTimeKeyStr] = duration;
+        dataObj[Project.allocatedTimeKeyStr] = 0;
         dataObj[Project.colorKeyStr] = color;
         if (!!marker) { dataObj[Project.markerKeyStr] = marker; }
         if (!!markerColor) { dataObj[Project.markerColorKeyStr] = markerColor; }
@@ -482,7 +513,7 @@ export class FsiService {
         dataObj[Project.nameKeyStr] = name;
         dataObj[Project.durationKeyStr] = duration;
         dataObj[Project.endlessKeyStr] = !!endless;
-        dataObj[Project.allocatedTimeKeyStr] = duration;
+        // dataObj[Project.allocatedTimeKeyStr] = duration;       // hier
         dataObj[Project.colorKeyStr] = color;
         if (!!marker) { dataObj[Project.markerKeyStr] = marker; }
         if (!!markerColor) { dataObj[Project.markerColorKeyStr] = markerColor; }
@@ -504,7 +535,7 @@ export class FsiService {
     }
   }
 
-  public getQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts',
+  public getQueriedProjects(orderedBy: 'createTS' | 'editTS' | 'useTS',
                             startAt: Date,
                             endBefore: Date): Promise<Project[]> {
     return new Promise<Project[]>((res, rej) => {
@@ -532,7 +563,7 @@ export class FsiService {
     });
   }
 
-  public syncQueriedProjects(orderedBy: 'create_ts' | 'edit_ts' | 'use_ts', startAt: Date,
+  public syncQueriedProjects(orderedBy: 'createTS' | 'editTS' | 'useTS', startAt: Date,
                              endBefore: Date,
                              addedCB: (arg0: Project[]) => void,
                              modifiedCB: (arg0: Project[]) => void,
@@ -731,7 +762,7 @@ export class FsiService {
     return sub;
   }
 
-  public getEmployeeAccesses(employeeId): Promise<[string, boolean][]> {
+  public getEmployeeAccesses(employeeId: string): Promise<[string, boolean][]> {
     return new Promise((res, rej) => {
       const accessesDocPath = this.buildAccessesDocPath(employeeId);
       this.getDocDataFromDbAtDocPath(accessesDocPath)
@@ -749,8 +780,8 @@ export class FsiService {
     });
   }
 
-  public syncEmployeeAccesses(employeeId,
-                              cb: (arg0: [string, boolean][]) => void,
+  public syncEmployeeAccesses(employeeId: string,
+                              cb: (accesses: [string, boolean][]) => void,
                               errCB: (err: string) => void): Subscription {
     const accessesDocPath = this.buildAccessesDocPath(employeeId);
     const sub = this.syncDocValueChangesFromDbAtDocPath(
@@ -769,6 +800,69 @@ export class FsiService {
       }
     );
     return sub;
+  }
+
+  public getUsersEmployeeAccesses(): Promise<[string, boolean][]> {
+    return this.getEmployeeAccesses(this.usersEmployeeId);
+  }
+
+  public syncUsersEmployeeAccesses(cb: (arg0: [string, boolean][]) => void,
+                                   errCB: (err: string) => void): Subscription {
+    return this.syncEmployeeAccesses(this.usersEmployeeId, cb, errCB);
+  }
+
+  public addEmployeeToDB(employee: Employee, accessesTo: [string, boolean][], accessesBy: [string, boolean][], userEMail?: string) {
+    return new Promise<void>((res, rej) => {
+          // HIER // Check Pflichtfelder
+
+    const batch = this.angFirestore.firestore.batch();
+
+    const employeeId = !!employee.docId ? employee.docId : FsiService.generatePushId();
+
+    // buld docData
+    const employeeDocData = FsiService.converEmplyeeToDBObj(employee);
+    this.addCreateDataToDbObj(employeeDocData, employeeId);
+    this.addChangeDataToDbObj(employeeDocData);
+
+    // build docRef
+    const employeeDocRef = this.angFirestore.firestore.doc(this.buildEmployeeDocPath(employeeId));
+    batch.set(employeeDocRef, employeeDocData);
+
+    const accessesToDocData = {};
+    accessesTo.forEach( accesTo => {
+      const empId = accesTo[0];
+      const canWrite = accesTo[1];
+
+      accessesToDocData[empId] = canWrite;
+    });
+
+    const accesToDocRef = this.angFirestore.firestore.doc(this.buildAccessesDocPath(employeeId));
+    batch.set(accesToDocRef, accessesToDocData);
+
+
+    // HIER // Check for at least accessesBY
+    // HIER // dont forget to somehow check for valid accesses employeeIDs!!!!
+
+    accessesBy.forEach(accessBy => {
+      const tempEmpId = accessBy[0];
+      const tempCanWrite = accessBy[1];
+
+      const accessesByDocData = {};
+      accessesByDocData[employeeId] = tempCanWrite;
+
+      const accesByDocRef = this.angFirestore.firestore.doc(this.buildAccessesDocPath(tempEmpId));
+      batch.update(accesByDocRef, accessesByDocData);
+    });
+
+    batch.commit()
+      .then(() => {
+        res();
+      })
+      .catch(err => {
+        console.error('Was ist jetzt schon wieder los!?!?'); // HIER
+        rej(err);
+      });
+    });
   }
 
   //#endregion
@@ -809,7 +903,9 @@ export class FsiService {
 
             this.getUserData()
               .then(() => {
-                this.setIsLoggedInState = true;
+                this.getAdminState().then(() => {
+                  this.setIsLoggedInState = true;
+                });
                 res(true);
               })
               .catch(err => {
@@ -875,8 +971,6 @@ export class FsiService {
 
   public setUpNewClient(email: string,
                         password: string,
-                        employeeId: string,
-                        clientId: string,
                         lang: string,
                         company: string,
                         phone: string,
@@ -892,7 +986,7 @@ export class FsiService {
       }
 
       try {
-        await this.createClient(employeeId, clientId, lang, company, phone, poc);
+        await this.createClient(lang, company, phone, poc);
       } catch (error) {
         // if fails delete account
         this.angFireAuth.auth.currentUser.delete().then(() => { /*__*/ });
@@ -1162,7 +1256,7 @@ export class FsiService {
       });
   }
 
-  private createClient(employeeId: string, clientId: string, lang: string, company: string, phone: string, poc: string): Promise<any> {
+  private createClient(lang: string, company: string, phone: string, poc: string): Promise<any> {
     return new Promise<any>((res, rej) => {
       const createClientCF = this.angFireFunctions.functions.httpsCallable(this.createClientCFKeyStr);
       if (!createClientCF) {
@@ -1170,6 +1264,9 @@ export class FsiService {
         rej('server not available');
         return;
       }
+
+      const clientId = FsiService.generatePushId();
+      const employeeId = FsiService.generatePushId();
 
       const data = {
         employeeId,

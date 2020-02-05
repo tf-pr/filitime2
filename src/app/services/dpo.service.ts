@@ -6,7 +6,7 @@ import { Observable, Subscription } from 'rxjs';
   providedIn: 'root'
 })
 export class DpoService {
-  //#region projectView properites
+  //#region projectView properties
 
   private projectList: Project[] = [];
   private projectIdList: string[] = [];
@@ -14,18 +14,60 @@ export class DpoService {
   private projectListChangeEmitter = new EventEmitter<Project[]>();
   public projectListChange: Observable<Project[]> = this.projectListChangeEmitter.asObservable();
 
-  private projectAddEmitter = new EventEmitter<[Project, number]>();
-  public projectAdd: Observable<[Project, number]> = this.projectAddEmitter.asObservable();
+  private projectAddEmitter = new EventEmitter<Project>();
+  public projectAdd: Observable<Project> = this.projectAddEmitter.asObservable();
 
-  private projectRemoveEmitter = new EventEmitter<[Project, number]>();
-  public projectRemove: Observable<[Project, number]> = this.projectRemoveEmitter.asObservable();
+  private projectRemoveEmitter = new EventEmitter<Project>();
+  public projectRemove: Observable<Project> = this.projectRemoveEmitter.asObservable();
 
-  private projectModifyEmitter = new EventEmitter<[Project, number]>();
-  public projectModify: Observable<[Project, number]> = this.projectModifyEmitter.asObservable();
+  private projectModifyEmitter = new EventEmitter<Project>();
+  public projectModify: Observable<Project> = this.projectModifyEmitter.asObservable();
 
   private projectAddSub: Subscription;
   private projectModifySub: Subscription;
   private projectRemoveSub: Subscription;
+
+  //#endregion
+
+  //#region employee properties
+
+  private usersEmployeeAccesses: [string, boolean][] = [];
+  private usersEmployeeAccessesEmpIds: string[] = [];
+
+  private usersEmployeeAccessesChangeEmitter = new EventEmitter<[string, boolean][]>();
+  public usersEmployeeAccessesChange = this.usersEmployeeAccessesChangeEmitter.asObservable();
+
+  private usersEmployeeAccessesAddEmitter = new EventEmitter<[string, boolean][]>();
+  public usersEmployeeAccessesAdd = this.usersEmployeeAccessesAddEmitter.asObservable();
+
+  private usersEmployeeAccessesRemoveEmitter = new EventEmitter<[string, boolean][]>();
+  public usersEmployeeAccessesRemove = this.usersEmployeeAccessesRemoveEmitter.asObservable();
+
+  private usersEmployeeAccessesModifyEmitter = new EventEmitter<[string, boolean][]>();
+  public usersEmployeeAccessesModify = this.usersEmployeeAccessesModifyEmitter.asObservable();
+
+  private usersEmployeeAccessesSub: Subscription;
+
+  private employees: Employee[] = [];
+  private employeeIds: string[] = [];
+
+  private employeesChangeEmitter = new EventEmitter<Employee[]>();
+  public employeesChange = this.employeesChangeEmitter.asObservable();
+
+  private employeeAddEmitter = new EventEmitter<Employee>();
+  public employeeAdd = this.employeeAddEmitter.asObservable();
+
+  private employeeRemoveEmitter = new EventEmitter<Employee>();
+  public employeeRemove = this.employeeRemoveEmitter.asObservable();
+
+  private employeeModifyEmitter = new EventEmitter<Employee>();
+  public employeeModify = this.employeeModifyEmitter.asObservable();
+
+  private employeeSubs: [string, Subscription][] = [];
+
+  private allEmployeesAddSub: Subscription;
+  private allEmployeesModifySub: Subscription;
+  private allEmployeesRemoveSub: Subscription;
 
   //#endregion
 
@@ -42,17 +84,11 @@ export class DpoService {
     this.projectIdList = [];
   }
 
-  //#region projectView getter&setter
+  //#region projectView getter
 
   public getProjectList(): Project[] {
     return this.projectList;
   }
-
-  //#endregion
-
-  //#region profileView methods
-
-
 
   //#endregion
 
@@ -66,17 +102,13 @@ export class DpoService {
     this.projectList = [];
     this.projectIdList = [];
     this.projectListChangeEmitter.emit(this.projectList);
-    for (let i = 0; i < tempList.length; i++) {
-      this.projectRemoveEmitter.emit([tempList[i], i]);
-    }
+    tempList.forEach(tempListItem => {
+      this.projectRemoveEmitter.emit(tempListItem);
+    });
   }
 
   private buildProjectIdList() {
-    let temp = [];
-    temp = this.projectList.map(project => {
-      return project.docId;
-    });
-    this.projectIdList = temp;
+    this.projectIdList = this.projectList.length === 0 ? [] : this.projectList.map(project => project.docId );
   }
 
    /**
@@ -87,12 +119,12 @@ export class DpoService {
     this.projectList = projectList;
     this.buildProjectIdList();
     this.projectListChangeEmitter.emit(this.projectList);
-    for (let i = 0; i < oldList.length; i++) {
-      this.projectRemoveEmitter.emit([oldList[i], i]);
-    }
-    for (let i = 0; i < this.projectList.length; i++) {
-      this.projectAddEmitter.emit([this.projectList[i], i]);
-    }
+    oldList.forEach(oldListItem => {
+      this.projectRemoveEmitter.emit(oldListItem);
+    });
+    this.projectList.forEach(projectListItem => {
+      this.projectAddEmitter.emit(projectListItem);
+    });
   }
 
   /**
@@ -126,7 +158,7 @@ export class DpoService {
     this.projectIdList.push(project.docId);
     const newLength = this.projectList.length;
     this.projectListChangeEmitter.emit(this.projectList);
-    this.projectAddEmitter.emit([this.projectList[(newLength - 1)], (newLength - 1)]);
+    this.projectAddEmitter.emit(this.projectList[(newLength - 1)]);
   }
 
   /**
@@ -156,9 +188,11 @@ export class DpoService {
       }
     }
 
+    // HIER check for project changes via areProjectEquel o.d.s
+
     this.projectList[i] = project;
     this.projectListChangeEmitter.emit(this.projectList);
-    this.projectModifyEmitter.emit([project, i]);
+    this.projectModifyEmitter.emit(project);
   }
 
   /**
@@ -191,7 +225,7 @@ export class DpoService {
     this.projectList.splice(i, 1);
     this.projectIdList.splice(i, 1);
     this.projectListChangeEmitter.emit(this.projectList);
-    this.projectRemoveEmitter.emit([project, i]);
+    this.projectRemoveEmitter.emit(project);
   }
 
   /**
@@ -203,6 +237,182 @@ export class DpoService {
     projects.forEach(project => {
       this.removeProject(project);
     });
+  }
+
+  //#endregion
+
+  //#region employee getter & setter
+
+  /**
+   * DO NOT USE THIS!!!
+   */
+  public setUsersEmployeeAccesses(newAccesses: [string, boolean][]) {
+    this.usersEmployeeAccesses = newAccesses;
+    this.usersEmployeeAccessesEmpIds = this.usersEmployeeAccesses.map(access => access[0]);
+  }
+
+  public getUsersEmployeeAccesses(): [string, boolean][] {
+    return this.usersEmployeeAccesses.slice(0);
+  }
+
+  private getEmployeeIdsOfEmployeeSubs(): string[] {
+    return this.employeeSubs.map(employeeSubsItem => employeeSubsItem[0]);
+  }
+
+  public getEmployees(): Employee[] {
+    return this.employees.slice(0);
+  }
+
+  //#endregion
+
+  //#region employee methodes
+
+  public startSyncUsersEmployeeAccesses(accessesSub: Subscription) {
+    this.stopSyncUsersEmployeeAccesses();
+    this.usersEmployeeAccessesSub = accessesSub;
+  }
+
+  public stopSyncUsersEmployeeAccesses() {
+    if (!this.usersEmployeeAccessesSub) { return; }
+    this.usersEmployeeAccessesSub.unsubscribe();
+    this.usersEmployeeAccessesSub = undefined;
+  }
+
+  public startSyncEmployee(employeeId: string, employeeSub: Subscription) {
+    const i = this.getEmployeeIdsOfEmployeeSubs().indexOf(employeeId);
+    if (i !== -1) {
+      console.error('U RLY WANNA DOUBLE SYNC THE SAME EMPLOYEE?! ... GO FU SOAB!!');
+      return;
+    }
+    this.employeeSubs.push([employeeId, employeeSub]);
+  }
+
+  public stopSyncEmployee(employeeId) {
+    const i = this.getEmployeeIdsOfEmployeeSubs().indexOf(employeeId);
+    if (i === -1) {
+      console.error('U RLY WANNA UNSYNC AN EMPLOYEE NOT BEEING LISTED?! ... GO FU SOAB!!');
+      return;
+    }
+    const empSubTuple = this.employeeSubs.splice(i, 1)[0];
+    empSubTuple[1].unsubscribe();
+  }
+
+  /**
+   * do not use this
+   */
+  public stopSyncAllEmployees() {
+    if ( !!this.allEmployeesAddSub    ) { this.allEmployeesAddSub.unsubscribe();    }
+    if ( !!this.allEmployeesModifySub ) { this.allEmployeesModifySub.unsubscribe(); }
+    if ( !!this.allEmployeesRemoveSub ) { this.allEmployeesRemoveSub.unsubscribe(); }
+    this.allEmployeesAddSub    = undefined;
+    this.allEmployeesModifySub = undefined;
+    this.allEmployeesRemoveSub = undefined;
+  }
+
+  /**
+   * do not use this
+   */
+  public startSyncAllEmployees(projectAddSub: Subscription, projectModifySub: Subscription, projectRemoveSub: Subscription) {
+    this.stopSyncAllEmployees();
+
+    this.allEmployeesAddSub = projectAddSub;
+    this.allEmployeesModifySub = projectModifySub;
+    this.allEmployeesRemoveSub = projectRemoveSub;
+  }
+
+  public modifyEmployeeAccess(access: [string, boolean]) {
+    const i = this.usersEmployeeAccessesEmpIds.indexOf(access[0]);
+    if (i === -1) {
+      console.error('DUDE!!! WTF IS THIS?!?!?');
+      return;
+    }
+
+    if (this.usersEmployeeAccesses[i][0] !== access[0]) {
+      console.error('WOW U STUPID FUCK MANAGED TO FUCK UP THE IDS! WOW! GJ!');
+      console.error('1: ' + JSON.stringify(this.usersEmployeeAccessesEmpIds));
+      console.error('2: ' + JSON.stringify(this.usersEmployeeAccesses));
+      console.error('NOW LOOK AT 1 AND 2 AND THAN GO FUCK YOURSELF!');
+      return;
+    }
+
+    this.usersEmployeeAccesses[i][1] = access[1];
+  }
+
+  private buildEmployeeIds() {
+    this.employeeIds = this.employees.length === 0 ? [] : this.employees.map(employee => employee.docId);
+  }
+
+  /**
+   * do not use this
+   */
+  public addOrModifyEmployee(employee: Employee) {
+    const empDocId = employee.docId;
+    const i = this.employeeIds.indexOf( empDocId );
+
+    if ( i !== -1 ) {
+      this.modifyEmployee(employee);
+      return;
+    }
+    this.addEmployee(employee);
+  }
+
+  /**
+   * do not use this
+   */
+  public addEmployee(employee: Employee) {
+    this.employees.push(employee);
+    this.employeeIds.push(employee.docId);
+    const newLength = this.employees.length;
+    this.employeesChangeEmitter.emit(this.employees);
+    this.employeeAddEmitter.emit(this.employees[(newLength - 1)]);
+  }
+
+  /**
+   * do not use this
+   */
+  public modifyEmployee(employee: Employee) {
+    const empDocId = employee.docId;
+    let i = this.employeeIds.indexOf( empDocId );
+    if (i === -1) {
+      console.warn('Warning: 76469785');
+      this.buildEmployeeIds();
+      i = this.employeeIds.indexOf( empDocId );
+
+      if ( i === -1 ) {
+        console.warn('Error: 57628195');
+        this.addEmployee(employee);
+        return;
+      }
+    }
+
+    // HIER check for project changes via areProjectEquel o.d.s
+
+    this.employees[i] = employee;
+    this.employeesChangeEmitter.emit(this.employees);
+    this.employeeModifyEmitter.emit(employee);
+  }
+
+  /**
+   * do not use this
+   */
+  public removeEmployee(employeeId: string) {
+    console.log('removeEmployee');
+    let i = this.employeeIds.indexOf(employeeId);
+    console.log({ i });
+    if (i === -1) {
+      console.warn('Warning: 78398218');
+      this.buildEmployeeIds();
+      i = this.employeeIds.indexOf(employeeId);
+      if (i === -1) {
+        console.error('Error: 85614532');
+        return;
+      }
+    }
+
+    const employee = this.employees.splice(i, 1)[0];
+    this.employeeIds.splice(i, 1);
+    this.employeesChangeEmitter.emit(this.employees);
+    this.employeeRemoveEmitter.emit(employee);
   }
 
   //#endregion

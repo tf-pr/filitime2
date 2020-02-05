@@ -20,6 +20,14 @@ export class GlobalDataService {
   private isOfflineEmitter = new EventEmitter<boolean>();
   public isOfflineSateChange: Observable<boolean> = this.isOfflineEmitter.asObservable();
 
+  private qucikStartOpened = false;
+  private qucikStartOpenedEmitter = new EventEmitter<boolean>();
+  public qucikStartOpenedChange: Observable<boolean> = this.qucikStartOpenedEmitter.asObservable();
+
+  private currRoutePath: string = undefined;
+  private currRoutePathEmitter = new EventEmitter<string>();
+  public currRoutePathChange: Observable<string> = this.currRoutePathEmitter.asObservable();
+
   public getIsLandscape(): boolean {
     return this.isLandscape;
   }
@@ -48,6 +56,28 @@ export class GlobalDataService {
     if (this.isOffline === value) { return; }
     this.isOffline = value;
     this.isOfflineEmitter.emit(value);
+  }
+
+  public getQucikStartOpened(): boolean {
+    return this.qucikStartOpened;
+  }
+
+  public set setQucikStartOpened(value: boolean) {
+    if (this.qucikStartOpened === value) { return; }
+    this.qucikStartOpened = value;
+    this.qucikStartOpenedEmitter.emit(value);
+  }
+
+  public getCurrTab(): string {
+    return this.currRoutePath;
+  }
+
+  public setCurrTab(tab: string) {
+    if (!tab) { tab = undefined; }
+    if (this.currRoutePath === tab) { return; }
+
+    this.currRoutePath = tab;
+    this.currRoutePathEmitter.emit(this.currRoutePath);
   }
 
   constructor() {

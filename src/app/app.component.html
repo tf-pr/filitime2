@@ -1,4 +1,12 @@
-<app-navigator *ngIf="!showLoginForm"></app-navigator>
-<app-login *ngIf="!!showLoginForm"></app-login>
-<app-loading-screen *ngIf="isLoadingGetter"></app-loading-screen>
-<mat-icon *ngIf="!!isOffline" class="isOfflineIcon">cloud_off</mat-icon>
+<ng-container *ngIf="!fiddlify">
+    <!-- <app-navigator></app-navigator> -->
+    <!-- <app-navigator *ngIf="!showLoginForm"></app-navigator>
+    <app-login *ngIf="!!showLoginForm"></app-login> -->
+    <app-navigator></app-navigator>
+    <!-- <app-login *ngIf="!!showLoginForm"></app-login> -->
+    <app-loading-screen *ngIf="isLoadingGetter"></app-loading-screen>
+    <mat-icon *ngIf="!!isOffline" class="isOfflineIcon">cloud_off</mat-icon>
+</ng-container>
+
+<app-fiddle *ngIf="fiddlify" style="z-index: 10000; position: absolute; top: 0;left: 0; width: 100vw; height: 100vw; background: white;">
+</app-fiddle>

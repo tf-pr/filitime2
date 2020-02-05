@@ -18,7 +18,9 @@ import { HelpViewComponent } from './navigator/help-view/help-view.component';
 import { LizenzViewComponent } from './navigator/lizenz-view/lizenz-view.component';
 import { PlanboardViewComponent } from './navigator/planboard-view/planboard-view.component';
 import { ProfileViewComponent } from './navigator/profile-view/profile-view.component';
-import { ProjectViewComponent, CreateProjectDialogComponent } from './navigator/project-view/project-view.component';
+import { ProjectViewComponent,
+         CreateProjectDialogComponent,
+         ProjectQueryoptionsDialogComponent } from './navigator/project-view/project-view.component';
 import { PageNotFoundComponent } from './navigator/page-not-found/page-not-found.component';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
@@ -42,6 +44,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatDatepickerModule, MatDatepickerIntl } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/';
+import {MatSelectModule} from '@angular/material/select';
 
 import { AlertModule } from 'ngx-bootstrap/alert';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
@@ -50,6 +56,9 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 
 import { ButtonModule } from 'primeng/button';
 import { PaginatorTranslator } from './PaginatorTranslator';
+import { DatePickerTranslator } from './DatePickerTranslator';
+import { FiddleComponent } from './fiddle/fiddle.component';
+import { MdFocusOnInitDirective } from './directives/md-focus-on-init.directive';
 
 @NgModule({
   declarations: [
@@ -64,8 +73,11 @@ import { PaginatorTranslator } from './PaginatorTranslator';
     ProfileViewComponent,
     ProjectViewComponent,
     CreateProjectDialogComponent,
+    ProjectQueryoptionsDialogComponent,
     PageNotFoundComponent,
     LoadingScreenComponent,
+    FiddleComponent,
+    MdFocusOnInitDirective,
   ],
   imports: [
     FormsModule,
@@ -96,13 +108,18 @@ import { PaginatorTranslator } from './PaginatorTranslator';
     MatCheckboxModule,
     MatRadioModule,
     MatButtonToggleModule,
+    MatBadgeModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule,
     AlertModule.forRoot(),
     BsDropdownModule.forRoot(),
     ColorPickerModule,
     ButtonModule,
   ],
-  entryComponents: [CreateProjectDialogComponent],
-  providers: [{provide: MatPaginatorIntl, useClass: PaginatorTranslator}],
+  entryComponents: [CreateProjectDialogComponent, ProjectQueryoptionsDialogComponent],
+  providers: [{provide: MatPaginatorIntl, useClass: PaginatorTranslator},
+              {provide: MatDatepickerIntl, useClass: DatePickerTranslator}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

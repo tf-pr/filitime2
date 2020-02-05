@@ -1,4 +1,5 @@
-@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+/* @import "~@angular/material/prebuilt-themes/deeppurple-amber.css"; */
+@import "cmdt.css";
 
 * {
     box-sizing: border-box;

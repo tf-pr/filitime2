@@ -126,13 +126,10 @@ export class EmployeeViewComponent implements OnInit {
     const newDirection = this.sortDesc ? 'desc' : 'asc';
     if ( this.currOrderDirection === newDirection ) { return; }
     this.currOrderDirection = newDirection;
-    console.log('newDirection: ' + newDirection);
     this.queryEmployeeList('sort');
   }
 
   public sortChanged() {
-    console.log(this.sortBy);
-    console.log('sort by: ' + this.sortBy);
     let newSortBy: 'name' | 'identifier' | 'createdAt';
 
     switch (this.sortBy) {
@@ -209,19 +206,19 @@ export class EmployeeViewComponent implements OnInit {
 
   private initEmployeeListSubscription() {
     const tempList = [];
-    console.log('const tempList = [];'); console.log(tempList);
+    // console.log('const tempList = [];'); console.log(tempList);
     // const wonEmployee = this.dpo.usersEmployeeAccessesAdd;
     // tempList.push(ownEmployee);
 
     const tempList2 = this.dpo.getEmployees();
-    console.log('const tempList2 = this.dpo.getEmployees();'); console.log(tempList2);
+    // console.log('const tempList2 = this.dpo.getEmployees();'); console.log(tempList2);
     tempList.push(...tempList2);
-    console.log('tempList.push(tempList2);'); console.log(tempList);
+    // console.log('tempList.push(tempList2);'); console.log(tempList);
     this.employeeList = tempList;
-    console.log('this.employees = tempList;'); console.log(this.employeeList);
+    // console.log('this.employees = tempList;'); console.log(this.employeeList);
     this.queryEmployeeList('filter');
     // tslint:disable-next-line:quotemark
-    console.log("this.queryEmployeeList('filter');"); console.log(this.employeeListPaginated);
+    // console.log("this.queryEmployeeList('filter');"); console.log(this.employeeListPaginated);
 
     this.dpo.employeeAdd.subscribe({
       next: employee => {
@@ -239,7 +236,7 @@ export class EmployeeViewComponent implements OnInit {
             return;
           }
         }
-        console.error('ARE U HIGH?! CHANGING AN EMPLOYEE THAT IS UNKNOWN!!!'); // HIER
+        console.error('CHANGING AN EMPLOYEE THAT IS UNKNOWN IS NOT PSOOIBLE'); // HIER
       }
     });
 
@@ -332,8 +329,8 @@ export class EmployeeViewComponent implements OnInit {
   }
 
   public paginatorChanged(event) {
-    console.log('paginatorChanged');
-    console.log(this.paginatorPageEvent);
+    // console.log('paginatorChanged');
+    // console.log(this.paginatorPageEvent);
 
     this.paginatorPageEvent = event;
     this.paginatorPageIndex = event.pageIndex;
@@ -377,7 +374,7 @@ export class EmployeeViewComponent implements OnInit {
   }
 
   public addEmployeeButtonClicked() {
-    console.log('HIER');
+    // console.log('HIER');
     // const data = {};
     // if (!!this.currFolder) { data[Project.folderKeyStr] = this.currFolder; }
     // if (!!this.filterReserved) { data[Project.reservedKeyStr] = this.filterReserved; }

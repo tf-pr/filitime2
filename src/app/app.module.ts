@@ -1,3 +1,4 @@
+// tslint:disable:max-line-length
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -59,6 +60,18 @@ import { PaginatorTranslator } from './PaginatorTranslator';
 import { DatePickerTranslator } from './DatePickerTranslator';
 import { FiddleComponent } from './fiddle/fiddle.component';
 import { MdFocusOnInitDirective } from './directives/md-focus-on-init.directive';
+import { WvEmployeeTimeComponent } from './navigator/planboard-view/week-view/wv-employee-time/wv-employee-time.component';
+import { WvTimeEmployeeComponent } from './navigator/planboard-view/week-view/wv-time-employee/wv-time-employee.component';
+import { DvEmployeeTimeComponent } from './navigator/planboard-view/day-view/dv-employee-time/dv-employee-time.component';
+import { DvTimeEmployeeComponent } from './navigator/planboard-view/day-view/dv-time-employee/dv-time-employee.component';
+import { ToolBarComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/tool-bar/tool-bar.component';
+import { PlanboardTableComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/planboard-table/planboard-table.component';
+import { EmployeeColumnComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/employee-column/employee-column.component';
+import { TimeAxisComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/time-axis/time-axis.component';
+import { WeekRowComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/week-row/week-row.component';
+import { DayRowComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/day-row/day-row.component';
+import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/assignment-card/assignment-card.component';
+// tslint:enable:max-line-length
 
 @NgModule({
   declarations: [
@@ -78,6 +91,17 @@ import { MdFocusOnInitDirective } from './directives/md-focus-on-init.directive'
     LoadingScreenComponent,
     FiddleComponent,
     MdFocusOnInitDirective,
+    WvEmployeeTimeComponent,
+    WvTimeEmployeeComponent,
+    DvEmployeeTimeComponent,
+    DvTimeEmployeeComponent,
+    ToolBarComponent,
+    PlanboardTableComponent,
+    EmployeeColumnComponent,
+    TimeAxisComponent,
+    WeekRowComponent,
+    DayRowComponent,
+    AssignmentCardComponent,
   ],
   imports: [
     FormsModule,

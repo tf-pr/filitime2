@@ -1,0 +1,33 @@
+<div class="background">
+    <div id="spacing"></div>
+    <div id="weekRowContainer">
+        <div class="week-row" [style.height.%]="100 / cwList.length" *ngFor="let cw of cwList; let weekI = index;">
+            <div class="cw-label">
+                <div style="display: table; height: 100%; width: 100%;">
+                    <div style="display: table-cell; vertical-align: middle; text-align: center;"><b>{{cw}}</b></div>
+                </div>
+            </div>
+            <div class="day-container" *ngIf="!!dayContainer[weekI]">
+                <div class="day-label" *ngFor="let day of dayContainer[weekI];">
+                    <div style="display: table; height: 100%; width: 100%;">
+                        <div style="display: table-cell; vertical-align: middle; text-align: center;">{{day}}</div>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div style="display: table; height: 100%; width: 100%;">
+                <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                    <b>Mi</b>
+                </div>
+            </div>
+            -->
+            <div class="date-conatainer" *ngIf="!!dateContainer[weekI]">
+                <div class="date-label" *ngFor="let date of dateContainer[weekI];">
+                    <div style="display: table; height: 100%; width: 100%;">
+                        <div style="display: table-cell; vertical-align: middle; text-align: center;">{{date}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

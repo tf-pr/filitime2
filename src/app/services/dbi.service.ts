@@ -212,14 +212,14 @@ export class DbiService {
 
     const userIsAdmin = this.isAdmin;
     if (userIsAdmin) {
-      console.log('Ohh iM aN aDmIn....');
+      // console.log('Ohh iM aN aDmIn....'); // HIER ...
     } else {
-      console.log('u r nothin!');
+      // console.log('u r nothin!'); // HIER ....
     }
 
     {
       // get users emp id
-      const lolamk = await this.fsi.getUsersEmployeeAccesses();
+      const lolamk = await this.fsi.getUsersEmployeeAccesses(); // HIER lolamk...
 
       // check if users accesses are empty
       if (lolamk.length === 0) {

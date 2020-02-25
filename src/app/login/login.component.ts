@@ -254,7 +254,7 @@ export class LoginComponent implements OnInit {
   public registerEmployee() {
     // HIER // register employee
     // now wait for login after register i gues?!
-    console.log('HI THERE, NEW EMPLOYEE!');
+    // console.log('HI THERE, NEW EMPLOYEE!'); // HIER
   }
 
   public registerCompany() {
@@ -269,15 +269,6 @@ export class LoginComponent implements OnInit {
     const company  =  this.formGroupRegisterC.get('companyName').value;
     const phone    =  this.formGroupRegisterC.get('phoneNumber').value;
     const poc      =  this.formGroupRegisterC.get('fullName').value;
-
-    console.log({
-      email,
-      pw,
-      lang,
-      company,
-      phone,
-      poc
-    });
 
     this.dbi.setUpNewClient(email, pw, lang, company, phone, poc)
       .then(val => {

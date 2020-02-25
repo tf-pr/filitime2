@@ -1,0 +1,6 @@
+<!-- <ng-container *ngFor=...>
+    <app-day-row></app-day-row>
+</ng-container> -->
+<ng-container *ngFor="let blub of stupidArray;">
+    <app-day-row (assignmentClick)="onAssignmentClick($event)" [editAssignmentModeActive]="editAssignmentModeActive"></app-day-row>
+</ng-container>

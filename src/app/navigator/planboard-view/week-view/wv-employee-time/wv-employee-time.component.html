@@ -1,0 +1,6 @@
+<div class="background">
+    <app-tool-bar id="toolbar" [toolbarMode]="toolbarMode" (toolbarCountChange)="toolbarCountChanged($event)"
+        [style.height]="toolBarHeight"></app-tool-bar>
+    <app-planboard-table id="planboardTable" (assignmentClicked)="onAssignmentClicked($event)" [style.height]="planboardTableHeight">
+    </app-planboard-table>
+</div>

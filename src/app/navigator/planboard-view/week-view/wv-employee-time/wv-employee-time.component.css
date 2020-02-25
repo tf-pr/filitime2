@@ -1,0 +1,20 @@
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background: lightblue; /* color4test */
+}
+
+#toolbar {
+    display: block;
+    /* height: calc( 64px * 1 );               /* HIER schieb des in html und ts */
+    /* background: red; /* color4test */
+}
+
+#planboardTable {
+    display: block;
+    /* height: calc( 100% - 64px * 1 );        /* HIER schieb des in html und ts */
+    /* background: blue; /* color4test */
+}

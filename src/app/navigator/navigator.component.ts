@@ -136,7 +136,7 @@ export class NavigatorComponent implements OnInit {
     if ( path.startsWith('/login') ) { path = '/'; }
     this.routerPathAfterLogin = path;
 
-    console.log('go to "' + this.routerPathAfterLogin + '" after login');
+    // console.log('go to "' + this.routerPathAfterLogin + '" after login');
   }
 
   public logoutClicked() {

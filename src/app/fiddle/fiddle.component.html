@@ -1,4 +1,4 @@
-<mat-card *ngIf="currMode == 'registerEmployee'" class="formContainer">
+<!-- <mat-card *ngIf="currMode == 'registerEmployee'" class="formContainer">
     <mat-card-content>
         <div class="filitimeLogo">
             <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -7,9 +7,9 @@
         <form [formGroup]="formGroup" (ngSubmit)="checkEmployeeMail()" class="form">
             <mat-form-field class="form-element">
                 <input matInput placeholder="E-Mail-Adresse" formControlName="email">
-                <!-- <mat-error *ngIf="!formGroup.controls['email'].valid && formGroup.controls['email'].touched">
+                <!- <mat-error *ngIf="!formGroup.controls['email'].valid && formGroup.controls['email'].touched">
                             {{ getErrorEmployeeEmail() }}
-                        </mat-error> -->
+                        </mat-error> ->
             </mat-form-field>
             <div class="form-element">
                 <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
@@ -18,4 +18,5 @@
             </div>
         </form>
     </mat-card-content>
-</mat-card>
+</mat-card> -->
+<app-wv-employee-time style="display: inline-block; width: 100%; height: 100%; overflow: hidden;"></app-wv-employee-time>

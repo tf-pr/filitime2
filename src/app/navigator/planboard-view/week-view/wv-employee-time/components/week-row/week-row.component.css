@@ -1,0 +1,8 @@
+app-day-row {
+    display: block;
+    height: calc( 100% / 6 );
+    border: 1px solid #f9f9f9;
+    overflow: hidden;
+    background-color: #e1eef7;
+    /* background: purple; /* color4test */
+}

@@ -1,0 +1,53 @@
+
+.acContainer {
+    display: block;
+    position: absolute;
+    height: 100%;
+    overflow: hidden;
+    padding: 1px;
+    border-radius: 4px 4px 0 0;
+    border-style: solid;
+    border-width: 2px;
+    border-bottom: unset!important;
+    box-shadow: grey 2px 2px 10px;
+    top: 0;
+    opacity: 1;
+    border-style: none;
+    border-width: 0px 3px 0px 0px;
+    border-color: transparent;
+}
+
+.acHeaderContainer {
+    width: 100%;
+    height: fit-content;
+}
+
+.acHeader {
+    display: inline-block;
+    vertical-align: top;
+    width: calc( 100% - 18px );
+    height: auto;
+    text-align: left;
+    font-weight: bold;
+    word-wrap: break-word;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.acHeaderCb{
+    display: inline-block;
+    vertical-align: top;
+    width: 18px;
+}
+
+.acNote {
+    position: relative;
+    width: 100%;
+    margin-top: 5px;
+    height: auto;
+    text-align: left;
+    font-style: italic;
+    word-wrap: break-word;
+    margin-left: 4px;
+    margin-right: 4px;
+}

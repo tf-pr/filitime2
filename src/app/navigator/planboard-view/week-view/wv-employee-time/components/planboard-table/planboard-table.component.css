@@ -1,0 +1,29 @@
+.background {
+    width: 100%;
+    height: 100%;
+    /* background: darkgreen; /* color4test */
+}
+
+app-time-axis {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    width: 136px;
+    /* background: yellow; /* color4test */
+}
+
+#employeeColumnContainer {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    width: calc( 100% - 136px );
+    /* background: blueviolet; /* color4test */
+}
+
+app-employee-column {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    width: calc( 100% / 3 );
+    /* background: rosybrown; /* color4test */
+}

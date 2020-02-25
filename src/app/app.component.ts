@@ -12,7 +12,7 @@ import { LoggerService } from './services/logger.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  private fiddlify = false;
+  private fiddlify = true;
 
   public isOffline = false;
   // private isLoggedIn = false;
@@ -39,7 +39,7 @@ export class AppComponent {
     this.globalData.setDeviceScreenVar(target.innerWidth, target.innerHeight);
   }
 
-  constructor(private testerService: TesterService,
+  constructor(// private testerService: TesterService,
               private globalData: GlobalDataService,
               private dbi: DbiService,
               private logger: LoggerService,

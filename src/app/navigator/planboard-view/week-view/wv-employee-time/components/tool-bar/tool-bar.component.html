@@ -1,0 +1,37 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <button mat-raised-button (click)="zoomInCliked()">Zoom In</button>
+        <button mat-raised-button (click)="zoomOutCliked()">Zoom Out</button>
+        <button mat-raised-button (click)="undoCliked()">Undo</button>
+        <button mat-raised-button (click)="redoCliked()">Redo</button>
+        <button mat-raised-button (click)="layoutSettingsClicked()">Settings</button>
+    </mat-toolbar-row>
+    <mat-toolbar-row *ngIf="!!secondaryToolbar" [ngSwitch]="secondaryToolbar" style="font-size: 14px;">
+        <!-- <span>Custom Toolbar</span> -->
+        <!-- <ng-container *ngIf="secondaryToolbar == 'editAssignments'"> -->
+        <ng-container *ngSwitchCase="'editAssignments'">
+            <mat-button-toggle-group #group="matButtonToggleGroup">
+                <mat-button-toggle value="left" aria-label="Text align left">
+                    <mat-icon>format_align_left</mat-icon>
+                    <span>über Tage verschieben</span>
+                </mat-button-toggle>
+                <mat-button-toggle value="center" aria-label="Text align center">
+                    <mat-icon>format_align_center</mat-icon>
+                    <span>im Tag verschieben</span>
+                </mat-button-toggle>
+                <mat-button-toggle value="right" aria-label="Text align right">
+                    <mat-icon>format_align_right</mat-icon>
+                    <span>Start/Ende verschieben</span>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+            <button mat-raised-button>Bearbeiten</button>
+            <button mat-raised-button>Löschen</button>
+            <button mat-raised-button>Kopieren</button>
+        </ng-container>
+        <!-- <ng-container *ngIf="secondaryToolbar == 'editLayout'"> -->
+        <ng-container *ngSwitchCase="'editLayout'">
+                <button mat-raised-button>Mitarbeiter auswählen</button>
+                <button mat-raised-button>Ansicht wechseln</button>
+        </ng-container>
+    </mat-toolbar-row>
+</mat-toolbar>

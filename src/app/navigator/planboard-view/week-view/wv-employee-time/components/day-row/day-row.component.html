@@ -1,0 +1,5 @@
+<div class="fillParent">
+    <app-assignment-card *ngFor="let assignment of assignmentList; let i = index"
+        [assignment]="assignment" [showCheckBox]="editAssignmentModeActive"
+        (clicked)="assignmentClicked(i)"></app-assignment-card>
+</div>

@@ -1,5 +1,8 @@
+/*  This component ist here to detect wich view should be served at runtime */
+
 import { Component, OnInit } from '@angular/core';
 import { GlobalDataService } from 'src/app/services/global-data.service';
+import { PlanboardViewServiceService, planboardView } from './planboard-view-service.service';
 
 @Component({
   selector: 'app-planboard-view',
@@ -7,15 +10,12 @@ import { GlobalDataService } from 'src/app/services/global-data.service';
   styleUrls: ['./planboard-view.component.css']
 })
 export class PlanboardViewComponent implements OnInit {
-  public isMobile = false;
-  public isLandscape = true;
+  public isMobile = this.myService.isMobile;          // HIER : this will not work!
+  public isLandscape = this.myService.isLandscape;    // HIER : this will not work!
 
-  constructor(private globalData: GlobalDataService) {
-    this.isMobile = globalData.getIsMobile();
-    this.globalData.isMobileSateChange.subscribe({next: val => { this.isMobile = val; }});
+  public currView: planboardView = planboardView.dvTimeEmployee;
 
-    this.isLandscape = globalData.getIsLandscape();
-    this.globalData.isLandscapeSateChange.subscribe({next: val => { this.isLandscape = val; }});
+  constructor(private myService: PlanboardViewServiceService) {
   }
 
   ngOnInit() {

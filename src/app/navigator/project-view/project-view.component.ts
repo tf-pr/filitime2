@@ -123,13 +123,10 @@ export class ProjectViewComponent implements OnInit {
     const newDirection = this.sortDesc ? 'desc' : 'asc';
     if ( this.currOrderDirection === newDirection ) { return; }
     this.currOrderDirection = newDirection;
-    console.log('newDirection: ' + newDirection);
     this.queryProjctList('sort');
   }
 
   public sortChanged() {
-    console.log(this.sortBy);
-    console.log('sort by: ' + this.sortBy);
     let newSortBy: 'name' | 'identifier' | 'createdAt';
 
     switch (this.sortBy) {
@@ -389,9 +386,6 @@ export class ProjectViewComponent implements OnInit {
   }
 
   public paginatorChanged(event) {
-    console.log('paginatorChanged');
-    console.log(this.paginatorPageEvent);
-
     this.paginatorPageEvent = event;
     this.paginatorPageIndex = event.pageIndex;
     this.paginatorPageSize = event.pageSize;

@@ -158,6 +158,82 @@ export class Helper {
         const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
         return (hsp < 127.5);
     }
+
+    public static getMondayTS(dateTS: number) {
+        const date: Date = new Date(this.get0oclockTS(dateTS));
+
+        let temp = date.getDay();
+
+        if (temp === 1) {
+            return date.valueOf();
+        }
+
+        if (temp === 0) {
+            temp = 7;
+        }
+
+        this.subtractDaysOfDate(date, (temp - 1));
+        return date.valueOf();
+    }
+
+    public static get0oclockTS(dateTS: number): number {
+        const tempDate1280 = new Date(dateTS);
+        this.setDate0oclock(tempDate1280);
+
+        return tempDate1280.valueOf();
+    }
+
+    public static setDate0oclock(date: Date): boolean {
+        if (!date || !date.valueOf || isNaN(date.valueOf())) {
+            return false;
+        }
+
+        date.setMilliseconds(0);
+        date.setSeconds(0);
+        date.setMinutes(0);
+        date.setHours(0);
+        return true;
+    }
+
+    public static addDaysToDate(date: Date, dayCount: number): boolean {
+        if (!date || !date.valueOf || isNaN(date.valueOf())) {
+            return false;
+        }
+
+        date.setDate(date.getDate() + dayCount);
+        return true;
+    }
+
+    public static subtractDaysOfDate(date: Date, dayCount: number): boolean {
+        return this.addDaysToDate(date, (dayCount * -1));
+    }
+
+    public static getCW(timestamp: number) {
+        const date = new Date(timestamp);
+
+        const currentThursday = new Date(date.getTime() + (3 - ((date.getDay() + 6) % 7)) * 86400000);
+        const yearOfThursday = currentThursday.getFullYear();
+        const firstThursday =
+            new Date(new Date(yearOfThursday, 0, 4).getTime()
+                + (3 - ((new Date(yearOfThursday, 0, 4).getDay() + 6) % 7)) * 86400000);
+        const weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000 / 7);
+
+        return weekNumber;
+    }
+
+    public static setLooperInterval(cb: () => void, loopCount: number, loopDelay: number): NodeJS.Timer {
+        if (loopCount <= 0 || loopDelay <= 0) { return undefined; }
+
+        let counter = 0;
+        const interval = setInterval(() => {
+            cb();
+            counter++;
+            if (counter >= loopCount) {
+                clearInterval(interval);
+            }
+        }, loopDelay);
+        return interval;
+    }
 }
 
 export class Project {
@@ -391,9 +467,26 @@ export class Employee {
 export class Assignment {
     employeeId: string;
     projectId: string;
+    projectIdentifier: string;
     start: number;
     end: number;
     note: string;
     isConflicted: boolean;
     blockedAt;
+
+    // HIER
+    projectName: string;
+    projectColor: string;
+    cw: number;
+    day: number;
+    marker: string;
+    markerColor: string;
+    fixed: boolean;
+    docId: string;
+    createId: string;
+    createName: string;
+    createTS: number;
+    editId: string;
+    editName: string;
+    editTS: number;
 }

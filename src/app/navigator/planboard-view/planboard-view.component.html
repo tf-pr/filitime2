@@ -1,4 +1,4 @@
-<ng-container *ngIf="!isMobile">
+<!-- <ng-container *ngIf="!isMobile">
     <div class="planboardViewBG">
         <p>planboard-view works on desk!</p>
     </div>
@@ -7,9 +7,23 @@
     <div class="planboardViewBG">
         <p>planboard-view works on spl!</p>
     </div>
-</ng-container>
+
 <ng-container *ngIf="isMobile && !isLandscape">
     <div class="planboardViewBG">
         <p>planboard-view works on spp!</p>
     </div>
+</ng-container> -->
+
+
+<ng-container *ngIf="currView == 0">
+    <app-wv-employee-time></app-wv-employee-time>
+</ng-container>
+<ng-container *ngIf="currView == 1">
+    <app-dv-employee-time></app-dv-employee-time>
+</ng-container>
+<ng-container *ngIf="currView == 2">
+    <app-wv-time-employee></app-wv-time-employee>
+</ng-container>
+<ng-container *ngIf="currView == 3">
+    <app-wv-employee-time></app-wv-employee-time>
 </ng-container>

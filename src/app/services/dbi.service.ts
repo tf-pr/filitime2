@@ -42,15 +42,16 @@ export class DbiService {
       const nextCwIndex = newDate.valueOf();
 
       this.dpo.getTableEmployeeIds().forEach(eId => {
-        this.startSyncEmployeeAssignmentsInCw(eId, nextCwIndex)
-          .then(tempSubs => {
-            const seccedded = this.dpo.addCwToTable(nextCwIndex, tempSubs);
-            if (seccedded === true) { res(); } else { rej(); }
+        // this.startSyncEmployeeAssignmentsInCw(eId, nextCwIndex)
+        //   .then(tempSubs => {
+        //     const seccedded = this.dpo.addCwToTable(nextCwIndex, tempSubs);
+        //     if (seccedded === true) { res(); } else { rej(); }
 
-          })
-          .catch(err => {
-            rej();
-          });
+        //   })
+        //   .catch(err => {
+        //     rej();
+        //   });
+        // HIER hab das oben ausgeklammert.. kp was hier abgeht
       });
     });
   }
@@ -243,7 +244,7 @@ export class DbiService {
   private startSyncEmployeeAssignmentsInCw(employeeId: string, cwIndex: number): Subscription[] {
     const subs: Subscription[] = [];
 
-    this.fsi.syncEmployeeAssignmentsInCw(employeeId, cwIndex);
+    // this.fsi.syncEmployeeAssignmentsInCw(employeeId, cwIndex); HIER gehts weiter?!
 
 
     return subs;

@@ -12,7 +12,7 @@ import { LoggerService } from './services/logger.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  private fiddlify = true;
+  private fiddlify = false;
 
   public isOffline = false;
   // private isLoggedIn = false;

@@ -71,6 +71,7 @@ export class AssignmentCardComponent implements OnInit {
   }
 
   public onClick() {
+    console.warn('this.clicked.emit();');
     this.clicked.emit();
   }
 }

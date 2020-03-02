@@ -68,8 +68,6 @@ import { ToolBarComponent } from './navigator/planboard-view/week-view/wv-employ
 import { PlanboardTableComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/planboard-table/planboard-table.component';
 import { EmployeeColumnComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/employee-column/employee-column.component';
 import { TimeAxisComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/time-axis/time-axis.component';
-import { WeekRowComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/week-row/week-row.component';
-import { DayRowComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/day-row/day-row.component';
 import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv-employee-time/components/assignment-card/assignment-card.component';
 // tslint:enable:max-line-length
 
@@ -99,8 +97,6 @@ import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv
     PlanboardTableComponent,
     EmployeeColumnComponent,
     TimeAxisComponent,
-    WeekRowComponent,
-    DayRowComponent,
     AssignmentCardComponent,
   ],
   imports: [

@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Project, Employee } from '../helper';
+import { Project, Employee, Assignment, Helper } from '../helper';
 import { Observable, Subscription } from 'rxjs';
 
 @Injectable({
@@ -68,6 +68,86 @@ export class DpoService {
   private allEmployeesAddSub: Subscription;
   private allEmployeesModifySub: Subscription;
   private allEmployeesRemoveSub: Subscription;
+
+  //#endregion
+
+  //#region planboard weekView
+
+  private tableCwIndexes: number[] = [];
+  private tableEmployeeIds: string[] = [];
+  private tableSubs: Subscription[][];
+
+  public getTableCwIndexes() {
+    return this.tableCwIndexes.slice(0);
+  }
+
+  public getTableEmployeeIds() {
+    return this.tableEmployeeIds.slice(0);
+  }
+
+  public getTableSubs() {
+    return this.tableSubs.slice(0);
+  }
+
+  public addCwToTable( newCwIndex: number, newSubs: Subscription[] ): boolean {
+    if ( newSubs.length !== this.tableEmployeeIds.length ) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return false;
+    }
+
+    const cwListWasEmpty = ( this.tableCwIndexes.length === 0 );
+    if (cwListWasEmpty) {
+      this.tableCwIndexes.push(newCwIndex);
+      this.tableSubs.push(newSubs.slice(0));
+      return true;
+    }
+
+    const firstIndex = this.tableCwIndexes[0];
+    const lastIndex = this.tableCwIndexes[this.tableCwIndexes.length - 1];
+
+    const tempDate1 = new Date(firstIndex);
+    const tempDate2 = new Date(lastIndex);
+
+    Helper.subtractDaysOfDate(tempDate1, 7);
+    Helper.addDaysToDate(tempDate2, 7);
+
+    const addBefore = newCwIndex !== tempDate1.valueOf();
+    const addAfter = newCwIndex !== tempDate2.valueOf();
+
+    if (addAfter) {
+      this.tableCwIndexes.push(newCwIndex);
+      this.tableSubs.push(newSubs.slice(0));
+      return true;
+    }
+    if (addBefore) {
+      this.tableCwIndexes.unshift(newCwIndex);
+      this.tableSubs.unshift(newSubs.slice(0));
+      return true;
+    }
+
+    // tslint:disable-next-line:no-debugger
+    debugger;
+    return false;
+  }
+
+  public addEmployeeToTable( newEmployeeId: string, newSubs: Subscription[] ): boolean {
+    if ( newSubs.length !== this.tableCwIndexes.length ) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return false;
+    }
+
+    if (this.tableEmployeeIds.indexOf(newEmployeeId) !== -1) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return;
+    }
+
+    this.tableEmployeeIds.push(newEmployeeId);
+    this.tableSubs.push(newSubs.slice(0));
+    return true;
+  }
 
   //#endregion
 

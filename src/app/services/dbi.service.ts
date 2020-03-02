@@ -19,6 +19,57 @@ export class DbiService {
   private usersEmployeeEmitter = new EventEmitter<Employee>();
   public usersEmployeeChange: Observable<Employee> = this.usersEmployeeEmitter.asObservable();
 
+  //#region planboard weekView
+
+  public initTable() {
+    //
+  }
+
+  public addEmployeeToTable(employeeId: string) {
+    //
+  }
+
+  public removeEmployeeFromTable(employeeId: string) {
+    //
+  }
+
+  public addNextCwToTable(): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      const tableCwIndexes = this.dpo.getTableCwIndexes();
+      const lastCwIndex = tableCwIndexes[tableCwIndexes.length - 1];
+      const newDate = new Date(lastCwIndex);
+      Helper.subtractDaysOfDate(newDate, 7);
+      const nextCwIndex = newDate.valueOf();
+
+      this.dpo.getTableEmployeeIds().forEach(eId => {
+        this.startSyncEmployeeAssignmentsInCw(eId, nextCwIndex)
+          .then(tempSubs => {
+            const seccedded = this.dpo.addCwToTable(nextCwIndex, tempSubs);
+            if (seccedded === true) { res(); } else { rej(); }
+
+          })
+          .catch(err => {
+            rej();
+          });
+      });
+    });
+  }
+
+  public removeLastCwFromTable() {
+    //
+  }
+
+  public addPreviousCwToTable() {
+    //
+  }
+
+  public removeFirstCwToTable() {
+    //
+  }
+
+    //#endregion
+
+
   public isLatestAppVersion(currVersion: string): Promise<boolean> {
     return new Promise<boolean>((res, rej) => {
       this.fsi.isLatestAppVersion(currVersion)
@@ -187,6 +238,15 @@ export class DbiService {
         });
 
       this.dpo.startSyncProjects(subsTuple[0], subsTuple[1], subsTuple[2]);
+  }
+
+  private startSyncEmployeeAssignmentsInCw(employeeId: string, cwIndex: number): Subscription[] {
+    const subs: Subscription[] = [];
+
+    this.fsi.syncEmployeeAssignmentsInCw(employeeId, cwIndex);
+
+
+    return subs;
   }
 
   public adminStateChanged() {

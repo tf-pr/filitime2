@@ -867,6 +867,8 @@ export class FsiService {
 
   //#endregion
 
+  // #region // HIER bin ich stehen geblieben :)
+
   //#region essential FS functions
 
   public isLatestAppVersion(currVersion: string): Promise<boolean> {

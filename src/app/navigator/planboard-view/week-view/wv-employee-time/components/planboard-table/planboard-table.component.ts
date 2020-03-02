@@ -11,12 +11,20 @@ export class PlanboardTableComponent implements OnInit {
   @Output() assignmentClicked = new EventEmitter<Assignment>();
   private editAssignmentModeActive = false;
   public employeeNamesTD: string[] = [];
+  public employeeDocIdsTD: string[] = [];
 
   constructor(private wvs: WeekViewServiceService) {
     this.employeeNamesTD = wvs.getSelectedEmployeeNames();
+    this.employeeDocIdsTD = wvs.getSelectedEmployeeDocIds();
+
     wvs.selectedEmployeeNamesChange.subscribe({
       next: value => {
         this.employeeNamesTD = value;
+      }
+    });
+    wvs.selectedEmployeeDocIdsChange.subscribe({
+      next: value => {
+        this.employeeDocIdsTD = value;
       }
     });
   }
@@ -27,6 +35,7 @@ export class PlanboardTableComponent implements OnInit {
   public onAssignmentClicked(e) {
     const assi = e as Assignment;
     if (!assi) {
+      // tslint:disable-next-line:no-debugger
       debugger;
     }
 

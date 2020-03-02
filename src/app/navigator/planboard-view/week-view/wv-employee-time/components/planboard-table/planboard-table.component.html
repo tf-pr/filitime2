@@ -1,9 +1,9 @@
 <div class="background">
     <app-time-axis></app-time-axis>
     <div id="employeeColumnContainer">
-        <ng-container *ngFor="let employeeName of employeeNamesTD; let i = index;">
-            <app-employee-column [style.width.%]="100 / employeeNamesTD.length"
-                (assignmentClicked)="onAssignmentClicked($event)" [employeeName]="employeeName"
+        <ng-container *ngFor="let employeeDocId of employeeDocIdsTD; let i = index;">
+            <app-employee-column [style.width.%]="100 / employeeDocIdsTD.length"
+                (assignmentClick)="onAssignmentClicked($event)" [employeeDocId]="employeeDocId" [employeeName]="employeeNamesTD[i]"
                 [editAssignmentModeActive]="editAssignmentModeActive"></app-employee-column>
         </ng-container>
     </div>

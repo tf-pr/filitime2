@@ -73,7 +73,7 @@
                             <mat-icon>add_circle_outline</mat-icon>Mitarbeiter hinzufügen
                         </button>
                     </div>
-                    <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                    <mat-paginator *ngIf="!disablePaginators" [showFirstLastButtons]="true" [length]="paginatorLength"
                         [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                         (page)="paginatorChanged($event)">
                     </mat-paginator>
@@ -86,7 +86,7 @@
                             </mat-card-header>
                             <mat-divider></mat-divider><br>
                             <mat-card-content>
-                    
+
                                 <span>docId: {{employee.docId}}</span><br>
                                 <span>identifier: {{employee.identifier}}</span><br>
                                 <span>name: {{employee.name}}</span><br>
@@ -103,8 +103,8 @@
                                 <span>editTS: {{employee.editTS}}</span><br>
                                 <span>editId: {{employee.editId}}</span><br>
                                 <span>editName: {{employee.editName}}</span><br>
-                    
-                    
+
+
                             </mat-card-content>
                             <mat-card-actions>
                                 <button mat-button (click)="changeCurrEmployeeId(employee.identifier)">Details</button>
@@ -115,7 +115,7 @@
                             [style.color]="getMostReadableFontColor(employee.color)"
                             [style.background]="'linear-gradient(45deg, ' + employee.color + ' 84%, ' + (!!employee.markerColor?employee.markerColor:employee.color) + ' 0)'"
                             matBadgeHidden="{{!employee.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
-                            matBadgePosition="before">
+                           [matBadgePosition]="matBadgePositionBefore">
                             <mat-card-header class="employee-card-header" matBadgeHidden="{{!employee.reserved}}" matBadge="?"
                                 matBadgeSize="large">
                                 <mat-card-title>{{employee.name}}</mat-card-title>
@@ -156,7 +156,7 @@
                             </mat-card-actions>
                         </mat-card> -->
                     </ng-container>
-                    <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                    <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" [showFirstLastButtons]="true" [length]="paginatorLength"
                         [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                         (page)="paginatorChanged($event)">
                     </mat-paginator>
@@ -169,10 +169,11 @@
                         <h3>Mitarbeiter "{{currEmployeeId}}" nicht bekannt</h3>
                     </div>
                     <div *ngIf="employeeListPaginated.length != 0">
-                        <mat-card class="employee-detail-card" [style.color]="getMostReadableFontColor(employeeListPaginated[0].color)"
+                        <!-- HIER das aus ProjectView kopierte zeug an employeeView anpassen -->
+                        <!-- <mat-card class="employee-detail-card" [style.color]="getMostReadableFontColor(employeeListPaginated[0].color)"
                             [style.background]="'linear-gradient(45deg, ' + employeeListPaginated[0].color + ' 84%, ' + (!!employeeListPaginated[0].markerColor?employeeListPaginated[0].markerColor:employeeListPaginated[0].color) + ' 0)'"
                             matBadgeHidden="{{!employeeListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
-                            matBadgePosition="before">
+                           [matBadgePosition]="matBadgePositionBefore">
                             <mat-card-header class="employee-card-header" matBadgeHidden="{{!employeeListPaginated[0].reserved}}" matBadge="?" matBadgeSize="large">
                                 <mat-card-title>{{employeeListPaginated[0].name}}</mat-card-title>
                                 <mat-card-subtitle class="employee-card-subtitle">{{employeeListPaginated[0].identifier}}</mat-card-subtitle>
@@ -233,16 +234,16 @@
                             <mat-card-actions>
                                 <button mat-button>Bearbeiten</button>
                             </mat-card-actions>
-                        </mat-card>
-        
-        
-        
-                        
-        
-        
+                        </mat-card> -->
+
+
+
+
+
+
                     </div>
                     <div>
-        
+
                     </div>
                 </ng-container>
 
@@ -320,7 +321,7 @@
                         </button>
                     </div>
                 </div>
-                <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                <mat-paginator *ngIf="!disablePaginators" [showFirstLastButtons]="true" [length]="paginatorLength"
                     [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                     (page)="paginatorChanged($event)">
                 </mat-paginator>
@@ -360,7 +361,7 @@
 
 
                 </ng-container>
-                <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" [showFirstLastButtons]="true" [length]="paginatorLength"
                     [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                     (page)="paginatorChanged($event)">
                 </mat-paginator>

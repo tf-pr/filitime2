@@ -1,11 +1,11 @@
 <h1 mat-dialog-title>Projekt hinzufügen</h1>
 <div mat-dialog-content style="width: 400px; max-width: calc( 80vw - 48px );">
   <mat-form-field style="display: block">
-    <input cdkFocusInitial matInput placeholder="Name" [(ngModel)]="data[projNameKeyStr]" required>
+    <input cdkFocusInitial matInput placeholder="Name" [(ngModel)]="data[projNameKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie einen Namen an</mat-error>
   </mat-form-field>
   <mat-form-field style="display: block">
-    <input matInput placeholder="Kennziffer" [(ngModel)]="data[projIdentifierKeyStr]" required>
+    <input matInput placeholder="Kennziffer" [(ngModel)]="data[projIdentifierKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie eine Kennziffer an</mat-error>
   </mat-form-field>
   <mat-form-field style="display: block">
@@ -16,15 +16,15 @@
   </mat-checkbox>
   <h3>Dauer</h3>
   <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Tage (8 Stunden)" [(ngModel)]="data[projDurationKeyStr]" required>
+    <input matInput type="number" placeholder="Tage (8 Stunden)" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie eine Dauer an</mat-error>
   </mat-form-field>
   <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Stunden" [(ngModel)]="data[projDurationKeyStr]" required>
+    <input matInput type="number" placeholder="Stunden" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie eine Dauer an</mat-error>
   </mat-form-field>
   <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Minuten" [(ngModel)]="data[projDurationKeyStr]" required>
+    <input matInput type="number" placeholder="Minuten" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie eine Dauer an</mat-error>
   </mat-form-field>
   <h3>Farbe</h3>
@@ -36,8 +36,8 @@
   <!-- <span>Kategoriefarbe</span><p-colorPicker [(ngModel)]="data[projMarkerColorKeyStr]"></p-colorPicker> -->
   <mat-form-field style="display: block">
     <!-- <input matInput placeholder="Notiz" [(ngModel)]="data[projNoteKeyStr]"> -->
-    <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
-      cdkAutosizeMaxRows="10" [(ngModel)]="data[projNoteKeyStr]"></textarea>
+    <textarea matInput [cdkTextareaAutosize]="true" #autosize="cdkTextareaAutosize" [cdkAutosizeMinRows]="4"
+      [cdkAutosizeMaxRows]="10" [(ngModel)]="data[projNoteKeyStr]"></textarea>
   </mat-form-field>
   <mat-checkbox [(ngModel)]="data[projReservedKeyStr]">
     <span style="font-weight: normal">unter Vorbehalt</span>
@@ -46,6 +46,6 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abbrechen</button>
   <button mat-button
-    disabled="{{!data[projNameKeyStr] || !data[projIdentifierKeyStr] || (!data[projDurationKeyStr] && !data[projEndlessKeyStr])}}"
+    [disabled]="!data[projNameKeyStr] || !data[projIdentifierKeyStr] || (!data[projDurationKeyStr] && !data[projEndlessKeyStr])"
     [mat-dialog-close]="data">Ok</button>
 </div>

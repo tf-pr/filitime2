@@ -4,7 +4,8 @@ import { Subscription } from 'rxjs';
 import { LoggerService } from './logger.service';
 import { DbiService } from './dbi.service';
 import { DpoService } from './dpo.service';
-import { Employee } from '../helper';
+import { Employee, Helper } from '../helper';
+import { WeekViewServiceService } from '../navigator/planboard-view/week-view/week-view-service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,11 @@ export class TesterService {
   // private sub2: Subscription;
   // private sub3: Subscription;
 
-  constructor(private fsi: FsiService, private dbi: DbiService, private dpo: DpoService, private logger: LoggerService) {
+  constructor(private fsi: FsiService,
+              private dbi: DbiService,
+              private dpo: DpoService,
+              private logger: LoggerService,
+              private wvs: WeekViewServiceService) {
     this.noDelay();
     this.delayMeBy500();
     this.delayMeBy1000();
@@ -74,6 +79,11 @@ export class TesterService {
 
         // this.logger.logUserInput('tester:delayMeBy2000');
         // console.log(Date.now());
+
+        // Helper.setLooperInterval(() => {
+        //   console.log('addNextEmployee');
+        //   this.addNextEmployee();
+        // }, 10, 666);
       });
   }
 
@@ -116,6 +126,8 @@ export class TesterService {
 
         // this.logger.logUserInput('tester:delayMeBy3000');
         // console.log(Date.now());
+
+        // this.renoveLastEmployee();
       });
   }
 
@@ -1399,5 +1411,34 @@ export class TesterService {
     return new Promise<void>((res) => {
       setTimeout(() => { res(); }, waitTime);
     });
+  }
+
+  private addNextEmployee() {
+    const selectedList = this.wvs.getSelectedEmployeeNames();
+    const selectableList = this.wvs.getSelectableEmployeeNames();
+
+    const lastSelected = selectedList[selectedList.length - 1];
+    const i = selectableList.indexOf(lastSelected);
+    if (i === -1) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return;
+    }
+
+    const nextName = selectableList[i + 1];
+    if ( !nextName ) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return;
+    }
+
+    this.wvs.addSelectedEmployeeName(nextName);
+  }
+
+  private renoveLastEmployee() {
+    const selectedList = this.wvs.getSelectedEmployeeNames();
+
+    const lastSelected = selectedList[selectedList.length - 1];
+    this.wvs.removeSelectedEmployeeName(lastSelected);
   }
 }

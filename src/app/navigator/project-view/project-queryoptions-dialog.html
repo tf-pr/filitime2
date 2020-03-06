@@ -19,6 +19,6 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abbrechen</button>
   <button mat-button
-    disabled="{{!data[queryBy] || !data[queryFrom] || !data[queryTo]"
+    [disabled]="!data['queryBy'] || !data['queryFrom'] || !data['queryTo']"
     [mat-dialog-close]="data">Ok</button>
 </div>

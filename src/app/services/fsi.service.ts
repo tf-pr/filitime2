@@ -867,7 +867,11 @@ export class FsiService {
 
   //#endregion
 
-  // #region // HIER bin ich stehen geblieben :)
+  //#region assignment functions
+
+  // Hi there HERE will be assi funcs. thx
+
+  //#endregion
 
   //#region essential FS functions
 

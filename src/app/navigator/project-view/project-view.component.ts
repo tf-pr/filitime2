@@ -1,16 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
-import { switchMap } from 'rxjs/operators';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { Project, Helper } from 'src/app/helper';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { DpoService } from 'src/app/services/dpo.service';
 import { DbiService } from 'src/app/services/dbi.service';
-import { delay } from 'q';
-import { ButtonModule } from 'primeng/button';
 import { LoggerService } from 'src/app/services/logger.service';
+import { MatBadgePosition } from '@angular/material';
 
 @Component({
   selector: 'app-project-view',
@@ -21,6 +19,8 @@ export class ProjectViewComponent implements OnInit {
   private deepLinkData: {} = undefined;
   private readonly deepLinkFolderStr = 'f';
   private readonly deepLinkProjectIdStr = 'p';
+
+  public readonly matBadgePositionBefore = 'before' as MatBadgePosition;
 
   public isMobile = false;
   public isLandscape = true;

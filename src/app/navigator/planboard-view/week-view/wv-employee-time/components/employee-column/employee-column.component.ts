@@ -21,7 +21,7 @@ export class EmployeeColumnComponent implements OnInit {
   public stupidArray: any[] = [];
   private weekAssignmentTemplate: Assignment[][];
 
-  private assignmentTable: Assignment[][][];
+  public assignmentTable: Assignment[][][];
 
   constructor(private wvs: WeekViewServiceService) {
     this.cwCount = this.wvs.getCwCount();

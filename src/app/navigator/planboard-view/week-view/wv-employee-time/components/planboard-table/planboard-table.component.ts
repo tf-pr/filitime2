@@ -9,7 +9,7 @@ import { WeekViewServiceService } from '../../../week-view-service.service';
 })
 export class PlanboardTableComponent implements OnInit {
   @Output() assignmentClicked = new EventEmitter<Assignment>();
-  private editAssignmentModeActive = false;
+  public editAssignmentModeActive = false;
   public employeeNamesTD: string[] = [];
   public employeeDocIdsTD: string[] = [];
 
@@ -20,6 +20,7 @@ export class PlanboardTableComponent implements OnInit {
     wvs.selectedEmployeeNamesChange.subscribe({
       next: value => {
         this.employeeNamesTD = value;
+        console.table('da new list', this.employeeNamesTD);
       }
     });
     wvs.selectedEmployeeDocIdsChange.subscribe({

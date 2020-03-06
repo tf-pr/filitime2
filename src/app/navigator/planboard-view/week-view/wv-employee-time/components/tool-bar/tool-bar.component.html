@@ -1,10 +1,22 @@
 <mat-toolbar color="primary">
     <mat-toolbar-row>
-        <button mat-raised-button (click)="zoomInCliked()">Zoom In</button>
-        <button mat-raised-button (click)="zoomOutCliked()">Zoom Out</button>
-        <button mat-raised-button (click)="undoCliked()">Undo</button>
-        <button mat-raised-button (click)="redoCliked()">Redo</button>
-        <button mat-raised-button (click)="layoutSettingsClicked()">Settings</button>
+        <button mat-raised-button (click)="zoomInClicked()">Zoom In</button>
+        <button mat-raised-button (click)="zoomOutClicked()">Zoom Out</button>
+        <button mat-raised-button (click)="upClicked()">Up</button>
+        <button mat-raised-button (click)="downClicked()">Down</button>
+        <!-- <button mat-raised-button (click)="undoClicked()">Undo</button>
+        <button mat-raised-button (click)="redoClicked()">Redo</button> -->
+        <!-- <button mat-raised-button (click)="layoutSettingsClicked()">Settings</button> -->
+
+        <!-- the following code does not work in fiddlify-mode:on  -->
+        <mat-form-field>
+          <mat-label>MA Auswählen</mat-label>
+          <mat-select [multiple]="true" (selectionChange)="showEmployeesMSChanged($event)">
+            <mat-option *ngFor="let name of selectableEmployees" [value]="name">{{name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+
     </mat-toolbar-row>
     <mat-toolbar-row *ngIf="!!secondaryToolbar" [ngSwitch]="secondaryToolbar" style="font-size: 14px;">
         <!-- <span>Custom Toolbar</span> -->

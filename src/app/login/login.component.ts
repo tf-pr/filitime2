@@ -37,11 +37,12 @@ export class LoginComponent implements OnInit {
   public titleAlert = 'This field is required';
   public post: any = '';
 
-  private employeesToAdd: string[] = [];
-  private employeeNameToAdd: string;
-  private projectsToAdd: string[] = [];
-  private projectNameToAdd: string;
+  public employeesToAdd: string[] = [];
+  public employeeNameToAdd: string;
+  public projectsToAdd: string[] = [];
+  public projectNameToAdd: string;
 
+  public resetPasswordErrorMsg: string;
   public logInErrorMsg: string;
 
   constructor(private globalData: GlobalDataService,
@@ -303,9 +304,9 @@ export class LoginComponent implements OnInit {
     this.employeesToAdd.splice(i, 1);
   }
 
-  public addEmployeeToAdd() {
-    if (!this.employeeNameToAdd) { return; }
-    this.employeesToAdd.push(this.employeeNameToAdd);
+  public addEmployeeToAdd(employeeNameToAdd) {
+    if (!employeeNameToAdd) { return; }
+    this.employeesToAdd.push(employeeNameToAdd);
     this.employeeNameToAdd = undefined;
   }
 
@@ -317,10 +318,10 @@ export class LoginComponent implements OnInit {
     this.projectsToAdd.splice(i, 1);
   }
 
-  public addProjectToAdd() {
-    if (!this.projectNameToAdd) { return; }
-    this.projectsToAdd.push(this.projectNameToAdd);
-    this.projectNameToAdd = undefined;
+  public addProjectToAdd(projectNameToAdd) {
+    if (!projectNameToAdd) { return; }
+    this.projectsToAdd.push(projectNameToAdd);
+    projectNameToAdd = undefined;
   }
 
   public finishQuickStart() {
@@ -334,5 +335,9 @@ export class LoginComponent implements OnInit {
   public cancelQuickStart() {
     this.changeMode(undefined);
     this.globalData.setQucikStartOpened = false;
+  }
+
+  public resetPasswordClicked() {
+    console.log('nji'); // HIER
   }
 }

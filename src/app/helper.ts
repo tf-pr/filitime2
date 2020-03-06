@@ -234,6 +234,42 @@ export class Helper {
         }, loopDelay);
         return interval;
     }
+
+    public static arrayCompare<T>(arrComp1: T[], arrComp2: T[]): any {
+        const added: T[] = [];
+        const unchanged: T[] = [];
+        const removed: T[] = arrComp1.slice(0);
+        arrComp2.forEach(elem => {
+            const i = arrComp1.indexOf(elem);
+            if (i === -1) {
+                added.push(elem);
+            } else {
+                unchanged.push(elem);
+            }
+            const i2 = removed.indexOf(elem);
+            if (i2 !== -1) {
+                removed.splice(i2, 1);
+            }
+        });
+        return { added, removed, unchanged };
+    }
+
+    public static async cleanArray(arr: any[]) {
+      return await this.asyncTimeout<void>(() => {
+        // console.log('before cleaning generic array', arr);
+        arr = [];
+        // console.log('after cleaning generic array', arr);
+        return;
+      });
+    }
+
+    public static asyncTimeout<T>( cb: (...args: any[]) => T, delay?: number ) {
+      return new Promise<T>((res) => {
+        setTimeout(() => {
+          res(cb());
+        }, delay);
+      });
+    }
 }
 
 export class Project {

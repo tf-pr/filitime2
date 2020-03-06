@@ -71,7 +71,7 @@
                     </button>
                 </div>
             </div>
-            <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+            <mat-paginator *ngIf="!disablePaginators" [showFirstLastButtons]="true" [length]="paginatorLength"
                 [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                 (page)="paginatorChanged($event)">
             </mat-paginator>
@@ -102,7 +102,7 @@
                     </mat-card-actions>
                 </mat-card>
             </ng-container>
-            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" [showFirstLastButtons]="true" [length]="paginatorLength"
                 [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                 (page)="paginatorChanged($event)">
             </mat-paginator>
@@ -183,7 +183,7 @@
                     <mat-icon>add_circle_outline</mat-icon>Projekt hinzufügen
                 </button>
             </div>
-            <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+            <mat-paginator *ngIf="!disablePaginators" [showFirstLastButtons]="true" [length]="paginatorLength"
                 [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                 (page)="paginatorChanged($event)">
             </mat-paginator>
@@ -192,9 +192,9 @@
                     [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
                     [style.color]="getMostReadableFontColor(project.color)"
                     [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'"
-                    matBadgeHidden="{{!project.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
-                    matBadgePosition="before">
-                    <mat-card-header class="project-card-header" matBadgeHidden="{{!project.reserved}}" matBadge="?"
+                    [matBadgeHidden]="!project.isConflicted" [matBadge]="'!'" [matBadgeColor]="'warn'" [matBadgeSize]="'large'"
+                   [matBadgePosition]="matBadgePositionBefore">
+                    <mat-card-header class="project-card-header" [matBadgeHidden]="!project.reserved" matBadge="?"
                         matBadgeSize="large">
                         <mat-card-title>{{project.name}}</mat-card-title>
                         <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
@@ -234,7 +234,7 @@
                     </mat-card-actions>
                 </mat-card>
             </ng-container>
-            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+            <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" [showFirstLastButtons]="true" [length]="paginatorLength"
                 [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                 (page)="paginatorChanged($event)">
             </mat-paginator>
@@ -248,10 +248,11 @@
             </div>
             <div *ngIf="projectListPaginated.length != 0">
                 <mat-card class="project-detail-card" [style.color]="getMostReadableFontColor(projectListPaginated[0].color)"
-                    [style.background]="'linear-gradient(45deg, ' + projectListPaginated[0].color + ' 84%, ' + (!!projectListPaginated[0].markerColor?projectListPaginated[0].markerColor:projectListPaginated[0].color) + ' 0)'"
-                    matBadgeHidden="{{!projectListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
-                    matBadgePosition="before">
-                    <mat-card-header class="project-card-header" matBadgeHidden="{{!projectListPaginated[0].reserved}}" matBadge="?" matBadgeSize="large">
+                  [style.background]="'linear-gradient(45deg, ' + projectListPaginated[0].color + ' 84%, ' + (!!projectListPaginated[0].markerColor?projectListPaginated[0].markerColor:projectListPaginated[0].color) + ' 0)'"
+                  [matBadgeHidden]="!projectListPaginated[0].isConflicted" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                  [matBadgePosition]="matBadgePositionBefore">
+                  <mat-card-header class="project-card-header" [matBadgeHidden]="!projectListPaginated[0].reserved" matBadge="?"
+                    matBadgeSize="large">
                         <mat-card-title>{{projectListPaginated[0].name}}</mat-card-title>
                         <mat-card-subtitle class="project-card-subtitle">{{projectListPaginated[0].identifier}}</mat-card-subtitle>
                     </mat-card-header>
@@ -292,7 +293,7 @@
                         <div style="display: inline-block; padding: 3px;">
                             <span>Erstellt</span>
                             <div style="padding-left: 10px;">
-                                <span>{{projectListPaginated[0].createdTS}}</span>
+                                <span>{{projectListPaginated[0].createTS}}</span>
                             </div>
                         </div>
                         <div  *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">
@@ -319,7 +320,7 @@
 
 
 
-                
+
 
 
             </div>
@@ -328,7 +329,7 @@
             </div>
         </ng-container>
 
-        <!-- 
+        <!--
         <mat-card class="project-folder-card">
             <mat-card-title *ngIf="!currProjectId" class="project-folder-card-header">
                 <button *ngIf="!!currFolder" mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
@@ -408,7 +409,7 @@
                         </button>
                     </div>
                 </div>
-                <mat-paginator *ngIf="!disablePaginators" showFirstLastButtons [length]="paginatorLength"
+                <mat-paginator *ngIf="!disablePaginators" [showFirstLastButtons]="true" [length]="paginatorLength"
                     [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                     (page)="paginatorChanged($event)">
                 </mat-paginator>
@@ -439,7 +440,7 @@
                         </mat-card-actions>
                     </mat-card>
                 </ng-container>
-                <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" showFirstLastButtons [length]="paginatorLength"
+                <mat-paginator *ngIf="!disablePaginators && !disableBottomPaginator" [showFirstLastButtons]="true" [length]="paginatorLength"
                     [pageSize]="paginatorPageSize" [pageIndex]="paginatorPageIndex" [pageSizeOptions]="paginatorPageSizeOptions"
                     (page)="paginatorChanged($event)">
                 </mat-paginator>
@@ -548,12 +549,12 @@
             <div class="project-card-container">
                 <ng-container *ngFor="let project of projectListPaginated">
                     <mat-card class="project-card"
-                        [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
-                        [style.color]="getMostReadableFontColor(project.color)"
-                        [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'"
-                        matBadgeHidden="{{!project.isConflicted}}" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
-                        matBadgePosition="before">
-                        <mat-card-header class="project-card-header" matBadgeHidden="{{!project.reserved}}" matBadge="?"
+                      [style.animation]="!isDeleting(project.docId) ? 'wobble-hor-bottom 0.4s both' : 'fade-out 1s ease-out both'"
+                      [style.color]="getMostReadableFontColor(project.color)"
+                      [style.background]="'linear-gradient(45deg, ' + project.color + ' 84%, ' + (!!project.markerColor?project.markerColor:project.color) + ' 0)'"
+                      [matBadgeHidden]="project.isConflicted !== true" matBadge="!" matBadgeColor="warn" matBadgeSize="large"
+                      [matBadgePosition]="matBadgePositionBefore">
+                        <mat-card-header class="project-card-header" [matBadgeHidden]="!project.reserved" matBadge="?"
                             matBadgeSize="large">
                             <mat-card-title>{{project.name}}</mat-card-title>
                             <mat-card-subtitle class="project-card-subtitle">{{project.identifier}}</mat-card-subtitle>
@@ -598,9 +599,9 @@
             <div *ngIf="projectListPaginated.length != 0">
                 <mat-card class="project-detail-card" [style.color]="getMostReadableFontColor(projectListPaginated[0].color)"
                     [style.background]="'linear-gradient(45deg, ' + projectListPaginated[0].color + ' 84%, ' + (!!projectListPaginated[0].markerColor?projectListPaginated[0].markerColor:projectListPaginated[0].color) + ' 0)'"
-                    matBadgeHidden="{{!projectListPaginated[0].isConflicted}}" matBadge="!" matBadgeColor="warn"
-                    matBadgeSize="large" matBadgePosition="before">
-                    <mat-card-header class="project-card-header" matBadgeHidden="{{!projectListPaginated[0].reserved}}" matBadge="?"
+                    [matBadgeHidden]="!projectListPaginated[0].isConflicted" matBadge="!" matBadgeColor="warn"
+                    matBadgeSize="large"[matBadgePosition]="matBadgePositionBefore">
+                    <mat-card-header class="project-card-header" [matBadgeHidden]="!projectListPaginated[0].reserved" matBadge="?"
                         matBadgeSize="large">
                         <mat-card-title>
                             <button mat-icon-button aria-label="Zurück" style="top: -4px" (click)="goBack()">
@@ -648,7 +649,7 @@
                         <div style="display: inline-block; padding: 3px;">
                             <span>Erstellt</span>
                             <div style="padding-left: 10px;">
-                                <span>{{projectListPaginated[0].createdTS}}</span>
+                                <span>{{projectListPaginated[0].createTS}}</span>
                             </div>
                         </div>
                         <div *ngIf="!projectListPaginated[0].endless" style="display: inline-block; padding: 3px;">

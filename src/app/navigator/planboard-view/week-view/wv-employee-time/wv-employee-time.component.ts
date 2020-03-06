@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+import { WeekViewServiceService } from '../week-view-service.service';
 
 @Component({
   selector: 'app-wv-employee-time',
@@ -7,12 +8,12 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
   styleUrls: ['./wv-employee-time.component.css']
 })
 export class WvEmployeeTimeComponent implements OnInit {
-  public toolbarMode: string;
+  public toolbarMode: 'editAssignments' | 'editLayout' | 'somethingelse';
   private toolbarCount = 1;
   public planboardTableHeight: SafeStyle;
   public toolBarHeight: SafeStyle;
 
-  constructor(private sanitizer: DomSanitizer) { }
+  constructor(private wvs: WeekViewServiceService, private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.recalcLayout();
@@ -28,7 +29,7 @@ export class WvEmployeeTimeComponent implements OnInit {
     this.toolBarHeight = this.sanitizer.bypassSecurityTrustStyle('calc( 64px *  ' + this.toolbarCount + ' )');
   }
 
-  public onAssignmentClicked() {
+  public onAssignmentClicked(e) {
     this.toolbarMode = 'editAssignments';
   }
 }

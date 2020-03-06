@@ -1,24 +1,236 @@
-import { Assignment } from 'src/app/helper';
+import { Assignment, Helper } from 'src/app/helper';
 import { WeekViewServiceService } from './week-view-service.service';
 
 export class WeekViewTable {
-    public table: Assignment[][][][] = [];
+  public table: Assignment[][][][] = [];
+  private columnTemplate: Assignment[][][] = [];
+  private readonly columnRowTemplate: Assignment[][] = [[], [], [], [], [], [], []];
+    // HIER mach columnRowTemplate so [null, null, null, null, null, null, null]
 
-    private columnTaplate: Assignment[][][] = [];
+  private columnRowPool: Assignment[][][] = [];
 
-    constructor( employeeCount, cwCount: number ) {
-        this.calcColumnTaplate(cwCount);
+  public get columnCount(): number {
+    return this.table.length;
+  }
 
-        this.table = [];
-        for (let i = 0; i < employeeCount; i++) {
-            this.table.push( this.columnTaplate.slice(0) );
+  public get rowCount(): number {
+    return this.columnTemplate.length;
+  }
+
+  constructor(column: number, row: number) {
+    this.initColumnTemplate(row);
+    this.initTable(column);
+
+    // tslint:disable-next-line:no-console
+    console.time('fillColumnRowPool');  // HIER
+    this.fillColumnRowPool(200).then(() => {
+      // tslint:disable-next-line:no-console
+      console.timeEnd('fillColumnRowPool');  // HIER
+    });
+  }
+
+  private initColumnTemplate(rows) {
+    this.columnTemplate = [];
+    for (let i = 0; i < rows; i++) {
+      this.columnTemplate.push(this.cloneColumnRowTemplate());
+    }
+  }
+
+  private initTable(columns) {
+    this.table = [];
+    for (let i = 0; i < columns; i++) {
+      this.table.push(this.cloneColumnTemplate());
+    }
+  }
+
+  private async fillColumnRowPool(poolCount: number) {
+    return new Promise<boolean>((res, rej) => {
+      let successCounter = 0;
+      for (let i = 0; i < poolCount; i++) {
+        const tempCR: Assignment[][] = this.cloneColumnRowTemplate();
+        this.columnRowPool.push(tempCR);
+        if (++successCounter >= poolCount) {
+          res();
         }
+      }
+    });
+  }
+
+  public addColumn(i?: number) {
+    if ((!i && i !== 0) || i > this.columnCount) {
+      i = this.columnCount;
+    } else if (i < -1) {
+      i = 0;
     }
 
-    private calcColumnTaplate(cwCount) {
-        this.columnTaplate = [];
-        for (let i = 0; i < cwCount; i++) {
-            this.columnTaplate.push( [[], [], [], [], [], [], []] );
-        }
+    switch (i) {
+      case 0:
+        this.table.unshift(this.cloneColumnTemplate());
+        break;
+      case this.columnCount:
+        this.table.push(this.cloneColumnTemplate());
+        break;
+      default:
+        this.table.splice(i, 0, this.cloneColumnTemplate());
     }
+  }
+
+  public removeColumn(i?: number) {
+    if ((!i && i !== 0) || i > this.columnCount) {
+      i = this.columnCount;
+    } else if (i < -1) {
+      i = 0;
+    }
+    switch (i) {
+      case 0:
+        this.clearAndPoolColumn(this.table.shift())
+          .then(() => {
+            // HIER
+          });
+        break;
+      case this.columnCount:
+        this.clearAndPoolColumn(this.table.pop())
+          .then(() => {
+            // HIER
+          });
+        break;
+      default:
+        this.clearAndPoolColumn(this.table.splice(i, 1)[0])
+          .then(() => {
+            // HIER
+          });
+        break;
+    }
+  }
+
+  public addRow(addTo: 'start' | 'end') {
+    const addColumnRowTo: (arr: Assignment[][][]) => void = (arr) => {
+      if (addTo !== 'start') {
+        arr.push(this.getEmptyColumnRow());
+      } else {
+        arr.unshift(this.getEmptyColumnRow());
+      }
+    };
+
+    addColumnRowTo(this.columnTemplate);
+    for (let i = 0; i < this.columnCount; i++) { addColumnRowTo(this.table[i]); }
+  }
+
+  public removeRow(removeAt: 'start' | 'end') {
+    const removeColumnRowAt: (arr: Assignment[][][]) => void = (arr) => {
+      const columnRow2pool = (removeAt !== 'start') ? arr.pop() : arr.shift();
+      this.clearAndPoolColumnRow(columnRow2pool).then(() => {});
+    };
+
+    removeColumnRowAt(this.columnTemplate);
+    for (let i = 0; i < this.columnCount; i++) { removeColumnRowAt(this.table[i]); }
+  }
+
+  private cloneColumnTemplate(): Assignment[][][] {
+    return JSON.parse(JSON.stringify(this.columnTemplate));
+  }
+
+  private cloneColumnRowTemplate(): Assignment[][] {
+    return JSON.parse(JSON.stringify(this.columnRowTemplate));
+  }
+
+  public getEmptyColumnRow(): Assignment[][] {
+    if (this.columnRowPool.length > 1) {
+      this.refillPoolIfNeeded().then(() => {
+        console.log('refill sag is ok');
+      });
+      return this.columnRowPool.splice(0, 1)[0];
+    }
+
+    // this should not happen
+    console.warn('Preloaded ColumnRowPool extended');
+    return this.cloneColumnRowTemplate();
+  }
+
+  private clearAndPoolColumn(column: Assignment[][][]): Promise<any> {
+    return new Promise<any>((res) => {
+      const columnRowCount = column.length;
+      let succesCount = 0;
+      column.forEach(columnRow => {
+        this.clearAndPoolColumnRow(columnRow)
+          .then(() => { if (++succesCount >= columnRowCount) { res(); } });
+      });
+    });
+  }
+
+  private clearAndPoolColumnRow(columnRow: Assignment[][]): Promise<any> {
+    return new Promise<any>((res) => {
+      if (columnRow.length !== 7) {
+        // tslint:disable-next-line:no-debugger
+        debugger;
+      }
+
+      // columnRow.forEach(day => { day.length = 0; });
+      let cleanCount = 0;
+      const incrementNCheckCounter: () => boolean
+        = () => (++cleanCount < 7) ? false : true;
+
+      columnRow.forEach(day => {
+        Helper.cleanArray(day)
+          .then(() => {
+            if (incrementNCheckCounter()) {
+              res();
+            }
+          });
+      });
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  private refillPoolIfNeededRunning = false;
+  // tslint:disable-next-line:member-ordering
+  private reExeRefillCheck = false;
+  private async refillPoolIfNeeded() {
+    return new Promise<void>(res => {
+      if (this.refillPoolIfNeededRunning) {
+        console.log('chill mal... bin nicht multitasking fähig, aber hab noch ' + this.columnRowPool.length + ' auf Lager'); // HIEr
+        this.reExeRefillCheck = true;
+        res();
+        return;
+      }
+      this.refillPoolIfNeededRunning = true;
+      this.reExeRefillCheck = false;
+      console.log('so weit so gut...'); // HIER
+      console.log('HI muss kurz checken ob der pool genug gefüllt ist..'); // HIER
+
+      const restartIfNeeded: () => void = () => {
+        this.refillPoolIfNeededRunning = false;
+        if (!this.reExeRefillCheck) {
+          console.log('so.. fertig hiers');  // HIER
+          res();
+          return;
+        }
+        console.log('ok.. jetzt nochmal');  // HIER
+        this.refillPoolIfNeeded().then(() => { /*     // HIER */ });
+      };
+
+      const objs2pool = (3 * this.columnCount) - this.columnRowPool.length;
+      console.log({
+        columnRowPoolSize: this.columnRowPool.length,
+        columnCount: this.columnCount,
+        objs2pool,
+      }); // HIER
+      if (objs2pool <= 0) {
+        console.log(this.columnRowPool.length + ' im pool is genug'); // HIER
+        restartIfNeeded();
+        return;
+      }
+
+      console.log(this.columnRowPool.length + ' im pool ist zu wenig'); // HIER
+      console.log(objs2pool + 'werden im pool nachgereicht'); // HIER
+
+      // tslint:disable-next-line:no-console
+      console.time('refill pool');
+      this.fillColumnRowPool(objs2pool).then(() => {
+        // tslint:disable-next-line:no-console
+        console.timeEnd('refill pool');
+        restartIfNeeded();
+      });
+    });
+  }
 }

@@ -48,44 +48,6 @@ export class TimeAxisComponent implements OnInit {
   ngOnInit() {
   }
 
-  // private updateLists() {
-  //   const tempDayContainer = [];
-  //   const tempDateContainer = [];
-
-  //   // ~~Inputs~~
-  //   // indexTS
-  //   // cwCount
-  //   // dayCount
-  //   // shortDayNames
-  //   // ~~Outputs~~
-  //   // cwList
-  //   // dayContainer
-  //   // dateContainer
-
-  //   const tempIndexTS = Helper.getMondayTS(this.indexTS);
-  //   const newIndexTS: number = ( tempIndexTS === this.indexTS ) ? undefined : tempIndexTS;
-  //   // newIndexTS === undefned  => newIndexTS unchanged
-
-
-
-
-
-  //   //
-  //   // this.cwList = [7, 8, 9, 10];
-  //   // this.dayContainer = [
-  //   //   ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', ],
-  //   //   ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', ],
-  //   //   ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', ],
-  //   //   ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', ],
-  //   // ];
-  //   // this.dateContainer = [
-  //   //   ['10.02.', '11.02.', '12.02.', '13.02.', '14.02.', '15.02.', ],
-  //   //   ['17.02.', '18.02.', '19.02.', '20.02.', '21.02.', '22.02.', ],
-  //   //   ['24.02.', '25.02.', '26.02.', '27.02.', '28.02.', '29.02.', ],
-  //   //   ['02.03.', '03.03.', '04.03.', '05.03.', '06.03.', '07.03.', ],
-  //   // ];
-  // }
-
   private updateLists() {
     // ~~Inputs~~
     // indexTS
@@ -153,22 +115,5 @@ export class TimeAxisComponent implements OnInit {
     this.cwList = newCwTD;
     this.dayContainer = newDayContainer;
     this.dateContainer = newDateContainer;
-
-    // console.warn('YOO zieh dir den geilen scheiß rein!!');
-    // console.log('~~Inputs~~');
-    // console.log('indexTS', this.indexTS);
-    // console.log('cwCount', this.cwCount);
-    // console.log('dayCount', this.dayCount);
-    // console.table(this.shortDayNames);
-    // console.log('~~Temps~~');
-    // console.log({newCwCount});
-    // console.log({newIndexTS});
-    // console.table(newWeekTD);
-    // console.table(newDaysTS);
-    // console.table(newCwTD);
-    // console.log('~~Outputs~~');
-    // console.table(this.cwList);
-    // console.table(this.dayContainer);
-    // console.table(this.dateContainer);
   }
 }

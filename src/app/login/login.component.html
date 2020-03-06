@@ -50,7 +50,7 @@
                         </mat-error>
                     </mat-form-field>
                     <div *ngIf="!!resetPasswordErrorMsg" class="submitError">
-                        <alert *ngIf="!!resetPassword" type="danger"><strong>{{resetPassword}}</strong></alert>
+                        <alert type="danger"><strong>{{resetPasswordErrorMsg}}</strong></alert>
                     </div>
                     <div class="form-element">
                         <button mat-raised-button color="primary" type="submit" class="wideButton"
@@ -222,7 +222,7 @@
                     </mat-form-field>
                     <div class="form-element">
                         <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
-                        <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                        <button mat-raised-button type="submit" style="float: right;"
                             class="nextButton">weiter</button>
                     </div>
                 </form>
@@ -256,7 +256,7 @@
                     </div> -->
                     <div class="form-element">
                         <button mat-raised-button class="backButton" (click)="changeMode('registerEmployee')">zurück</button>
-                        <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                        <button mat-raised-button type="submit" style="float: right;"
                             class="nextButton">weiter</button>
                     </div>
                 </form>
@@ -323,7 +323,7 @@
                     </mat-error>
                 </mat-form-field>
                 <div *ngIf="!!resetPasswordErrorMsg" class="submitError">
-                    <alert *ngIf="!!resetPassword" type="danger"><strong>{{resetPassword}}</strong></alert>
+                    <alert type="danger"><strong>{{resetPasswordErrorMsg}}</strong></alert>
                 </div>
                 <div class="form-element">
                     <button mat-raised-button color="primary" type="submit" class="wideButton"
@@ -498,7 +498,7 @@
                 </mat-form-field>
                 <div class="form-element">
                     <button mat-raised-button class="backButton" (click)="changeMode('register')">zurück</button>
-                    <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                    <button mat-raised-button type="submit" style="float: right;"
                         class="nextButton">weiter</button>
                 </div>
             </form>
@@ -531,7 +531,7 @@
                                     </div> -->
                 <div class="form-element">
                     <button mat-raised-button class="backButton" (click)="changeMode('registerEmployee')">zurück</button>
-                    <button *ngIf="currMode == 'registerEmployee'" mat-raised-button type="submit" style="float: right;"
+                    <button mat-raised-button type="submit" style="float: right;"
                         class="nextButton">weiter</button>
                 </div>
             </form>

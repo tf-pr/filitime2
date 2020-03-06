@@ -21,6 +21,8 @@ export class AssignmentCardComponent implements OnInit {
   public background = 'unset';
   public color = '#000000';
 
+  public checked = false; // HIER umbennene o.d.s.
+
   constructor(private globalData: GlobalDataService) { }
 
   ngOnInit() {
@@ -30,8 +32,7 @@ export class AssignmentCardComponent implements OnInit {
       || !this.assignment.start || typeof this.assignment.start !== 'number'
       || !this.assignment.end || typeof this.assignment.end !== 'number'
       || !this.assignment.projectColor || typeof this.assignment.projectColor !== 'string') {
-      // console.error('nein nein nein nein nein nein nein  nein nein nein nein nein'); // HIER
-      // console.error('what´s wrong with this?!:', this.assignment); // HIER ERROR HANDLE i guess
+      console.error('what´s wrong with this?!:', this.assignment); // HIER ERROR HANDLE i guess
       this.cardInvalid = true;
       return;
     }

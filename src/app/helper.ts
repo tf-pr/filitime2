@@ -256,9 +256,7 @@ export class Helper {
 
     public static async cleanArray(arr: any[]) {
       return await this.asyncTimeout<void>(() => {
-        // console.log('before cleaning generic array', arr);
         arr = [];
-        // console.log('after cleaning generic array', arr);
         return;
       });
     }

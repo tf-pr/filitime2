@@ -564,13 +564,19 @@ export class WeekViewServiceService {
   public addAssignmentToTable(empI: number, weekI: number, dayI: number, assi: Assignment): number {
     if ( !this.assignmentTable
       || !this.assignmentTable[empI]
-      || !this.assignmentTable[empI][weekI]
-      || !this.assignmentTable[empI][weekI][dayI]) {
+      || !this.assignmentTable[empI][weekI]) {
       return -1;
     }
 
-    const newLength = this.assignmentTable[empI][weekI][dayI].push(assi);
-    return (newLength - 1);
+    if ( !this.assignmentTable[empI][weekI][dayI] ) {
+      if (this.assignmentTable[empI][weekI][dayI] === null) {
+        this.assignmentTable[empI][weekI][dayI] = [assi];
+        return 0;
+      }
+      return -1;
+    }
+
+    return this.assignmentTable[empI][weekI][dayI].push(assi) - 1;
   }
 
   public removeAssignmentFromTable(empI: number, weekI: number, dayI: number, assiI?: number): Assignment {
@@ -631,8 +637,7 @@ export class WeekViewServiceService {
       debugger;
     }
 
-    this.weekViewTable.removeRow('end');
-    this.weekViewTable.addRow('start');
+    this.weekViewTable.moveRowise('back');
     this.setIndexTS(newIndexDate.valueOf());
   }
 
@@ -644,8 +649,7 @@ export class WeekViewServiceService {
       debugger;
     }
 
-    this.weekViewTable.removeRow('start');
-    this.weekViewTable.addRow('end');
+    this.weekViewTable.moveRowise('forth');
     this.setIndexTS(newIndexDate.valueOf());
   }
 }

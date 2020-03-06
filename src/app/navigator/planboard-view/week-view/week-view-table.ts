@@ -4,7 +4,7 @@ import { WeekViewServiceService } from './week-view-service.service';
 export class WeekViewTable {
   public table: Assignment[][][][] = [];
   private columnTemplate: Assignment[][][] = [];
-  private readonly columnRowTemplate: Assignment[][] = [[], [], [], [], [], [], []];
+  private readonly columnRowTemplate: Assignment[][] = [null, null, null, null, null, null, null];
     // HIER mach columnRowTemplate so [null, null, null, null, null, null, null]
 
   private columnRowPool: Assignment[][][] = [];
@@ -113,7 +113,9 @@ export class WeekViewTable {
     };
 
     addColumnRowTo(this.columnTemplate);
-    for (let i = 0; i < this.columnCount; i++) { addColumnRowTo(this.table[i]); }
+    for (let i = 0; i < this.columnCount; i++) {
+      addColumnRowTo(this.table[i]);
+    }
   }
 
   public removeRow(removeAt: 'start' | 'end') {
@@ -123,7 +125,29 @@ export class WeekViewTable {
     };
 
     removeColumnRowAt(this.columnTemplate);
-    for (let i = 0; i < this.columnCount; i++) { removeColumnRowAt(this.table[i]); }
+    for (let i = 0; i < this.columnCount; i++) {
+      removeColumnRowAt(this.table[i]);
+    }
+  }
+
+  public moveRowise(direction: 'back' | 'forth') {
+    const moveColumnRowAt: (arr: Assignment[][][]) => void = (arr) => {
+      let columnRow2pool;
+      if (direction === 'back') {
+        columnRow2pool = arr.pop();
+        arr.unshift(this.getEmptyColumnRow());
+      } else {
+        columnRow2pool = arr.shift();
+        arr.push(this.getEmptyColumnRow());
+      }
+      this.clearAndPoolColumnRow(columnRow2pool).then(() => {
+        // HIER
+      });
+    };
+
+    for (let i = 0; i < this.columnCount; i++) {
+      moveColumnRowAt(this.table[i]);
+    }
   }
 
   private cloneColumnTemplate(): Assignment[][][] {
@@ -164,19 +188,10 @@ export class WeekViewTable {
         // tslint:disable-next-line:no-debugger
         debugger;
       }
-
-      // columnRow.forEach(day => { day.length = 0; });
       let cleanCount = 0;
-      const incrementNCheckCounter: () => boolean
-        = () => (++cleanCount < 7) ? false : true;
-
       columnRow.forEach(day => {
-        Helper.cleanArray(day)
-          .then(() => {
-            if (incrementNCheckCounter()) {
-              res();
-            }
-          });
+        day = null;
+        if (++cleanCount >= 7) { res(); }
       });
     });
   }

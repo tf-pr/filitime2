@@ -2,6 +2,7 @@ import { DbiService } from './services/dbi.service';
 import { LoggerService } from './services/logger.service';
 
 export class Helper {
+    public static readonly msPerWeek: number = 604800000;
     public static readonly msPerDay: number = 86400000;
     public static readonly msPerHour: number = 3600000;
     public static readonly msPerMinute: number = 60000;
@@ -523,4 +524,32 @@ export class Assignment {
     editId: string;
     editName: string;
     editTS: number;
+
+    public static copyAssignment(assignment: Assignment): Assignment {
+      // HIER keep up to date
+      const copy: Assignment = new Assignment();
+      copy.employeeId = assignment.employeeId;
+      copy.projectId = assignment.projectId;
+      copy.projectIdentifier = assignment.projectIdentifier;
+      copy.start = assignment.start;
+      copy.end = assignment.end;
+      copy.note = assignment.note;
+      copy.isConflicted = assignment.isConflicted;
+      copy.blockedAt = assignment.blockedAt;
+      copy.projectName = assignment.projectName;
+      copy.projectColor = assignment.projectColor;
+      copy.cw = assignment.cw;
+      copy.day = assignment.day;
+      copy.marker = assignment.marker;
+      copy.markerColor = assignment.markerColor;
+      copy.fixed = assignment.fixed;
+      copy.docId = assignment.docId;
+      copy.createId = assignment.createId;
+      copy.createName = assignment.createName;
+      copy.createTS = assignment.createTS;
+      copy.editId = assignment.editId;
+      copy.editName = assignment.editName;
+      copy.editTS = assignment.editTS;
+      return copy;
+    }
 }

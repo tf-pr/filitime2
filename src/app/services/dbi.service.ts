@@ -2,7 +2,7 @@ import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { FsiService } from './fsi.service';
 import { Observable, Subscription } from 'rxjs';
-import { Helper, Project, Employee } from '../helper';
+import { Helper, Project, Employee, Assignment } from '../helper';
 import { DpoService } from './dpo.service';
 import { LoggerService } from './logger.service';
 
@@ -68,7 +68,42 @@ export class DbiService {
     //
   }
 
-    //#endregion
+  public changeSingleAssignment(assignment: Assignment): Promise<any> {
+    return new Promise<any>(() => {
+      //
+    });
+  }
+
+  /*
+
+  // HIER    gehts spätestens am 13.03.2020 weiter
+
+  // tslint:disable-next-line:member-ordering
+  private wvInedexDate: Date;
+  public startSyncAssignmentWVTable( indexTS: number, employeeIds: string[] ) {
+    const newIndexDate = new Date(indexTS);
+    const oldIndexDate = this.wvInedexDate;
+
+    if (!this.wvInedexDate) {
+      this.wvInedexDate = newIndexDate;
+    } else if ( newIndexDate.getMonth() === oldIndexDate.getMonth() && newIndexDate.getFullYear() === oldIndexDate.getFullYear()  ) {
+      //  alles gut. immer noch im selben index monat => kein neuer preload
+      return;
+    }
+
+    this.stopSyncAssignmentWVTable();
+
+    this.
+
+  }
+
+  public stopSyncAssignmentWVTable() {
+    //
+  }
+
+  */
+
+  //#endregion
 
 
   public isLatestAppVersion(currVersion: string): Promise<boolean> {

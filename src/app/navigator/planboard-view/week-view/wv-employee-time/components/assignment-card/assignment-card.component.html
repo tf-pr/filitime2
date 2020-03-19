@@ -1,11 +1,13 @@
-<div *ngIf="!cardInvalid" class="acContainer" (click)="onClick()" [style.left.%]="left" [style.width.%]="width" [style.background]="background" [style.color]="color">
+<div *ngIf="!cardInvalid" class="acContainer" (click)="onClick()" [style.left.%]="left" [style.width.%]="width">
+  <div class="fillParent" [style.background]="background" [style.color]="color">
     <div class="acHeaderContainer" style="position: relative;">
-        <mat-checkbox *ngIf="showCheckBox == true" class="acHeaderCb" [(ngModel)]="checked"></mat-checkbox>
-        <div class="acHeader">
-            <span>{{projectName}}</span>
-            <br>
-            <span>({{projectIdentifier}})</span>
-        </div>
+      <mat-checkbox *ngIf="showCheckBox == true" class="acHeaderCb" [(ngModel)]="checked"></mat-checkbox>
+      <div class="acHeader">
+        <span>{{projectName}}</span>
+        <br>
+        <span>({{projectIdentifier}})</span>
+      </div>
     </div>
     <div class="acNote">{{assignmentNote}}</div>
+  </div>
 </div>

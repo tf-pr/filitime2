@@ -130,24 +130,33 @@ export class WeekViewTable {
     }
   }
 
-  public moveRowise(direction: 'back' | 'forth') {
-    const moveColumnRowAt: (arr: Assignment[][][]) => void = (arr) => {
-      let columnRow2pool;
-      if (direction === 'back') {
-        columnRow2pool = arr.pop();
-        arr.unshift(this.getEmptyColumnRow());
-      } else {
-        columnRow2pool = arr.shift();
-        arr.push(this.getEmptyColumnRow());
-      }
-      this.clearAndPoolColumnRow(columnRow2pool).then(() => {
-        // HIER
-      });
-    };
+  public async moveRowise(direction: 'back' | 'forth') {
+    return new Promise((res) => {
 
-    for (let i = 0; i < this.columnCount; i++) {
-      moveColumnRowAt(this.table[i]);
-    }
+      const moveColumnRowAt: (arr: Assignment[][][]) => Promise<any> = async (arr) => {
+        return new Promise<any>((res2) => {
+          let columnRow2pool;
+          if (direction === 'back') {
+            columnRow2pool = arr.pop();
+            arr.unshift(this.getEmptyColumnRow());
+          } else {
+            columnRow2pool = arr.shift();
+            arr.push(this.getEmptyColumnRow());
+          }
+          this.clearAndPoolColumnRow(columnRow2pool).then(() => {
+            // HIER
+          });
+          res2();
+        });
+      };
+
+      const thatColumnCount = this.columnCount;
+      let succesCount = 0;
+      for (let i = 0; i < thatColumnCount; i++) {
+        moveColumnRowAt(this.table[i])
+          .then(() => { if (++succesCount <= thatColumnCount) { res(); return; } });
+      }
+    });
   }
 
   private cloneColumnTemplate(): Assignment[][][] {
@@ -161,7 +170,7 @@ export class WeekViewTable {
   public getEmptyColumnRow(): Assignment[][] {
     if (this.columnRowPool.length > 1) {
       this.refillPoolIfNeeded().then(() => {
-        console.log('refill sag is ok');
+        // console.log('refill sagt is ok');
       });
       return this.columnRowPool.splice(0, 1)[0];
     }
@@ -203,15 +212,15 @@ export class WeekViewTable {
   private async refillPoolIfNeeded() {
     return new Promise<void>(res => {
       if (this.refillPoolIfNeededRunning) {
-        console.log('chill mal... bin nicht multitasking fähig, aber hab noch ' + this.columnRowPool.length + ' auf Lager'); // HIEr
+        // console.log('chill mal... bin nicht multitasking fähig, aber hab noch ' + this.columnRowPool.length + ' auf Lager'); // HIEr
         this.reExeRefillCheck = true;
         res();
         return;
       }
       this.refillPoolIfNeededRunning = true;
       this.reExeRefillCheck = false;
-      console.log('so weit so gut...'); // HIER
-      console.log('HI muss kurz checken ob der pool genug gefüllt ist..'); // HIER
+      // console.log('so weit so gut...'); // HIER
+      // console.log('HI muss kurz checken ob der pool genug gefüllt ist..'); // HIER
 
       const restartIfNeeded: () => void = () => {
         this.refillPoolIfNeededRunning = false;
@@ -231,13 +240,13 @@ export class WeekViewTable {
         objs2pool,
       }); // HIER
       if (objs2pool <= 0) {
-        console.log(this.columnRowPool.length + ' im pool is genug'); // HIER
+        // console.log(this.columnRowPool.length + ' im pool is genug'); // HIER
         restartIfNeeded();
         return;
       }
 
-      console.log(this.columnRowPool.length + ' im pool ist zu wenig'); // HIER
-      console.log(objs2pool + 'werden im pool nachgereicht'); // HIER
+      // console.log(this.columnRowPool.length + ' im pool ist zu wenig'); // HIER
+      // console.log(objs2pool + 'werden im pool nachgereicht'); // HIER
 
       // tslint:disable-next-line:no-console
       console.time('refill pool');

@@ -1,6 +1,6 @@
 <div class="background">
     <app-time-axis></app-time-axis>
-    <div id="employeeColumnContainer">
+    <div id="employeeColumnContainer" cdkDropListGroup>
         <ng-container *ngFor="let employeeDocId of employeeDocIdsTD; let i = index;">
             <app-employee-column [style.width.%]="100 / employeeDocIdsTD.length"
                 (assignmentClick)="onAssignmentClicked($event)" [employeeDocId]="employeeDocId" [employeeName]="employeeNamesTD[i]"

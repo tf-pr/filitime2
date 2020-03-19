@@ -1,6 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { Assignment, Helper } from 'src/app/helper';
 import { GlobalDataService } from 'src/app/services/global-data.service';
+import { CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-assignment-card',
@@ -10,7 +11,7 @@ import { GlobalDataService } from 'src/app/services/global-data.service';
 export class AssignmentCardComponent implements OnInit {
   @Input() assignment: Assignment;
   @Input() showCheckBox: boolean;
-  @Output() clicked = new EventEmitter<void>();
+  @Output() acClicked = new EventEmitter<void>();
 
   public cardInvalid = false;
   public projectName = '???';
@@ -67,12 +68,8 @@ export class AssignmentCardComponent implements OnInit {
     this.width = ((tAD / tG) * 100);
   }
 
-  public dragEnd(e: any) {
-    // console.log(e); // HIER
-  }
-
   public onClick() {
     console.warn('this.clicked.emit();');
-    this.clicked.emit();
+    this.acClicked.emit();
   }
 }

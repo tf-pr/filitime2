@@ -19,15 +19,18 @@ import { HelpViewComponent } from './navigator/help-view/help-view.component';
 import { LizenzViewComponent } from './navigator/lizenz-view/lizenz-view.component';
 import { PlanboardViewComponent } from './navigator/planboard-view/planboard-view.component';
 import { ProfileViewComponent } from './navigator/profile-view/profile-view.component';
-import { ProjectViewComponent,
-         CreateProjectDialogComponent,
-         ProjectQueryoptionsDialogComponent } from './navigator/project-view/project-view.component';
+import {
+  ProjectViewComponent,
+  CreateProjectDialogComponent,
+  ProjectQueryoptionsDialogComponent
+} from './navigator/project-view/project-view.component';
 import { PageNotFoundComponent } from './navigator/page-not-found/page-not-found.component';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -35,7 +38,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
-import { MatPaginatorModule, MatPaginatorIntl  } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
@@ -48,7 +51,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDatepickerModule, MatDatepickerIntl } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/';
-import {MatSelectModule} from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AlertModule } from 'ngx-bootstrap/alert';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
@@ -111,6 +114,7 @@ import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv
     AngularFireFunctionsModule,
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    DragDropModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
     MatToolbarModule,
@@ -138,8 +142,8 @@ import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv
     ButtonModule,
   ],
   entryComponents: [CreateProjectDialogComponent, ProjectQueryoptionsDialogComponent],
-  providers: [{provide: MatPaginatorIntl, useClass: PaginatorTranslator},
-              {provide: MatDatepickerIntl, useClass: DatePickerTranslator}],
+  providers: [{ provide: MatPaginatorIntl, useClass: PaginatorTranslator },
+  { provide: MatDatepickerIntl, useClass: DatePickerTranslator }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -32,4 +32,8 @@ export class WvEmployeeTimeComponent implements OnInit {
   public onAssignmentClicked(e) {
     this.toolbarMode = 'editAssignments';
   }
+
+  public cancelEditAssignmentsMode() {
+    this.toolbarMode = undefined;
+  }
 }

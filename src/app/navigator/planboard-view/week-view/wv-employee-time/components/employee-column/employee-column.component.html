@@ -1,18 +1,20 @@
 <div class="background">
-    <div id="employeeLabel"><span>{{employeeName}}</span></div>
-    <div id="weekRowContainer">
-        <ng-container *ngFor="let cw of cwList; let cwI = index">
-            <div class="weekRow" [style.height.%]="100 / cwList.length">
-                <div class="dayRow" *ngFor="let day of stupidArray; let dI = index">
-                    <div class="fillParent">
-                        <ng-container *ngIf="!!assignmentTable && !!assignmentTable[cwI] && !!assignmentTable[cwI][dI]">
-                            <app-assignment-card *ngFor="let assignment of assignmentTable[cwI][dI]; let aI = index"
-                                [assignment]="assignment" [showCheckBox]="editAssignmentModeActive"
-                                (clicked)="assignmentClicked(assignment)"></app-assignment-card>
-                        </ng-container>
-                    </div>
-                </div>
-            </div>
-        </ng-container>
-    </div>
+  <div id="employeeLabel"><span>{{employeeName}}</span></div>
+  <div id="weekRowContainer">
+    <ng-container *ngFor="let cw of cwList; let cwI = index">
+      <div class="weekRow" [style.height.%]="100 / cwList.length">
+        <div class="dayRow" *ngFor="let day of stupidArray; let dI = index">
+          <div class="employeeDayContainer" cdkDropList #dragList="cdkDropList" [cdkDropListSortingDisabled]="true"
+            cdkDropListOrientation="horizontal" (cdkDropListDropped)="cdkDropListDroppedTest(cwI, dI)">
+            <ng-container *ngIf="!!assignmentTable && !!assignmentTable[cwI] && !!assignmentTable[cwI][dI]">
+              <app-assignment-card *ngFor="let assignment of assignmentTable[cwI][dI]; let aI = index"
+                cdkDrag (cdkDragStarted)="cdkDragStartedTest(cwI, dI, aI)"
+                [assignment]="assignment" [showCheckBox]="editAssignmentModeActive"
+                (acClicked)="assignmentClicked(assignment)"></app-assignment-card>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
 </div>

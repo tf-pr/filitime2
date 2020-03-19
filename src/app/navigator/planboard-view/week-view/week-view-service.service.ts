@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Helper, Assignment } from 'src/app/helper';
 import { WeekViewTable } from './week-view-table';
+import { DbiService } from 'src/app/services/dbi.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,14 +18,14 @@ export class WeekViewServiceService {
   private selectedEmployeeDocIds: string[] = [
     '*DocIdOf~Hans______*',
     '*DocIdOf~Dieter____*',
-    '*DocIdOf~Dirk______*',
-    '*DocIdOf~Peter_____*',
-    '*DocIdOf~Wolfgang__*',
-    '*DocIdOf~Fritz_____*',
-    '*DocIdOf~Frank_____*',
-    '*DocIdOf~Bernd_____*',
-    '*DocIdOf~Günther___*',
-    '*DocIdOf~Daniel____*',           // #10
+    // '*DocIdOf~Dirk______*',
+    // '*DocIdOf~Peter_____*',
+    // '*DocIdOf~Wolfgang__*',
+    // '*DocIdOf~Fritz_____*',
+    // '*DocIdOf~Frank_____*',
+    // '*DocIdOf~Bernd_____*',
+    // '*DocIdOf~Günther___*',
+    // '*DocIdOf~Daniel____*', // #10
     // '*DocIdOf~Theodor___*',
     // '*DocIdOf~Mohammed__*',
     // '*DocIdOf~Luke______*',
@@ -34,7 +35,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Lian______*',
     // '*DocIdOf~Florian___*',
     // '*DocIdOf~Kilian____*',
-    // '*DocIdOf~Pepe______*',
+    // '*DocIdOf~Pepe______*', // #20
     // '*DocIdOf~Nick______*',
     // '*DocIdOf~Fiete_____*',
     // '*DocIdOf~Milo______*',
@@ -44,7 +45,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Sebastian_*',
     // '*DocIdOf~Benedikt__*',
     // '*DocIdOf~Adam______*',
-    // '*DocIdOf~Malte_____*',
+    // '*DocIdOf~Malte_____*', // #30
     // '*DocIdOf~Phil______*',
     // '*DocIdOf~John______*',
     // '*DocIdOf~Timo______*',
@@ -54,7 +55,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Lias______*',
     // '*DocIdOf~Levin_____*',
     // '*DocIdOf~Tobias____*',
-    // '*DocIdOf~Lasse_____*',
+    // '*DocIdOf~Lasse_____*', // #40
     // '*DocIdOf~Emilio____*',
     // '*DocIdOf~Fritz_____*',
     // '*DocIdOf~Michael___*',
@@ -64,7 +65,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Jannes____*',
     // '*DocIdOf~Emilian___*',
     // '*DocIdOf~Franz_____*',
-    // '*DocIdOf~Noel______*',
+    // '*DocIdOf~Noel______*', // #50
     // '*DocIdOf~Ludwig____*',
     // '*DocIdOf~Leopold___*',
     // '*DocIdOf~Lennox____*',
@@ -74,7 +75,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Frederik__*',
     // '*DocIdOf~Robin_____*',
     // '*DocIdOf~Joel______*',
-    // '*DocIdOf~Justus____*',
+    // '*DocIdOf~Justus____*', // #60
     // '*DocIdOf~Alessio___*',
     // '*DocIdOf~Malik_____*',
     // '*DocIdOf~Lars______*',
@@ -84,7 +85,7 @@ export class WeekViewServiceService {
     // '*DocIdOf~Sam_______*',
     // '*DocIdOf~Lenn______*',
     // '*DocIdOf~Christian_*',
-    // '*DocIdOf~Elia______*',
+    // '*DocIdOf~Elia______*', // #70
     // '*DocIdOf~Jonte_____*',
     // '*DocIdOf~Thilo_____*',
     // '*DocIdOf~Colin_____*',
@@ -99,14 +100,14 @@ export class WeekViewServiceService {
   private selectedEmployeeNames: string[] = [
     'Hans',
     'Dieter',
-    'Dirk',
-    'Peter',
-    'Wolfgang',
-    'Fritz',
-    'Frank',
-    'Bernd',
-    'Günther',
-    'Daniel',           // #10
+    // 'Dirk',
+    // 'Peter',
+    // 'Wolfgang',
+    // 'Fritz',
+    // 'Frank',
+    // 'Bernd',
+    // 'Günther',
+    // 'Daniel',           // #10
     // 'Theodor',
     // 'Mohammed',
     // 'Luke',
@@ -116,7 +117,7 @@ export class WeekViewServiceService {
     // 'Lian',
     // 'Florian',
     // 'Kilian',
-    // 'Pepe',
+    // 'Pepe',          // #20
     // 'Nick',
     // 'Fiete',
     // 'Milo',
@@ -126,7 +127,7 @@ export class WeekViewServiceService {
     // 'Sebastian',
     // 'Benedikt',
     // 'Adam',
-    // 'Malte',
+    // 'Malte',         // #30
     // 'Phil',
     // 'John',
     // 'Timo',
@@ -136,7 +137,7 @@ export class WeekViewServiceService {
     // 'Lias',
     // 'Levin',
     // 'Tobias',
-    // 'Lasse',
+    // 'Lasse',         // #40
     // 'Emilio',
     // 'Fritz',
     // 'Michael',
@@ -146,7 +147,7 @@ export class WeekViewServiceService {
     // 'Jannes',
     // 'Emilian',
     // 'Franz',
-    // 'Noel',
+    // 'Noel',          // #50
     // 'Ludwig',
     // 'Leopold',
     // 'Lennox',
@@ -156,7 +157,7 @@ export class WeekViewServiceService {
     // 'Frederik',
     // 'Robin',
     // 'Joel',
-    // 'Justus',
+    // 'Justus',        // #60
     // 'Alessio',
     // 'Malik',
     // 'Lars',
@@ -166,7 +167,7 @@ export class WeekViewServiceService {
     // 'Sam',
     // 'Lenn',
     // 'Christian',
-    // 'Elia',
+    // 'Elia',          // #70
     // 'Jonte',
     // 'Thilo',
     // 'Colin',
@@ -176,7 +177,7 @@ export class WeekViewServiceService {
     // 'Luan',
     // 'Marc',
     // 'Piet',
-    // 'Michel', // #80
+    // 'Michel',        // #80
   ];
   // private selectableEmployeeDocIds: string[] = [];
   // private selectableEmployeeNames: string[] = [];
@@ -345,6 +346,8 @@ export class WeekViewServiceService {
     'Michel', // #80
   ];
 
+  private selectedAssignmentTupleList: [number, number, number][] = [];
+
   private weekViewTable: WeekViewTable;
   public get assignmentTable(): Assignment[][][][] {
     return this.weekViewTable.table;
@@ -477,7 +480,7 @@ export class WeekViewServiceService {
     const removedName = this.selectedEmployeeNames.splice(i, 1)[0];
     const removedDocId = this.selectedEmployeeDocIds.splice(i, 1)[0];
 
-    if (removedName !== name || removedDocId  !== empId) {
+    if (removedName !== name || removedDocId !== empId) {
       // tslint:disable-next-line:no-debugger
       debugger;
     }
@@ -490,16 +493,18 @@ export class WeekViewServiceService {
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
   }
 
-  constructor() {
+  constructor(private dbi: DbiService) {
     if (!this.cwCount) { this.cwCount = 4; }
     if (!this.daysPerWorkday) { this.daysPerWorkday = 6; }
 
-    this.weekViewTable = new WeekViewTable( this.selectedEmployeeNames.length, this.cwCount );
+    this.weekViewTable = new WeekViewTable(this.selectedEmployeeNames.length, this.cwCount);
 
     setTimeout(() => {
+      // HIER TEST TEST TEST
       //#region set 5 tempAssis
       const tempAssi1 = new Assignment();
       tempAssi1.projectName = 'FiliTime2.0_1';
+      tempAssi1.docId = 'docidofFiliTime2.0_1';
       tempAssi1.projectIdentifier = '7834534';
       tempAssi1.note = 'nice note bro!';
       tempAssi1.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
@@ -509,6 +514,7 @@ export class WeekViewServiceService {
 
       const tempAssi2 = new Assignment();
       tempAssi2.projectName = 'FiliTime2.0_2';
+      tempAssi2.docId = 'docidofFiliTime2.0_2';
       tempAssi2.projectIdentifier = '7834534';
       tempAssi2.note = 'nice note bro!';
       tempAssi2.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
@@ -517,6 +523,7 @@ export class WeekViewServiceService {
 
       const tempAssi3 = new Assignment();
       tempAssi3.projectName = 'FiliTime2.0_3';
+      tempAssi3.docId = 'docidofFiliTime2.0_3';
       tempAssi3.projectIdentifier = '7834534';
       tempAssi3.note = 'nice note bro!';
       tempAssi3.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
@@ -525,6 +532,7 @@ export class WeekViewServiceService {
 
       const tempAssi4 = new Assignment();
       tempAssi4.projectName = 'FiliTime2.0_4';
+      tempAssi4.docId = 'docidofFiliTime2.0_4';
       tempAssi4.projectIdentifier = '7834534';
       tempAssi4.note = 'nice note bro!';
       tempAssi4.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
@@ -533,6 +541,7 @@ export class WeekViewServiceService {
 
       const tempAssi5 = new Assignment();
       tempAssi5.projectName = 'FiliTime2.0_5';
+      tempAssi5.docId = 'docidofFiliTime2.0_5';
       tempAssi5.projectIdentifier = '7834534';
       tempAssi5.note = 'nice note bro!';
       tempAssi5.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
@@ -557,18 +566,18 @@ export class WeekViewServiceService {
       //   if (!!rmAssi4) { this.addAssignmentToTable(0, 3, 4, rmAssi4); }
       //   if (!!rmAssi5) { this.addAssignmentToTable(4, 2, 2, rmAssi5); }
       // }, 2000);
-    //#endregion
+      //#endregion
     }, 2000);
   }
 
   public addAssignmentToTable(empI: number, weekI: number, dayI: number, assi: Assignment): number {
-    if ( !this.assignmentTable
+    if (!this.assignmentTable
       || !this.assignmentTable[empI]
       || !this.assignmentTable[empI][weekI]) {
       return -1;
     }
 
-    if ( !this.assignmentTable[empI][weekI][dayI] ) {
+    if (!this.assignmentTable[empI][weekI][dayI]) {
       if (this.assignmentTable[empI][weekI][dayI] === null) {
         this.assignmentTable[empI][weekI][dayI] = [assi];
         return 0;
@@ -580,7 +589,7 @@ export class WeekViewServiceService {
   }
 
   public removeAssignmentFromTable(empI: number, weekI: number, dayI: number, assiI?: number): Assignment {
-    if ( !this.assignmentTable
+    if (!this.assignmentTable
       || !this.assignmentTable[empI]
       || !this.assignmentTable[empI][weekI]
       || !this.assignmentTable[empI][weekI][dayI]) {
@@ -590,7 +599,7 @@ export class WeekViewServiceService {
     const maxAssiI = this.assignmentTable[empI][weekI][dayI].length - 1;
     if (isNaN(assiI) || assiI > maxAssiI) {
       assiI = maxAssiI;
-    } else if ( assiI < 0 ) {
+    } else if (assiI < 0) {
       assiI = 0;
     }
 
@@ -599,7 +608,7 @@ export class WeekViewServiceService {
     return removedElemArr[0];
   }
 
-  public getNameOfEmployee( employeeDocId: string ): string {
+  public getNameOfEmployee(employeeDocId: string): string {
     const i = this.selectedEmployeeDocIds.indexOf(employeeDocId);
     if (i === -1) { return undefined; }
     const name = this.selectedEmployeeNames[i];
@@ -629,27 +638,170 @@ export class WeekViewServiceService {
     this.setCwCount(this.getCwCount() + 1);
   }
 
-  public moveToPreviousWeeks() {
-    const newIndexDate =  new Date(this.getIndexTS());
-    Helper.subtractDaysOfDate(newIndexDate, 7);
-    if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-    }
+  public async moveToPreviousWeeks() {
+    return new Promise((res) => {
+      console.warn('moveToPreviousWeeks', new Date());
+      const newIndexDate = new Date(this.getIndexTS());
+      Helper.subtractDaysOfDate(newIndexDate, 7);
+      if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
+        // tslint:disable-next-line:no-debugger
+        debugger;
+      }
 
-    this.weekViewTable.moveRowise('back');
-    this.setIndexTS(newIndexDate.valueOf());
+      console.warn('this.weekViewTable.moveRowise(\'back\');', new Date());
+      this.weekViewTable.moveRowise('back')
+        .then(() => {
+          this.setIndexTS(newIndexDate.valueOf());
+          res();
+        });
+    });
   }
 
-  public moveToNextWeeks() {
-    const newIndexDate =  new Date(this.getIndexTS());
-    Helper.addDaysToDate(newIndexDate, 7);
-    if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-    }
+  public async moveToNextWeeks() {
+    return new Promise((res) => {
+      const newIndexDate = new Date(this.getIndexTS());
+      Helper.addDaysToDate(newIndexDate, 7);
+      if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
+        // tslint:disable-next-line:no-debugger
+        debugger;
+      }
 
-    this.weekViewTable.moveRowise('forth');
-    this.setIndexTS(newIndexDate.valueOf());
+      this.weekViewTable.moveRowise('forth')
+        .then(() => {
+          this.setIndexTS(newIndexDate.valueOf());
+          res();
+        });
+    });
   }
+
+  //#region drag and drop
+
+  // tslint:disable:variable-name member-ordering
+  private projectDrag: boolean; private assignmentDrag: boolean; private employeeDrag: boolean;
+  private daIe: number; private daIw: number; private daId: number; private daIa: number;
+  // tslint:enable:variable-name member-ordering
+
+  public dragAssignmentStart(empId: string, iw: number, id: number, ia: number) {
+    const ie = this.selectableEmployeeDocIds.indexOf(empId); // HIER könnte in Zukunft abkacken!
+
+    this.daIe = ie;
+    this.daIw = iw;
+    this.daId = id;
+    this.daIa = ia;
+
+    this.projectDrag = false;
+    this.assignmentDrag = true;
+    this.employeeDrag = false;
+  }
+
+  public dragAssignmentEnd() {
+    this.assignmentDrag = false;
+    this.daIe = undefined;
+    this.daIw = undefined;
+    this.daId = undefined;
+    this.daIa = undefined;
+  }
+
+  public dropAssignment(empId: string, tableIdW: number, tableIdD: number) {
+    // this.setIsLoading(4831); // HIER
+    this.assignmentDrag = false;
+    const tableIdE = this.selectableEmployeeDocIds.indexOf(empId); // HIER könnte in Zukunft abkacken!
+
+    // HIER check ob schreibrechte auf alle MAs die geändert werden sollen vorhanden sind
+
+    // {
+    //   const employeeName = this.employeesTD[tableIdE];
+    //   if (this.getPermissionStateByName(employeeName) !== true) {
+    //     // this.openErrorDialog( 'Fehler', 'Sie haben keine Schreibrechte auf diesen Mitarbeiter'); // HIER
+    //     // this.setIsNotLoading(4831);  // HIER
+    //     return;
+    //   }
+    // }
+
+    if (tableIdE === this.daIe && tableIdW === this.daIw && tableIdD === this.daId) {
+      // this.setIsNotLoading(4831);    // HIER
+      return;
+
+      // HIER in zukunft soll drop on self ein horizontal drag and drop machen. Für jetzt ist return ok..
+
+    // } else if (this.moveBlockwise) { // HIER moveBlockwise wird es in Zukunft so nichtmhr geben
+    } else if (this.selectedAssignmentTupleList.length > 1) {
+      // get all marked assignments and move them all
+      // dx and dy are delta between first assignment in dragList and dropped employee/day
+    } else {
+      // kp ob das hier falsch ist oder noch relevant wird
+      // if (!this.selectedAssignmentTupleList[0]) {
+      //   // tslint:disable-next-line:no-debugger
+      //   debugger;
+      // }
+
+      const ie = this.daIe;
+      const ic = this.daIw;
+      const id = this.daId;
+      const ia = this.daIa;
+
+      const oldAssignment: Assignment = this.assignmentTable[ie][ic][id][ia];
+
+      const oldStartDate = new Date(oldAssignment.start);  // HIER das muss einfacher gehen
+      const oldEndDate = new Date(oldAssignment.end);      // HIER das muss einfacher gehen
+
+      // const newStartDate = new Date(this.daysTS_wv[tableIdD]);
+      // const newEndDate = new Date(this.daysTS_wv[tableIdD]);
+      const targetDayTS: number = this.indexTS + ic * Helper.msPerWeek + id * Helper.msPerDay;
+
+      const newStartDate = new Date(targetDayTS);
+      newStartDate.setHours(oldStartDate.getHours());
+      newStartDate.setMinutes(oldStartDate.getMinutes());
+
+      const newEndDate = new Date(targetDayTS);
+      newEndDate.setHours(oldEndDate.getHours());
+      newEndDate.setMinutes(oldEndDate.getMinutes());
+
+      const employeeId = this.selectedEmployeeDocIds[tableIdE]; // HIER this might change in the future
+      const start = newStartDate.valueOf();
+      const end = newEndDate.valueOf();
+
+      const assignment: Assignment = Assignment.copyAssignment(oldAssignment);
+      assignment.start = start;
+      assignment.end = end;
+      assignment.employeeId = employeeId;
+
+      // HIER TEST HIER TEST
+      const remAssi = this.removeAssignmentFromTable(ie, ic, id, ia);
+      this.addAssignmentToTable(tableIdE, tableIdW, tableIdD, remAssi);
+      // TEST ENDE
+
+      // this.addAssignmentToTable()
+
+      // this.dbi.changeSingleAssignment(assignment)
+      //   .then(([returnAssignmentId, returnHistoryObj, returnHistoryId]) => {
+      //     if (!!returnHistoryObj) {
+      //       // HIER undo/redo stuff comes here
+      //       // const undoObj: UndoObj = new UndoObj(
+      //       //   returnHistoryObj.changerKey,
+      //       //   returnHistoryId,
+      //       //   returnAssignmentId,
+      //       //   returnHistoryObj.object,
+      //       //   'Assignment',
+      //       //   returnHistoryObj.changeTyp
+      //       // );
+
+      //       // this.undoAssignmentContainer.unshift([undoObj]);
+      //       // this.redoAssignmentContainer = [];
+      //     } else {
+      //       // tslint:disable-next-line:no-debugger
+      //       debugger;
+      //     }
+
+      //     // this.setFirstStepAchievementAssignmentDropped(); HIER
+      //     // this.setIsNotLoading(4831); HIER
+      //   })
+      //   .catch(error => {
+      //     // this.setIsNotLoading(4831);  HIER
+      //     // this.openErrorDialog('Fehler') error); // HIER
+      //   });
+    }
+  }
+
+  //#endregion
 }

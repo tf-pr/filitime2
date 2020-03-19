@@ -39,6 +39,7 @@
             <button mat-raised-button>Bearbeiten</button>
             <button mat-raised-button>Löschen</button>
             <button mat-raised-button>Kopieren</button>
+            <button mat-raised-button (click)="closeSecondaryToolbar()">Cancel</button>
         </ng-container>
         <!-- <ng-container *ngIf="secondaryToolbar == 'editLayout'"> -->
         <ng-container *ngSwitchCase="'editLayout'">

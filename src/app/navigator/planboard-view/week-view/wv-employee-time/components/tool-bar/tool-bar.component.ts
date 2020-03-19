@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { WeekViewServiceService } from '../../../week-view-service.service';
 import { Helper } from 'src/app/helper';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-tool-bar',
@@ -12,8 +13,11 @@ export class ToolBarComponent implements OnInit {
     this.activateSecondaryToolbar(mode);
   }
   @Output() toolbarCountChange = new EventEmitter<number>();
-
   public secondaryToolbar: 'editAssignments' | 'editLayout' | 'somethingelse';
+  private secondaryToolbarEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'somethingelse'>();
+  public secondaryToolbarChange: Observable<'editAssignments' | 'editLayout' | 'somethingelse'>
+    = this.secondaryToolbarEmitter.asObservable();
+
   public toolbarCount = 1;
 
   selectableEmployees = this.wvs.getSelectableEmployeeNames();
@@ -23,7 +27,7 @@ export class ToolBarComponent implements OnInit {
   ngOnInit() {
   }
 
-  public activateSecondaryToolbar(mode: 'editAssignments' | 'editLayout' | 'somethingelse') {
+  private activateSecondaryToolbar(mode: 'editAssignments' | 'editLayout' | 'somethingelse') {
     switch (mode) {
       case 'editAssignments':
         this.secondaryToolbar = mode;
@@ -54,11 +58,23 @@ export class ToolBarComponent implements OnInit {
   }
 
   public upClicked() {
-    this.wvs.moveToPreviousWeeks();
+    console.warn('upClicked', new Date());
+    // tslint:disable-next-line:no-console
+    console.time('moveToPreviousWeeks');
+    this.wvs.moveToPreviousWeeks().then(() => {
+      // tslint:disable-next-line:no-console
+      console.timeEnd('moveToPreviousWeeks');
+    });
   }
 
   public downClicked() {
-    this.wvs.moveToNextWeeks();
+    console.warn('upClicked', new Date());
+    // tslint:disable-next-line:no-console
+    console.time('moveToPreviousWeeks');
+    this.wvs.moveToNextWeeks().then(() => {
+      // tslint:disable-next-line:no-console
+      console.timeEnd('moveToPreviousWeeks');
+    });
   }
 
   public undoClicked() {
@@ -71,6 +87,10 @@ export class ToolBarComponent implements OnInit {
 
   public layoutSettingsClicked() {
     this.activateSecondaryToolbar('editLayout');
+  }
+
+  public closeSecondaryToolbar() {
+    this.activateSecondaryToolbar(undefined);
   }
 
   // tslint:disable-next-line:member-ordering

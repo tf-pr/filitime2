@@ -1,3 +1,10 @@
+.fillParent {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .background {
     width: 100%;
     height: 100%;
@@ -12,7 +19,7 @@ app-time-axis {
     /* background: yellow; /* color4test */
 }
 
-#employeeColumnContainer {
+#employeeColumnList {
     display: inline-block;
     vertical-align: top;
     height: 100%;
@@ -20,10 +27,26 @@ app-time-axis {
     /* background: blueviolet; /* color4test */
 }
 
+.employeeColumnContainer {
+  display: inline-block;
+  position: relative;
+  height: 100%;
+}
+
 app-employee-column {
     display: inline-block;
     vertical-align: top;
     height: 100%;
-    width: calc( 100% / 3 );
+    width: 100%;
     /* background: rosybrown; /* color4test */
+}
+
+.drag-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #ccc;
+  cursor: move;
+  width: 24px;
+  height: 24px;
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angu
 import { Assignment, Helper } from 'src/app/helper';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { CdkDropList } from '@angular/cdk/drag-drop';
+import { WeekViewService } from '../../../week-view.service';
 
 @Component({
   selector: 'app-assignment-card',
@@ -10,8 +11,8 @@ import { CdkDropList } from '@angular/cdk/drag-drop';
 })
 export class AssignmentCardComponent implements OnInit {
   @Input() assignment: Assignment;
-  @Input() showCheckBox: boolean;
-  @Output() acClicked = new EventEmitter<void>();
+
+  public showCheckBox: boolean;
 
   public cardInvalid = false;
   public projectName = '???';
@@ -24,7 +25,13 @@ export class AssignmentCardComponent implements OnInit {
 
   public checked = false; // HIER umbennene o.d.s.
 
-  constructor(private globalData: GlobalDataService) { }
+  constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
+    wvs.currModeChange.subscribe({
+      next: val => {
+        this.showCheckBox = val === 'editAssignments';
+      }
+    });
+  }
 
   ngOnInit() {
     if (!this.assignment || typeof this.assignment !== 'object'
@@ -69,7 +76,6 @@ export class AssignmentCardComponent implements OnInit {
   }
 
   public onClick() {
-    console.warn('this.clicked.emit();');
-    this.acClicked.emit();
+    this.wvs.startEditAssignmentMode();
   }
 }

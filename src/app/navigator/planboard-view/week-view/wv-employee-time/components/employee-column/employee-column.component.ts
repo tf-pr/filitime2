@@ -1,21 +1,19 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, ViewChildren, QueryList } from '@angular/core';
 import { Assignment, Helper } from 'src/app/helper';
-import { WeekViewServiceService } from '../../../week-view-service.service';
+import { WeekViewService } from '../../../week-view.service';
 import { GlobalDataService } from 'src/app/services/global-data.service';
-import { CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-employee-column',
   templateUrl: './employee-column.component.html',
   styleUrls: ['./employee-column.component.css']
 })
-export class EmployeeColumnComponent implements OnInit, AfterViewInit {
-  @Input() editAssignmentModeActive: boolean;
+export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() employeeName: string;
   @Input() employeeDocId: string;
-  @Output() assignmentClick = new EventEmitter<Assignment>();
 
-  @ViewChild('cdkDropListDay') cdkDropListDay: CdkDropList;
+  @ViewChildren('cdkDropListDay') cdkDropListDayList !: QueryList<CdkDropList>;
 
   private indexTS: number;
   private cwCount: number;
@@ -27,11 +25,7 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit {
 
   public assignmentTable: Assignment[][][];
 
-  public cdkDropListAssignmentObj: {
-    ref: CdkDropList<any>;
-  };
-
-  constructor(private wvs: WeekViewServiceService, private globalData: GlobalDataService) {
+  constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
     this.cwCount = this.wvs.getCwCount();
     this.indexTS = this.wvs.getIndexTS();
 
@@ -70,7 +64,23 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit {
     this.initAssignmentTable();
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    console.log('cdkDropListDayList', this.cdkDropListDayList);
+
+    const tempList: CdkDropList[] = [];
+    this.cdkDropListDayList.forEach(cdkDropListDay => {
+      tempList.push(cdkDropListDay);
+      console.log({cdkDropListDay});
+      console.log('id', cdkDropListDay.id);
+    });
+    this.wvs.registerEmployeeDayDropRef(tempList);
+  }
+
+  ngOnDestroy() {
+    const tempList: CdkDropList[] = [];
+    this.cdkDropListDayList.forEach(cdkDropListDay => tempList.push(cdkDropListDay));
+    this.wvs.unregisterEmployeeDayDropRef(tempList);
+  }
 
   private cwCountChanged() {
     const newCwCount = (!this.cwCount) ? 4 : this.cwCount;
@@ -100,17 +110,6 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit {
     this.weekAssignmentTemplate = tempWeekAssignmentTemplate;
   }
 
-  public assignmentClicked(e) {
-    // HIER diese scheiße hat hier nix zu suchen für so'n kack gibts wvs bro!!
-    const assi = e as Assignment;
-    if (!assi) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-    }
-
-    this.assignmentClick.emit(assi);
-  }
-
   private initAssignmentTable() {
     const i = this.wvs.getSelectedEmployeeDocIds().indexOf( this.employeeDocId );
 
@@ -127,11 +126,29 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit {
     // console.table(this.assignmentTable);
   }
 
-  public cdkDragStartedTest(cwI: number, dI: number, aI: number) {
+  public cdkDragStartedTest(e: any, cwI: number, dI: number, aI: number) {
+    console.log('cdkDragStartedTest', e);
+    const a = e.source;
+    if (!a) {
+      debugger;
+      return;
+    }
+    const b = a as CdkDrag;
+    const c = b.dropContainer;
+    const d = this.wvs.getRegisteredEmployeeDayDropRef;
+    c.connectedTo = d;
+
+    console.log({a});
+    console.log({b});
+    console.log({c});
+
+    // cdkDropListParent.con
+
     this.wvs.dragAssignmentStart(this.employeeDocId, cwI, dI, aI);
   }
 
   public cdkDropListDroppedTest(cwI: number, dI: number) {
+    console.log('cdkDropListDroppedTest');
     this.wvs.dropAssignment(this.employeeDocId, cwI, dI);
   }
 

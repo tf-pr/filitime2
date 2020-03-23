@@ -1,17 +1,20 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Helper, Assignment } from 'src/app/helper';
 import { WeekViewTable } from './week-view-table';
 import { DbiService } from 'src/app/services/dbi.service';
+import { moveItemInArray, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WeekViewServiceService {
+export class WeekViewService {
 
   private indexTS: number = Helper.getMondayTS(Date.now());
   private cwCount: number;
   private daysPerWorkday: number;
+
+  private currMode: 'editAssignments' | 'editLayout' | 'somethingelse';
 
   // private selectedEmployeeDocIds: string[] = [];
   // private selectedEmployeeNames: string[] = [];
@@ -365,7 +368,6 @@ export class WeekViewServiceService {
   private selectedEmployeeNamesChangeEmitter = new EventEmitter<string[]>();
   public selectedEmployeeNamesChange: Observable<string[]> = this.selectedEmployeeNamesChangeEmitter.asObservable();
 
-
   private selectedEmployeeNameAddEmitter = new EventEmitter<[string, string]>();
   public selectedEmployeeNameAdd: Observable<[string, string]> = this.selectedEmployeeNameAddEmitter.asObservable();
   // HIER emit empName and empDocId via the above emitter, when an employee is added to selectedEmployeeNames
@@ -380,6 +382,9 @@ export class WeekViewServiceService {
 
   private selectedEmployeeDocIdsEmitter = new EventEmitter<string[]>();
   public selectedEmployeeDocIdsChange: Observable<string[]> = this.selectedEmployeeDocIdsEmitter.asObservable();
+
+  private currModeEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'somethingelse'>();
+  public currModeChange: Observable<'editAssignments' | 'editLayout' | 'somethingelse'> = this.currModeEmitter.asObservable();
 
 
   public getIndexTS(): number {
@@ -433,6 +438,10 @@ export class WeekViewServiceService {
   private setSelectedEmployeeDocIds(value: string[]) {
     this.selectedEmployeeDocIds = value;
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
+  }
+
+  public getCurrMode(): 'editAssignments' | 'editLayout' | 'somethingelse' {
+    return this.currMode;
   }
 
   public addSelectedEmployeeName(name: string) {
@@ -500,6 +509,11 @@ export class WeekViewServiceService {
     this.weekViewTable = new WeekViewTable(this.selectedEmployeeNames.length, this.cwCount);
 
     setTimeout(() => {
+      this.addDummyAssignmentsToTable();
+    }, 2000);
+  }
+
+  public addDummyAssignmentsToTable() {
       // HIER TEST TEST TEST
       //#region set 5 tempAssis
       const tempAssi1 = new Assignment();
@@ -554,20 +568,50 @@ export class WeekViewServiceService {
       this.addAssignmentToTable(0, 3, 5, tempAssi4);
       this.addAssignmentToTable(4, 3, 2, tempAssi5);
 
-      // setTimeout(() => {
-      //   const rmAssi1 = this.removeAssignmentFromTable(0, 0, 0);
-      //   const rmAssi2 = this.removeAssignmentFromTable(1, 1, 0);
-      //   const rmAssi3 = this.removeAssignmentFromTable(1, 0, 0);
-      //   const rmAssi4 = this.removeAssignmentFromTable(0, 3, 5);
-      //   const rmAssi5 = this.removeAssignmentFromTable(4, 3, 2);
-      //   if (!!rmAssi1) { this.addAssignmentToTable(1, 0, 0, rmAssi1); }
-      //   if (!!rmAssi2) { this.addAssignmentToTable(1, 1, 1, rmAssi2); }
-      //   if (!!rmAssi3) { this.addAssignmentToTable(0, 0, 0, rmAssi3); }
-      //   if (!!rmAssi4) { this.addAssignmentToTable(0, 3, 4, rmAssi4); }
-      //   if (!!rmAssi5) { this.addAssignmentToTable(4, 2, 2, rmAssi5); }
-      // }, 2000);
-      //#endregion
-    }, 2000);
+      this.addAssignmentToTable(0, 0, 1, Assignment.copyAssignment(tempAssi1));
+      // this.addAssignmentToTable(0, 0, 2, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 0, 3, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 0, 4, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 0, 5, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 0, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 1, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 2, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 3, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 4, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 1, 5, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 0, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 1, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 2, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 3, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 4, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 2, 5, Assignment.copyAssignment(tempAssi1));
+      this.addAssignmentToTable(0, 3, 0, Assignment.copyAssignment(tempAssi4));
+      this.addAssignmentToTable(0, 3, 1, Assignment.copyAssignment(tempAssi4));
+      this.addAssignmentToTable(0, 3, 2, Assignment.copyAssignment(tempAssi4));
+      this.addAssignmentToTable(0, 3, 3, Assignment.copyAssignment(tempAssi4));
+      this.addAssignmentToTable(0, 3, 4, Assignment.copyAssignment(tempAssi4));
+      this.addAssignmentToTable(1, 0, 1, Assignment.copyAssignment(tempAssi3));
+      this.addAssignmentToTable(1, 0, 2, Assignment.copyAssignment(tempAssi3));
+      this.addAssignmentToTable(1, 0, 3, Assignment.copyAssignment(tempAssi3));
+      this.addAssignmentToTable(1, 0, 4, Assignment.copyAssignment(tempAssi3));
+      this.addAssignmentToTable(1, 0, 5, Assignment.copyAssignment(tempAssi3));
+      this.addAssignmentToTable(1, 1, 1, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 1, 2, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 1, 3, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 1, 4, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 1, 5, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 0, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 1, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 2, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 3, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 4, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 2, 5, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 0, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 1, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 2, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 3, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 4, Assignment.copyAssignment(tempAssi2));
+      this.addAssignmentToTable(1, 3, 5, Assignment.copyAssignment(tempAssi2));
   }
 
   public addAssignmentToTable(empI: number, weekI: number, dayI: number, assi: Assignment): number {
@@ -804,4 +848,46 @@ export class WeekViewServiceService {
   }
 
   //#endregion
+
+  //#region blub
+
+  public startEditAssignmentMode() {
+    this.currMode = 'editAssignments';
+    this.currModeEmitter.emit(this.currMode);
+  }
+
+  public stopEditAssignmentMode() {
+    this.currMode = undefined;
+    this.currModeEmitter.emit(this.currMode);
+  }
+
+  //#endregion
+
+  // tslint:disable-next-line:member-ordering
+  private registeredEmployeeDayDropRef: CdkDropList[] = [];
+
+
+  public get getRegisteredEmployeeDayDropRef(): CdkDropList[] {
+    return this.registeredEmployeeDayDropRef.slice(0);
+  }
+
+
+  public registerEmployeeDayDropRef(args: CdkDropList[]): void {
+    console.log('old stuff', this.registeredEmployeeDayDropRef);
+
+    const firstI = this.registerEmployeeDayDropRef.length;
+    this.registeredEmployeeDayDropRef.push(...args);
+    const lastI = this.registerEmployeeDayDropRef.length - 1;
+
+    console.log('new stuff', this.registeredEmployeeDayDropRef);
+  }
+  public unregisterEmployeeDayDropRef(args: CdkDropList[]) {
+    console.log('old shit', this.registeredEmployeeDayDropRef);
+    args.forEach(arg => {
+      const i = this.registeredEmployeeDayDropRef.indexOf(arg);
+      if (i === -1) { return; }
+      this.registeredEmployeeDayDropRef.splice(i, 1);
+    });
+    console.log('new shit', this.registeredEmployeeDayDropRef);
+  }
 }

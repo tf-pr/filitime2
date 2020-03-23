@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { WeekViewServiceService } from '../../../week-view-service.service';
+import { WeekViewService } from '../../../week-view.service';
 import { Helper } from 'src/app/helper';
 import { Observable } from 'rxjs';
 
@@ -14,20 +14,21 @@ export class ToolBarComponent implements OnInit {
   }
   @Output() toolbarCountChange = new EventEmitter<number>();
   public secondaryToolbar: 'editAssignments' | 'editLayout' | 'somethingelse';
+  public toolbarCount = 1;
   private secondaryToolbarEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'somethingelse'>();
   public secondaryToolbarChange: Observable<'editAssignments' | 'editLayout' | 'somethingelse'>
     = this.secondaryToolbarEmitter.asObservable();
 
-  public toolbarCount = 1;
 
   selectableEmployees = this.wvs.getSelectableEmployeeNames();
 
-  constructor(private wvs: WeekViewServiceService) { }
+  constructor(private wvs: WeekViewService) {}
 
   ngOnInit() {
   }
 
   private activateSecondaryToolbar(mode: 'editAssignments' | 'editLayout' | 'somethingelse') {
+    console.log('activateSecondaryToolbar: ' + mode);
     switch (mode) {
       case 'editAssignments':
         this.secondaryToolbar = mode;
@@ -47,6 +48,9 @@ export class ToolBarComponent implements OnInit {
       this.toolbarCount = newCount;
       this.toolbarCountChange.emit(this.toolbarCount);
     }
+
+    console.log('toolbarCount', this.toolbarCount);
+    console.log('newCount', newCount);
   }
 
   public zoomInClicked() {
@@ -89,8 +93,8 @@ export class ToolBarComponent implements OnInit {
     this.activateSecondaryToolbar('editLayout');
   }
 
-  public closeSecondaryToolbar() {
-    this.activateSecondaryToolbar(undefined);
+  public cancelEditAssignments() {
+    this.wvs.stopEditAssignmentMode();
   }
 
   // tslint:disable-next-line:member-ordering

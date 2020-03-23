@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { WeekViewServiceService } from '../week-view-service.service';
+import { WeekViewService } from '../week-view.service';
 
 @Component({
   selector: 'app-wv-employee-time',
@@ -13,7 +13,10 @@ export class WvEmployeeTimeComponent implements OnInit {
   public planboardTableHeight: SafeStyle;
   public toolBarHeight: SafeStyle;
 
-  constructor(private wvs: WeekViewServiceService, private sanitizer: DomSanitizer) { }
+  constructor(private wvs: WeekViewService, private sanitizer: DomSanitizer) {
+    this.toolbarMode = wvs.getCurrMode();
+    wvs.currModeChange.subscribe({ next: val => this.toolbarMode = val });
+  }
 
   ngOnInit() {
     this.recalcLayout();
@@ -25,11 +28,14 @@ export class WvEmployeeTimeComponent implements OnInit {
   }
 
   private recalcLayout() {
-    this.planboardTableHeight = this.sanitizer.bypassSecurityTrustStyle('calc( 100% - 64px *  ' + this.toolbarCount + ' )');
-    this.toolBarHeight = this.sanitizer.bypassSecurityTrustStyle('calc( 64px *  ' + this.toolbarCount + ' )');
+    console.log('blub35448368436', this.toolbarCount);
+    setTimeout(() => {
+      this.planboardTableHeight = this.sanitizer.bypassSecurityTrustStyle('calc( 100% - 64px *  ' + this.toolbarCount + ' )');
+      this.toolBarHeight = this.sanitizer.bypassSecurityTrustStyle('calc( 64px *  ' + this.toolbarCount + ' )');
+    });
   }
 
-  public onAssignmentClicked(e) {
+  public startEditAssignmentsMode(e) {
     this.toolbarMode = 'editAssignments';
   }
 

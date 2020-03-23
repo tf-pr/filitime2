@@ -1,5 +1,6 @@
 import { Assignment, Helper } from 'src/app/helper';
-import { WeekViewServiceService } from './week-view-service.service';
+import { WeekViewService } from './week-view.service';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 export class WeekViewTable {
   public table: Assignment[][][][] = [];

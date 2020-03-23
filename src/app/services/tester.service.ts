@@ -5,7 +5,7 @@ import { LoggerService } from './logger.service';
 import { DbiService } from './dbi.service';
 import { DpoService } from './dpo.service';
 import { Employee, Helper } from '../helper';
-import { WeekViewServiceService } from '../navigator/planboard-view/week-view/week-view-service.service';
+import { WeekViewService } from '../navigator/planboard-view/week-view/week-view.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +22,7 @@ export class TesterService {
               private dbi: DbiService,
               private dpo: DpoService,
               private logger: LoggerService,
-              private wvs: WeekViewServiceService) {
+              private wvs: WeekViewService) {
     this.noDelay();
     this.delayMeBy500();
     this.delayMeBy1000();

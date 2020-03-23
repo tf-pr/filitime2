@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WeekViewServiceService } from '../../../week-view-service.service';
+import { WeekViewService } from '../../../week-view.service';
 import { Helper } from 'src/app/helper';
 
 @Component({
@@ -18,7 +18,7 @@ export class TimeAxisComponent implements OnInit {
   public dayContainer: string[][] = [];
   public dateContainer: string[][] = [];
 
-  constructor(private wvs: WeekViewServiceService) {
+  constructor(private wvs: WeekViewService) {
     this.indexTS = wvs.getIndexTS();
     this.cwCount = wvs.getCwCount();
     this.dayCount = wvs.getDaysPerWorkday();

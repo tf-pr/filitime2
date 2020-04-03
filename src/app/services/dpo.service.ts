@@ -86,6 +86,9 @@ export class DpoService {
   }
 
   public getTableSubs() {
+    if (!this.tableSubs || this.tableSubs.length === 0) {
+      return ([] as Subscription[][]);
+    }
     return this.tableSubs.slice(0);
   }
 

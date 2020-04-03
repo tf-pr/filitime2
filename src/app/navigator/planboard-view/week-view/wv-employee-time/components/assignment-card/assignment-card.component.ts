@@ -18,17 +18,17 @@ export class AssignmentCardComponent implements OnInit {
   public projectName = '???';
   public projectIdentifier = '???';
   public assignmentNote = '???';
-  public left = 0;
-  public width = 50;
   public background = 'unset';
   public color = '#000000';
 
-  public checked = false; // HIER umbennene o.d.s.
+  public checked = false; // HIER umbenennen o.d.s.
 
   constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
-    wvs.currModeChange.subscribe({
+    this.showCheckBox = wvs.getCurrEditMode() === 'editAssignments';
+    wvs.currEditModeChange.subscribe({
       next: val => {
         this.showCheckBox = val === 'editAssignments';
+        if (!this.showCheckBox) { this.checked = false; }
       }
     });
   }
@@ -55,27 +55,13 @@ export class AssignmentCardComponent implements OnInit {
       this.background = '' + this.assignment.projectColor; // temp till HIER resolved
     }
     this.color = Helper.isColorDark(this.assignment.projectColor) ? '#eeeeee' : '#000000';
-
-    this.calcAssiSizeAndPos();
-  }
-
-  private calcAssiSizeAndPos() {
-
-    const assignmentDate = new Date(this.assignment.start);
-    const tAS = assignmentDate.getHours() * 60 + assignmentDate.getMinutes();
-
-    const timeAxisStart = this.globalData.pbs.getDayTimeAxisStart();
-    const timeAxisEnd = this.globalData.pbs.getDayTimeAxisEnd();
-
-    const dt = tAS - timeAxisStart;
-    const tG = timeAxisEnd - timeAxisStart;
-    const tAD = Math.round((this.assignment.end - this.assignment.start) / Helper.msPerMinute);
-
-    this.left = ((dt / tG) * 100);
-    this.width = ((tAD / tG) * 100);
   }
 
   public onClick() {
-    this.wvs.startEditAssignmentMode();
+    event.stopPropagation();
+    if (!this.showCheckBox) {
+      this.wvs.startEditAssignmentMode();
+    }
+    this.checked = true;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, Input } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 import { GlobalDataService } from 'src/app/services/global-data.service';
@@ -9,6 +9,8 @@ import { DpoService } from 'src/app/services/dpo.service';
 import { DbiService } from 'src/app/services/dbi.service';
 import { LoggerService } from 'src/app/services/logger.service';
 import { MatBadgePosition } from '@angular/material';
+import { CdkDrag } from '@angular/cdk/drag-drop';
+import { WeekViewService } from '../planboard-view/week-view/week-view.service';
 
 @Component({
   selector: 'app-project-view',
@@ -16,6 +18,8 @@ import { MatBadgePosition } from '@angular/material';
   styleUrls: ['./project-view.component.css']
 })
 export class ProjectViewComponent implements OnInit {
+  @Input() isSideNav;
+
   private deepLinkData: {} = undefined;
   private readonly deepLinkFolderStr = 'f';
   private readonly deepLinkProjectIdStr = 'p';
@@ -157,7 +161,8 @@ export class ProjectViewComponent implements OnInit {
               private dpo: DpoService,
               private dbi: DbiService,
               private logger: LoggerService,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,
+              private wvs: WeekViewService) {
     this.logger.setDbi = dbi;
 
     this.isMobile = globalData.getIsMobile();
@@ -167,6 +172,8 @@ export class ProjectViewComponent implements OnInit {
     this.globalData.isLandscapeSateChange.subscribe({ next: val => { this.isLandscape = val; } });
 
     this.initProjectListSubscription();
+
+    console.log('isSideNav', this.isSideNav);
   }
 
   ngOnInit() {
@@ -482,6 +489,17 @@ export class ProjectViewComponent implements OnInit {
 
       console.log('das ist der neue query stuff', result ); // HIER
     });
+  }
+
+  public pcDragStarted(e: { source: CdkDrag }, project: Project) {
+    if ( !e || !e.source || !e.source.dropContainer ) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return;
+    }
+    e.source.data = 'project';
+    e.source.dropContainer.connectedTo = this.wvs.getRegisteredEmployeeDayDropRef;
+    this.wvs.dragProjectStart(project); // HIER
   }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter, Output, NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { Helper, Project, Employee } from '../helper';
+import { Helper, Project, Employee, Assignment } from '../helper';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, Action, DocumentSnapshot, DocumentChangeAction } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
@@ -29,6 +29,7 @@ export class FsiService {
   private readonly employeesColKeyStr = 'employees';
   private readonly accessesColKeyStr = 'accesses';
   private readonly projectsColKeyStr = 'projects';
+  private readonly assignmentsColKeyStr = 'assignments';
   private readonly docIdKeyStr = 'docId';
   private readonly adminColKeyStr = 'adminCol';
   private readonly adminsDocKeyStr = 'admins';
@@ -374,11 +375,20 @@ export class FsiService {
     return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.projectsColKeyStr;
   }
 
+  private buildAssignmentDocPath( assignmentId: string ): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.assignmentsColKeyStr + '/' + assignmentId;
+  }
+
+  private buildAssignmentsColPath( assignmentId: string ): string {
+    return this.clientDataColKeyStr + '/' + this.usersClientId + '/' + this.assignmentsColKeyStr;
+  }
+
   //#endregion
 
   //#region dbDataUsage methodes
 
   private addCreateDataToDbObj(dbObj: {}, docId?: string): string {
+    // HIER make it cloud function
     dbObj[Project.createTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
     dbObj[Project.createIdKeyStr] = this.usersEmployeeId;
     dbObj[Project.createNameKeyStr] = this.usersEmployeeName;
@@ -390,12 +400,14 @@ export class FsiService {
   }
 
   private addChangeDataToDbObj(dbObj: {}): void {
+    // HIER make it cloud function
     dbObj[Project.editTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
     dbObj[Project.editIdKeyStr] = this.usersEmployeeId;
     dbObj[Project.editNameKeyStr] = this.usersEmployeeName;
   }
 
   private addUseInfoToDbObj(dbObj: {}): void {
+    // HIER make it cloud function
     dbObj[Project.useTsKeyStr] = firebase.firestore.FieldValue.serverTimestamp();
     dbObj[Project.useIdKeyStr] = this.usersEmployeeId;
     dbObj[Project.useNameKeyStr] = this.usersEmployeeName;
@@ -525,7 +537,7 @@ export class FsiService {
         this.addChangeDataToDbObj(dataObj);
         this.addUseInfoToDbObj(dataObj);
         const projDocPath = this.buildProjectDocPath(docId);
-        this.addDocToDbAtDocPath(projDocPath, dataObj)
+        this.updateDocInDbAtDocPath(projDocPath, dataObj)
           .then(() => { res(); })
           .catch(err => {
             console.error('Error: 46534135' + ' | ' + err);
@@ -869,7 +881,171 @@ export class FsiService {
 
   //#region assignment functions
 
-  // Hi there HERE will be assi funcs. thx
+  public addSingleAssignmentToDb(employeeId: string,
+                                 projectId: string,
+                                 projectIdentifier: string,
+                                 projectName: string,
+                                 projectColor: string,
+                                 start: number,
+                                 end: number,
+                                 note: string,
+                                 marker: string,
+                                 markerColor: string,
+                                 fixed: boolean): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      if (!employeeId) {
+        rej('employeeId invalid');
+        return;
+      }
+      if (!projectId) {
+        rej('projectId invalid');
+        return;
+      }
+      if (!projectIdentifier) {
+        rej('projectIdentifier invalid');
+        return;
+      }
+      if (!projectName) {
+        rej('projectName invalid');
+        return;
+      }
+      if (!projectColor) {
+        rej('projectColor invalid');
+        return;
+      }
+      if (!start) {
+        rej('start invalid');
+        return;
+      }
+      if (!end) {
+        rej('end invalid');
+        return;
+      }
+
+      const dataObj = {};
+      dataObj[Assignment.employeeIdKeyStr] = employeeId;
+      dataObj[Assignment.projectIdKeyStr] = projectId;
+      dataObj[Assignment.projectIdentifierKeyStr] = projectIdentifier;
+      dataObj[Assignment.projectNameKeyStr] = projectName;
+      dataObj[Assignment.projectColorKeyStr] = projectColor;
+      dataObj[Assignment.startKeyStr] = start;
+      dataObj[Assignment.endKeyStr] = end;
+      if (!!note) { dataObj[Assignment.noteKeyStr] = note; }
+      if (!!marker) { dataObj[Assignment.markerKeyStr] = marker; }
+      if (!!markerColor) { dataObj[Assignment.markerColorKeyStr] = markerColor; }
+      if (fixed === true) { dataObj[Assignment.fixedKeyStr] = fixed; }
+      dataObj[Assignment.isConflictedKeyStr] = false;
+
+      const docId = this.addCreateDataToDbObj(dataObj);
+      this.addChangeDataToDbObj(dataObj);
+      const projDocPath = this.buildAssignmentDocPath(docId);
+      this.addDocToDbAtDocPath(projDocPath, dataObj)
+        .then(() => { res(); })
+        .catch(err => {
+          console.error('Error: 64163929' + ' | ' + err);
+          rej(err);
+        });
+    });
+  }
+
+  public addMultipleAssignmentsToDb(...args) {
+    // HIER check requiert fields return fail if not
+  }
+
+  public changeSingleAssignmentToDb(assignmentId: string,
+                                    employeeId: string,
+                                    projectId: string,
+                                    projectIdentifier: string,
+                                    projectName: string,
+                                    projectColor: string,
+                                    start: number,
+                                    end: number,
+                                    note: string,
+                                    marker: string,
+                                    markerColor: string,
+                                    fixed: boolean): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      if (!assignmentId) {
+        rej('assignmentId invalid');
+        return;
+      }
+      if (!employeeId) {
+        rej('employeeId invalid');
+        return;
+      }
+      if (!projectId) {
+        rej('projectId invalid');
+        return;
+      }
+      if (!projectIdentifier) {
+        rej('projectIdentifier invalid');
+        return;
+      }
+      if (!projectName) {
+        rej('projectName invalid');
+        return;
+      }
+      if (!projectColor) {
+        rej('projectColor invalid');
+        return;
+      }
+      if (!start) {
+        rej('start invalid');
+        return;
+      }
+      if (!end) {
+        rej('end invalid');
+        return;
+      }
+
+      const dataObj = {};
+      dataObj[Assignment.employeeIdKeyStr] = employeeId;
+      dataObj[Assignment.projectIdKeyStr] = projectId;
+      dataObj[Assignment.projectIdentifierKeyStr] = projectIdentifier;
+      dataObj[Assignment.projectNameKeyStr] = projectName;
+      dataObj[Assignment.projectColorKeyStr] = projectColor;
+      dataObj[Assignment.startKeyStr] = start;
+      dataObj[Assignment.endKeyStr] = end;
+      if (!!note) { dataObj[Assignment.noteKeyStr] = note; }
+      if (!!marker) { dataObj[Assignment.markerKeyStr] = marker; }
+      if (!!markerColor) { dataObj[Assignment.markerColorKeyStr] = markerColor; }
+      if (fixed === true) { dataObj[Assignment.fixedKeyStr] = fixed; }
+      dataObj[Assignment.isConflictedKeyStr] = false;
+
+      this.addChangeDataToDbObj(dataObj);
+      const projDocPath = this.buildAssignmentDocPath(assignmentId);
+      this.updateDocInDbAtDocPath(projDocPath, dataObj)
+        .then(() => { res(); })
+        .catch(err => {
+          console.error('Error: 99089856' + ' | ' + err);
+          rej(err);
+        });
+    });
+  }
+
+  public changeMultipleAssignmentsFromDb(...args) {
+    // HIER TBI
+  }
+
+  public removeSingleAssignmentFromDb(assignmentId): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      if (!assignmentId) {
+        rej('assignmentId invalid');
+        return;
+      }
+      const projDocPath = this.buildAssignmentDocPath(assignmentId);
+      this.deleteDocFromDbAtDocPath(projDocPath)
+        .then(() => { res(); })
+        .catch(err => {
+          console.error('Error: 45417576' + ' | ' + err);
+          rej(err);
+        });
+    });
+  }
+
+  public removeMultipleAssignmentsFromDb(...args) {
+    // HIER TBI
+  }
 
   //#endregion
 
@@ -920,6 +1096,8 @@ export class FsiService {
               });
           } else {
             this.setIsLoggedInState = false;
+            // tslint:disable-next-line:no-debugger
+            debugger;
             rej('????');
           }
         })

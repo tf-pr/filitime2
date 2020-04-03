@@ -4,12 +4,14 @@
     <ng-container *ngFor="let cw of cwList; let cwI = index">
       <div class="weekRow" [style.height.%]="100 / cwList.length">
         <div class="dayRow" *ngFor="let day of stupidArray; let dI = index">
-          <div class="employeeDayContainer" cdkDropList #cdkDropListDay="cdkDropList" id="{{cwI + '_' + dI}}"
-            [cdkDropListSortingDisabled]="true" cdkDropListOrientation="horizontal"
-            (cdkDropListDropped)="cdkDropListDroppedTest(cwI, dI)">
+          <div class="employeeDayContainer" cdkDropList #cdkDropListDay="cdkDropList"
+            id="{{cwI + '_' + dI}}" [cdkDropListSortingDisabled]="true" cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="employeeDayDropped($event, cwI, dI)" (click)="employeeDayClicked(cwI, dI)">
             <ng-container *ngIf="!!assignmentTable && !!assignmentTable[cwI] && !!assignmentTable[cwI][dI]">
-              <app-assignment-card *ngFor="let assignment of assignmentTable[cwI][dI]; let aI = index" cdkDrag
-                (cdkDragStarted)="cdkDragStartedTest($event, cwI, dI, aI)" [assignment]="assignment"></app-assignment-card>
+              <app-assignment-card *ngFor="let assignment of assignmentTable[cwI][dI]; let aI = index"
+                [style.left.%]="calcAssignmentCardLeft(assignment.start, assignment.end)"
+                [style.width.%]="calcAssignmentCardWidth(assignment.start, assignment.end)" cdkDrag
+                (cdkDragStarted)="acDragStarted($event, cwI, dI, aI)" [assignment]="assignment"></app-assignment-card>
             </ng-container>
           </div>
         </div>

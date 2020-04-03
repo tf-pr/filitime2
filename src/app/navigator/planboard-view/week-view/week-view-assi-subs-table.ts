@@ -1,11 +1,11 @@
-import { Assignment } from 'src/app/helper';
+import { Subscription } from 'rxjs';
 
-export class WeekViewTable {
-  public table: Assignment[][][][] = [];
-  private columnTemplate: Assignment[][][] = [];
-  private readonly columnRowTemplate: Assignment[][] = [null, null, null, null, null, null, null];
+export class WeekViewAssiSubsTable {
+  public table: Subscription[][][] = [];
+  private columnTemplate: Subscription[][] = [];
+  private readonly columnRowTemplate: Subscription[] = [null, null, null, null, null, null, null];
 
-  private columnRowPool: Assignment[][][] = [];
+  private columnRowPool: Subscription[][] = [];
 
   public get columnCount(): number {
     return this.table.length;
@@ -45,7 +45,7 @@ export class WeekViewTable {
     return new Promise<boolean>((res, rej) => {
       let successCounter = 0;
       for (let i = 0; i < poolCount; i++) {
-        const tempCR: Assignment[][] = this.cloneColumnRowTemplate();
+        const tempCR: Subscription[] = this.cloneColumnRowTemplate();
         this.columnRowPool.push(tempCR);
         if (++successCounter >= poolCount) {
           res();
@@ -102,7 +102,7 @@ export class WeekViewTable {
   }
 
   public addRow(addTo: 'start' | 'end') {
-    const addColumnRowTo: (arr: Assignment[][][]) => void = (arr) => {
+    const addColumnRowTo: (sub: Subscription[][]) => void = (arr) => {
       if (addTo !== 'start') {
         arr.push(this.getEmptyColumnRow());
       } else {
@@ -117,7 +117,7 @@ export class WeekViewTable {
   }
 
   public removeRow(removeAt: 'start' | 'end') {
-    const removeColumnRowAt: (arr: Assignment[][][]) => void = (arr) => {
+    const removeColumnRowAt: (arr: Subscription[][]) => void = (arr) => {
       const columnRow2pool = (removeAt !== 'start') ? arr.pop() : arr.shift();
       this.clearAndPoolColumnRow(columnRow2pool).then(() => {});
     };
@@ -131,15 +131,15 @@ export class WeekViewTable {
   public async moveRowise(direction: 'back' | 'forth') {
     return new Promise((res) => {
 
-      const moveColumnRowAt: (arr: Assignment[][][]) => Promise<any> = async (arr) => {
+      const moveColumnRowAt: (arr: Subscription[][]) => Promise<any> = async (sub) => {
         return new Promise<any>((res2) => {
           let columnRow2pool;
           if (direction === 'back') {
-            columnRow2pool = arr.pop();
-            arr.unshift(this.getEmptyColumnRow());
+            columnRow2pool = sub.pop();
+            sub.unshift(this.getEmptyColumnRow());
           } else {
-            columnRow2pool = arr.shift();
-            arr.push(this.getEmptyColumnRow());
+            columnRow2pool = sub.shift();
+            sub.push(this.getEmptyColumnRow());
           }
           this.clearAndPoolColumnRow(columnRow2pool).then(() => {
             // HIER
@@ -157,15 +157,15 @@ export class WeekViewTable {
     });
   }
 
-  private cloneColumnTemplate(): Assignment[][][] {
+  private cloneColumnTemplate(): Subscription[][] {
     return JSON.parse(JSON.stringify(this.columnTemplate));
   }
 
-  private cloneColumnRowTemplate(): Assignment[][] {
+  private cloneColumnRowTemplate(): Subscription[] {
     return JSON.parse(JSON.stringify(this.columnRowTemplate));
   }
 
-  public getEmptyColumnRow(): Assignment[][] {
+  public getEmptyColumnRow(): Subscription[] {
     if (this.columnRowPool.length > 1) {
       this.refillPoolIfNeeded().then(() => {
         // console.log('refill sagt is ok');
@@ -178,7 +178,7 @@ export class WeekViewTable {
     return this.cloneColumnRowTemplate();
   }
 
-  private clearAndPoolColumn(column: Assignment[][][]): Promise<any> {
+  private clearAndPoolColumn(column: Subscription[][]): Promise<any> {
     return new Promise<any>((res) => {
       const columnRowCount = column.length;
       let succesCount = 0;
@@ -189,15 +189,16 @@ export class WeekViewTable {
     });
   }
 
-  private clearAndPoolColumnRow(columnRow: Assignment[][]): Promise<any> {
+  private clearAndPoolColumnRow(columnRow: Subscription[]): Promise<any> {
     return new Promise<any>((res) => {
       if (columnRow.length !== 7) {
         // tslint:disable-next-line:no-debugger
         debugger;
       }
       let cleanCount = 0;
-      columnRow.forEach(day => {
-        day = null;
+      columnRow.forEach(assiDaySub => {
+        assiDaySub.unsubscribe();
+        assiDaySub = null;
         if (++cleanCount >= 7) { res(); }
       });
     });

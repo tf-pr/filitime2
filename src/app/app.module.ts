@@ -14,7 +14,10 @@ import { AppRoutingModule } from './app-router.module';
 import { LoginComponent } from './login/login.component';
 import { NavigatorComponent } from './navigator/navigator.component';
 import { AnalysisViewComponent } from './navigator/analysis-view/analysis-view.component';
-import { EmployeeViewComponent } from './navigator/employee-view/employee-view.component';
+import {
+  EmployeeViewComponent,
+  CreateEmployeeDialogComponent
+} from './navigator/employee-view/employee-view.component';
 import { HelpViewComponent } from './navigator/help-view/help-view.component';
 import { LizenzViewComponent } from './navigator/lizenz-view/lizenz-view.component';
 import { PlanboardViewComponent } from './navigator/planboard-view/planboard-view.component';
@@ -88,6 +91,7 @@ import { AssignmentCardComponent } from './navigator/planboard-view/week-view/wv
     ProjectViewComponent,
     CreateProjectDialogComponent,
     ProjectQueryoptionsDialogComponent,
+    CreateEmployeeDialogComponent,
     PageNotFoundComponent,
     LoadingScreenComponent,
     FiddleComponent,

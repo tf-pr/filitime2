@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { WeekViewService } from '../week-view.service';
+import { GlobalDataService } from 'src/app/services/global-data.service';
 
 @Component({
   selector: 'app-wv-employee-time',
@@ -8,14 +9,14 @@ import { WeekViewService } from '../week-view.service';
   styleUrls: ['./wv-employee-time.component.css']
 })
 export class WvEmployeeTimeComponent implements OnInit {
-  public toolbarMode: 'editAssignments' | 'editLayout' | 'somethingelse';
+  public toolbarMode: 'editAssignments' | 'editLayout' | 'markEmployeeDays';
   private toolbarCount = 1;
   public planboardTableHeight: SafeStyle;
   public toolBarHeight: SafeStyle;
 
-  constructor(private wvs: WeekViewService, private sanitizer: DomSanitizer) {
-    this.toolbarMode = wvs.getCurrMode();
-    wvs.currModeChange.subscribe({ next: val => this.toolbarMode = val });
+  constructor(private globalData: GlobalDataService, private wvs: WeekViewService, private sanitizer: DomSanitizer) {
+    this.toolbarMode = wvs.getCurrEditMode();
+    wvs.currEditModeChange.subscribe({ next: val => this.toolbarMode = val });
   }
 
   ngOnInit() {

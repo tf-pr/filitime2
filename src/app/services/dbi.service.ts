@@ -228,6 +228,44 @@ export class DbiService {
     this.dpo.reset();
   }
 
+  public addEmployeeToDB(identifier: string,
+                         name: string,
+                         dept: string,
+                         deptColor: string,
+                         group: string,
+                         groupColor: string,
+                         user: boolean,
+                         scheduler: boolean,
+                         selfEdit: boolean) {
+    return new Promise<any>((res, rej) => {
+      const employee = new Employee(
+        FsiService.generatePushId(),
+        identifier,
+        name,
+        dept,
+        deptColor,
+        group,
+        groupColor,
+        user,
+        scheduler,
+        selfEdit,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+
+      const usersEmpId = this.usersEmployee.docId;
+      const accessesBy: [string, boolean][] = [[usersEmpId, true]]; // HIER HIER HIER HIER HIER HIER HIER HIER
+
+      this.fsi.addEmployeeToDB(employee, [], accessesBy)
+        .then(val => { res(val); })
+        .catch(err => { rej(err); });
+    });
+  }
+
   public addProjectToDB(identifier: string,
                         name: string,
                         duration: number,
@@ -241,12 +279,65 @@ export class DbiService {
     return new Promise<void>((res, rej) => {
       this.fsi.addProjectToDb(identifier, name, duration, endless, color, marker,
                              markerColor, note, reserved, folder)
-        .then(val => {
-          console.log(val);
-          res();
-        })
+        .then(val => { res(); })
         .catch(err => {
           this.logError(2354131352, err);
+          rej(err);
+        });
+    });
+  }
+
+  public addSingleAssignmentToDb(employeeId: string,
+                                 projectId: string,
+                                 projectIdentifier: string,
+                                 projectName: string,
+                                 projectColor: string,
+                                 start: number,
+                                 end: number,
+                                 note: string,
+                                 marker: string,
+                                 markerColor: string,
+                                 fixed: boolean): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.fsi.addSingleAssignmentToDb(employeeId, projectId, projectIdentifier, projectName,
+        projectColor, start, end, note, marker, markerColor, fixed)
+        .then(val => { res(); })
+        .catch(err => {
+          this.logError(6496531498, err);
+          rej(err);
+        });
+    });
+  }
+
+  public changeSingleAssignmentToDb(assignmentId: string,
+                                    employeeId: string,
+                                    projectId: string,
+                                    projectIdentifier: string,
+                                    projectName: string,
+                                    projectColor: string,
+                                    start: number,
+                                    end: number,
+                                    note: string,
+                                    marker: string,
+                                    markerColor: string,
+                                    fixed: boolean): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.fsi.changeSingleAssignmentToDb(assignmentId, employeeId, projectId, projectIdentifier, projectName,
+        projectColor, start, end, note, marker, markerColor, fixed)
+        .then(val => { res(); })
+        .catch(err => {
+          this.logError(1462275567, err);
+          rej(err);
+        });
+    });
+  }
+
+  public removeSingleAssignmentFromDb(assignmentId): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      this.fsi.removeSingleAssignmentFromDb(assignmentId)
+        .then(val => { res(); })
+        .catch(err => {
+          this.logError(4449611579, err);
           rej(err);
         });
     });

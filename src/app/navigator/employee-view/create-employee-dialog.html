@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Mitarbeiter hinzufügen</h1>
+<div mat-dialog-content style="width: 400px; max-width: calc( 80vw - 48px );">
+  <mat-form-field style="display: block">
+    <input cdkFocusInitial matInput placeholder="Name" [(ngModel)]="data[empNameKeyStr]" [required]="true">
+    <mat-error>Bitte geben Sie einen Namen an</mat-error>
+  </mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput placeholder="Kennziffer" [(ngModel)]="data[empIdentifierKeyStr]" [required]="true">
+    <mat-error>Bitte geben Sie eine Kennziffer an</mat-error>
+  </mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput placeholder="Abbteilung" [(ngModel)]="data[empDeptKeyStr]">
+  </mat-form-field>
+  <mat-form-field style="display: block">
+    <input matInput placeholder="Gruppe" [(ngModel)]="data[empGroupKeyStr]">
+  </mat-form-field>
+  <mat-checkbox [(ngModel)]="data[empUserKeyStr]">
+    <span style="font-weight: normal">Account geben (i)</span>
+  </mat-checkbox>
+  <mat-checkbox [(ngModel)]="data[empSchedulerKeyStr]">
+    <span style="font-weight: normal">ist Planner (i)</span>
+  </mat-checkbox>
+  <mat-checkbox [(ngModel)]="data[empSelfEditKeyStr]">
+    <span style="font-weight: normal">kann eigenes Profil und Projekte bearbeiten</span>
+  </mat-checkbox>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Abbrechen</button>
+  <button mat-button [disabled]="!data[empNameKeyStr] || !data[empIdentifierKeyStr]" [mat-dialog-close]="data">Ok</button>
+</div>

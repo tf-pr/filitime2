@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, Input, ViewChildren, Query
 import { Assignment, Helper } from 'src/app/helper';
 import { WeekViewService } from '../../../week-view.service';
 import { GlobalDataService } from 'src/app/services/global-data.service';
-import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { CdkDropList, CdkDrag, CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-employee-column',
@@ -24,6 +24,10 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
   private weekAssignmentTemplate: Assignment[][];
 
   public assignmentTable: Assignment[][][];
+
+  private employeeDayDropRefList: CdkDropList[] = [];
+
+  public employeeDayColors: string[] = [];
 
   constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
     this.cwCount = this.wvs.getCwCount();
@@ -65,21 +69,31 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngAfterViewInit() {
-    console.log('cdkDropListDayList', this.cdkDropListDayList);
+    this.registerDropLists();
+    this.cdkDropListDayList.changes.subscribe({ next: val => {
+      this.refreshDropLists();
+    } });
 
-    const tempList: CdkDropList[] = [];
-    this.cdkDropListDayList.forEach(cdkDropListDay => {
-      tempList.push(cdkDropListDay);
-      console.log({cdkDropListDay});
-      console.log('id', cdkDropListDay.id);
-    });
-    this.wvs.registerEmployeeDayDropRef(tempList);
+
   }
 
   ngOnDestroy() {
-    const tempList: CdkDropList[] = [];
-    this.cdkDropListDayList.forEach(cdkDropListDay => tempList.push(cdkDropListDay));
-    this.wvs.unregisterEmployeeDayDropRef(tempList);
+    this.unregisterDropLists();
+  }
+
+  public registerDropLists() {
+    // HIER block with waitcode
+    this.cdkDropListDayList.forEach(cdkDropListDay => this.employeeDayDropRefList.push(cdkDropListDay));
+    this.wvs.registerEmployeeDayDropRef(this.employeeDayDropRefList);
+  }
+
+  public unregisterDropLists() {
+    this.wvs.unregisterEmployeeDayDropRef(this.employeeDayDropRefList);
+  }
+
+  public refreshDropLists() {
+    this.unregisterDropLists();
+    this.registerDropLists();
   }
 
   private cwCountChanged() {
@@ -126,30 +140,142 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
     // console.table(this.assignmentTable);
   }
 
-  public cdkDragStartedTest(e: any, cwI: number, dI: number, aI: number) {
-    console.log('cdkDragStartedTest', e);
-    const a = e.source;
-    if (!a) {
+  public calcAssignmentCardWidth(assignmentStart: number, assignmentEnd: number): number {
+    const assignmentDate = new Date(assignmentStart);
+    const tAS = assignmentDate.getHours() * 60 + assignmentDate.getMinutes();
+
+    const timeAxisStart = this.globalData.pbs.getDayTimeAxisStart();
+    const timeAxisEnd = this.globalData.pbs.getDayTimeAxisEnd();
+
+    const tG = timeAxisEnd - timeAxisStart;
+    const tAD = Math.round((assignmentEnd - assignmentStart) / Helper.msPerMinute);
+
+    const width = ((tAD / tG) * 100);
+    return width;
+  }
+
+  public calcAssignmentCardLeft(assignmentStart: number, assignmentEnd: number): number {
+    const assignmentDate = new Date(assignmentStart);
+    const tAS = assignmentDate.getHours() * 60 + assignmentDate.getMinutes();
+
+    const timeAxisStart = this.globalData.pbs.getDayTimeAxisStart();
+    const timeAxisEnd = this.globalData.pbs.getDayTimeAxisEnd();
+
+    const dt = tAS - timeAxisStart;
+    const tG = timeAxisEnd - timeAxisStart;
+
+    const left = ((dt / tG) * 100);
+    return left;
+  }
+
+  public acDragStarted(e: {source: CdkDrag}, cwI: number, dI: number, aI: number) {
+    if ( !e || !e.source || !e.source.dropContainer ) {
+      // tslint:disable-next-line:no-debugger
       debugger;
       return;
     }
-    const b = a as CdkDrag;
-    const c = b.dropContainer;
-    const d = this.wvs.getRegisteredEmployeeDayDropRef;
-    c.connectedTo = d;
 
-    console.log({a});
-    console.log({b});
-    console.log({c});
-
-    // cdkDropListParent.con
-
+    e.source.data = 'assignment';
+    e.source.dropContainer.connectedTo = this.wvs.getRegisteredEmployeeDayDropRef;
     this.wvs.dragAssignmentStart(this.employeeDocId, cwI, dI, aI);
   }
 
-  public cdkDropListDroppedTest(cwI: number, dI: number) {
-    console.log('cdkDropListDroppedTest');
-    this.wvs.dropAssignment(this.employeeDocId, cwI, dI);
+  public employeeDayDropped(event: CdkDragDrop<any>, cwI: number, dI: number) {
+    console.log('employeeDayDropped');
+    if (!event || !event.item || !event.item.data) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return;
+    }
+
+    console.log(event.item.data);
+
+    switch (event.item.data) {
+      case 'assignment':
+        this.wvs.dropAssignment(this.employeeDocId, cwI, dI);
+        break;
+      case 'project':
+        this.wvs.dropProject(this.employeeDocId, cwI, dI);
+        break;
+      default:
+        console.log('WTF is "' + event.item.data + '"');
+        break;
+    }
+  }
+
+  public employeeDayClicked(cwI: number, dI: number) {
+    this.wvs.toggleEmployeeDayMarkedState(this.employeeDocId, cwI, dI);
+    this.globalData.setCurrViewCode(1);
+  }
+
+  private blub34563435(drag: CdkDrag): boolean {
+    console.log(1);
+    const dataStr = drag.data as string;
+    console.log(2);
+    if (!dataStr) {
+      // tslint:disable-next-line:no-debugger
+      console.log(3);
+      // tslint:disable-next-line:no-debugger
+      debugger;
+      return false;
+    }
+    if (this.wvs.getCurrEditMode() === 'markEmployeeDays') {
+      console.log(4);
+      const dataArr = dataStr.split('_');
+      if (!dataArr || dataArr.length !== 2) {
+        // tslint:disable-next-line:no-debugger
+        console.log(5);
+        // tslint:disable-next-line:no-debugger
+        debugger;
+        return false;
+      }
+
+      console.log(6);
+      const cwI: number = Number(dataArr[0]);
+      const dI: number = Number(dataArr[1]);
+
+      console.log('dataStr: ' + dataStr); console.log('dataArr: ' + dataArr); console.log('cwI: ' + cwI); console.log('dI: ' + dI);
+
+      console.log(7);
+      return this.validateEmployeeDayDropEnableState(cwI, dI);
+    // } else if ( this.wvs.getCurrEditMode() !== '???' ) {
+    //   //
+    } else {
+      console.log(8);
+      return true;
+    }
+    console.log(9);
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public employeeDayDropEnterPredicate: (drag: CdkDrag) => boolean = (drag) => {
+    return true;
+    // return this.blub34563435(drag);
+  }
+
+  public isEmployeeDayMarked(cwI: number, dI: number): boolean {
+    if (this.wvs.getCurrEditMode() !== 'markEmployeeDays') {
+      return false;
+    } else {
+      return this.wvs.getMarkStateOf(this.employeeDocId, cwI, dI) === true;
+    }
+  }
+
+  public validateEmployeeDayDropEnableState(cwI: number, dI: number): boolean {
+    // return true;
+    return true;
+    // if (!this.wvs) {
+    //   // onInit o.d.s.
+    //   return true;
+    // }
+
+    // if (this.wvs.getCurrEditMode() === 'markEmployeeDays') {
+    //   return !!this.wvs.getMarkStateOf(this.employeeDocId, cwI, dI);
+    // // } else if ( this.wvs.getCurrEditMode() !== '???' ) {
+    // //   //
+    // } else {
+    //   return true;
+    // }
   }
 
   //#region sync Functions

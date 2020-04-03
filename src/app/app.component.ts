@@ -80,8 +80,8 @@ export class AppComponent {
     this.globalData.isOfflineSateChange.subscribe({
       next: val => {
         this.isOffline = val;
-        if ( val === true )  { console.log('u r on the line!'); }
-        if ( val === false ) { console.log('u r off the line!'); }
+        if ( val === true )  { console.log('u r off the line!'); }
+        if ( val === false ) { console.log('u r on the line!'); }
         if ( val !== true && val !== false ) { console.log('ur line is broken!'); }
       }
     });

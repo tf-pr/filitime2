@@ -1,23 +1,35 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Helper, Assignment } from 'src/app/helper';
+import { Helper, Assignment, Project, Employee } from 'src/app/helper';
 import { WeekViewTable } from './week-view-table';
+import { WeekViewAssiSubsTable } from './week-view-assi-subs-table';
 import { DbiService } from 'src/app/services/dbi.service';
 import { moveItemInArray, CdkDropList } from '@angular/cdk/drag-drop';
+import { GlobalDataService } from 'src/app/services/global-data.service';
+import { PlanboardSettings } from 'src/app/helper/planboardSettings';
+import { FsiService } from 'src/app/services/fsi.service'; // TEST TEST TEST
+import { DpoService } from 'src/app/services/dpo.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WeekViewService {
+  private readonly pbs: PlanboardSettings = this.globalData.pbs;
 
   private indexTS: number = Helper.getMondayTS(Date.now());
   private cwCount: number;
   private daysPerWorkday: number;
 
-  private currMode: 'editAssignments' | 'editLayout' | 'somethingelse';
+  private currEditMode: 'editAssignments' | 'editLayout' | 'markEmployeeDays';
 
-  // private selectedEmployeeDocIds: string[] = [];
-  // private selectedEmployeeNames: string[] = [];
+  private selectedEmployeeDocIds: string[] = [];
+  private selectedEmployeeNames: string[] = [];
+  private selectedEmployees: Employee[] = [];
+  private selectableEmployeeDocIds: string[] = [];
+  private selectableEmployeeNames: string[] = [];
+  private selectableEmployees: Employee[] = [];
+  //#region test selectedEmpIds&Names
+  /*
   private selectedEmployeeDocIds: string[] = [
     '*DocIdOf~Hans______*',
     '*DocIdOf~Dieter____*',
@@ -100,6 +112,8 @@ export class WeekViewService {
     // '*DocIdOf~Piet______*',
     // '*DocIdOf~Michel____*', // #80
   ];
+  */
+  /*
   private selectedEmployeeNames: string[] = [
     'Hans',
     'Dieter',
@@ -182,8 +196,10 @@ export class WeekViewService {
     // 'Piet',
     // 'Michel',        // #80
   ];
-  // private selectableEmployeeDocIds: string[] = [];
-  // private selectableEmployeeNames: string[] = [];
+  */
+  //#endregion
+  //#region test empIds&Names
+  /*
   private selectableEmployeeDocIds: string[] = [
     '*DocIdOf~Hans______*',
     '*DocIdOf~Dieter____*',
@@ -266,6 +282,8 @@ export class WeekViewService {
     '*DocIdOf~Piet______*',
     '*DocIdOf~Michel____*', // #80
   ];
+  */
+  /*
   private selectableEmployeeNames: string[] = [
     'Hans',
     'Dieter',
@@ -348,10 +366,14 @@ export class WeekViewService {
     'Piet',
     'Michel', // #80
   ];
+  */
+//#endregion
 
   private selectedAssignmentTupleList: [number, number, number][] = [];
 
   private weekViewTable: WeekViewTable;
+  private weekViewAssiSubsTable: WeekViewAssiSubsTable;
+
   public get assignmentTable(): Assignment[][][][] {
     return this.weekViewTable.table;
   }
@@ -383,9 +405,22 @@ export class WeekViewService {
   private selectedEmployeeDocIdsEmitter = new EventEmitter<string[]>();
   public selectedEmployeeDocIdsChange: Observable<string[]> = this.selectedEmployeeDocIdsEmitter.asObservable();
 
-  private currModeEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'somethingelse'>();
-  public currModeChange: Observable<'editAssignments' | 'editLayout' | 'somethingelse'> = this.currModeEmitter.asObservable();
+  private selectableEmployeeNameAddEmitter = new EventEmitter<[string, string]>();
+  public selectableEmployeeNameAdd: Observable<[string, string]> = this.selectableEmployeeNameAddEmitter.asObservable();
+  // HIER emit empName and empDocId via the above emitter, when an employee is added to selectedEmployeeNames
 
+  private selectableEmployeeNameRemoveEmitter = new EventEmitter<[string, string]>();
+  public selectableEmployeeNameRemove: Observable<[string, string]> = this.selectableEmployeeNameRemoveEmitter.asObservable();
+  // HIER emit empName and empDocId via the above emitter, when an employee is removed from selectedEmployeeNames
+
+  private selectableEmployeeNameModifyEmitter = new EventEmitter<[string, string]>();
+  public selectableEmployeeNameModify: Observable<[string, string]> = this.selectableEmployeeNameModifyEmitter.asObservable();
+  // HIER emit empName and empDocId via the above emitter, when an employeeName in selectedEmployeeNames is updated
+
+  private currEditModeEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'markEmployeeDays'>();
+  public currEditModeChange: Observable<'editAssignments' | 'editLayout' | 'markEmployeeDays'> = this.currEditModeEmitter.asObservable();
+
+  private markEmployeeDayTable: boolean[][];
 
   public getIndexTS(): number {
     return this.indexTS;
@@ -426,6 +461,10 @@ export class WeekViewService {
     return this.selectedEmployeeNames.slice(0);
   }
 
+  public getSelectedEmployees(): Employee[] {
+    return this.selectedEmployees.slice(0); // HIER slice(0) bringt hier nicht so viel oder...
+  }
+
   public getSelectedEmployeeDocIds(): string[] {
     return this.selectedEmployeeDocIds.slice(0);
   }
@@ -440,8 +479,13 @@ export class WeekViewService {
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
   }
 
-  public getCurrMode(): 'editAssignments' | 'editLayout' | 'somethingelse' {
-    return this.currMode;
+  private setSelectedEmployees(value: Employee[]) {
+    this.selectedEmployees = value;
+    // this.selectedEmployeesEmitter.emit(this.selectedEmployees); // HIER WTF is this wsa hatte ich letzten Freitag damit vor?!
+  }
+
+  public getCurrEditMode(): 'editAssignments' | 'editLayout' | 'markEmployeeDays' {
+    return this.currEditMode;
   }
 
   public addSelectedEmployeeName(name: string) {
@@ -458,16 +502,21 @@ export class WeekViewService {
     }
 
     const empId = this.selectableEmployeeDocIds[i];
-    if (!empId) {
+    const emp = this.selectableEmployees[i];
+    if (!empId || !emp || emp.docId !== empId || emp.name !== name) {
+      // tslint:disable-next-line:no-debugger
+      debugger;
       console.error('Oh shit!!!', { empId }); // HIER ...
       return;
     }
 
     this.weekViewTable.addColumn();
-    console.table('is it ok2?', this.weekViewTable.table);
+    // this.weekViewAssiSubsTable.addColumn();                        // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
+    // const columnCount = this.weekViewAssiSubsTable.columnCount;    // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
 
     this.selectedEmployeeNames.push(name);
     this.selectedEmployeeDocIds.push(empId);
+    this.selectedEmployees.push(emp);
     this.selectedEmployeeNameAddEmitter.emit([name, empId]);
     this.selectedEmployeeNamesChangeEmitter.emit(this.selectedEmployeeNames.slice(0));
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
@@ -502,134 +551,119 @@ export class WeekViewService {
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
   }
 
-  constructor(private dbi: DbiService) {
-    if (!this.cwCount) { this.cwCount = 4; }
+  constructor(private dbi: DbiService, private dpo: DpoService, private globalData: GlobalDataService) {
+    if (!this.cwCount)        { this.cwCount = 2; }
     if (!this.daysPerWorkday) { this.daysPerWorkday = 6; }
+
+    const currEmployees = this.dpo.getEmployees();
+    console.log('currEmployees', currEmployees);
+
+    const tempEmpNames = currEmployees.map(employee => employee.name);
+    const tempEmpIds = currEmployees.map(employee => employee.docId);
+    console.log('names', tempEmpNames);
+    console.log('ids', tempEmpIds);
+
+    this.selectableEmployees = currEmployees;
+    this.selectableEmployeeNames = tempEmpNames;
+    this.selectableEmployeeDocIds = tempEmpIds;
+
+    this.dpo.employeeAdd.subscribe({next: newEmp => {
+      const empObj = newEmp;
+      const empName = newEmp.name;
+      const empId = newEmp.docId;
+      this.selectableEmployees.push(empObj);
+      this.selectableEmployeeNames.push(empName);
+      this.selectableEmployeeDocIds.push(empId);
+
+      this.selectableEmployeeNameAddEmitter.emit([empName, empId]);
+    }});
+
+    this.dpo.employeeRemove.subscribe({next: rmEmp => {
+      const rmEmpId = rmEmp.docId;
+      const i = this.selectableEmployeeDocIds.indexOf(rmEmpId);
+
+      if (i === -1) {
+        // tslint:disable-next-line:no-debugger
+        debugger;
+        return;
+      }
+
+      const empId = this.selectableEmployeeDocIds.splice(i, 1)[0];
+      const empName = this.selectableEmployeeNames.splice(i, 1)[0];
+      this.selectableEmployees.splice(i, 1);
+
+      this.selectableEmployeeNameRemoveEmitter.emit([empName, empId]);
+    }});
+
+    this.dpo.employeeModify.subscribe({next: modEmp => {
+      // HIER check mal ob des so passt...
+      const empName = modEmp.name;
+      const empId = modEmp.docId;
+      const i = this.selectableEmployeeDocIds.indexOf(empId);
+      if (i === -1) {
+        // tslint:disable-next-line:no-debugger
+        debugger;
+        return;
+      }
+
+      this.selectableEmployees[i] = modEmp;
+
+      if ( this.selectableEmployeeNames[i] !== empName ) {
+        this.selectableEmployeeNames[i] = empName;
+        this.selectableEmployeeNameModifyEmitter.emit([empName, empId]);
+      }
+
+    }});
 
     this.weekViewTable = new WeekViewTable(this.selectedEmployeeNames.length, this.cwCount);
 
-    setTimeout(() => {
-      this.addDummyAssignmentsToTable();
-    }, 2000);
+    this.selectableEmployeeNames = tempEmpNames;
   }
 
-  public addDummyAssignmentsToTable() {
-      // HIER TEST TEST TEST
-      //#region set 5 tempAssis
-      const tempAssi1 = new Assignment();
-      tempAssi1.projectName = 'FiliTime2.0_1';
-      tempAssi1.docId = 'docidofFiliTime2.0_1';
-      tempAssi1.projectIdentifier = '7834534';
-      tempAssi1.note = 'nice note bro!';
-      tempAssi1.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
-      tempAssi1.end = (new Date(2020, 1, 17, 16)).valueOf();
-      tempAssi1.isConflicted = true;
-      tempAssi1.projectColor = '#4682b4';
-
-      const tempAssi2 = new Assignment();
-      tempAssi2.projectName = 'FiliTime2.0_2';
-      tempAssi2.docId = 'docidofFiliTime2.0_2';
-      tempAssi2.projectIdentifier = '7834534';
-      tempAssi2.note = 'nice note bro!';
-      tempAssi2.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
-      tempAssi2.end = (new Date(2020, 1, 17, 16)).valueOf();
-      tempAssi2.projectColor = '#62ff00';
-
-      const tempAssi3 = new Assignment();
-      tempAssi3.projectName = 'FiliTime2.0_3';
-      tempAssi3.docId = 'docidofFiliTime2.0_3';
-      tempAssi3.projectIdentifier = '7834534';
-      tempAssi3.note = 'nice note bro!';
-      tempAssi3.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
-      tempAssi3.end = (new Date(2020, 1, 17, 16)).valueOf();
-      tempAssi3.projectColor = '#ffb000';
-
-      const tempAssi4 = new Assignment();
-      tempAssi4.projectName = 'FiliTime2.0_4';
-      tempAssi4.docId = 'docidofFiliTime2.0_4';
-      tempAssi4.projectIdentifier = '7834534';
-      tempAssi4.note = 'nice note bro!';
-      tempAssi4.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
-      tempAssi4.end = (new Date(2020, 1, 17, 16)).valueOf();
-      tempAssi4.projectColor = '#ff0000';
-
-      const tempAssi5 = new Assignment();
-      tempAssi5.projectName = 'FiliTime2.0_5';
-      tempAssi5.docId = 'docidofFiliTime2.0_5';
-      tempAssi5.projectIdentifier = '7834534';
-      tempAssi5.note = 'nice note bro!';
-      tempAssi5.start = (new Date(2020, 1, 17, 7, 30)).valueOf();
-      tempAssi5.end = (new Date(2020, 1, 17, 16)).valueOf();
-      tempAssi5.projectColor = '#f9bdc5';
-
-      this.addAssignmentToTable(0, 0, 0, tempAssi1);
-      this.addAssignmentToTable(1, 1, 0, tempAssi2);
-      this.addAssignmentToTable(1, 0, 0, tempAssi3);
-      this.addAssignmentToTable(0, 3, 5, tempAssi4);
-      this.addAssignmentToTable(4, 3, 2, tempAssi5);
-
-      this.addAssignmentToTable(0, 0, 1, Assignment.copyAssignment(tempAssi1));
-      // this.addAssignmentToTable(0, 0, 2, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 0, 3, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 0, 4, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 0, 5, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 0, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 1, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 2, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 3, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 4, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 1, 5, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 0, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 1, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 2, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 3, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 4, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 2, 5, Assignment.copyAssignment(tempAssi1));
-      this.addAssignmentToTable(0, 3, 0, Assignment.copyAssignment(tempAssi4));
-      this.addAssignmentToTable(0, 3, 1, Assignment.copyAssignment(tempAssi4));
-      this.addAssignmentToTable(0, 3, 2, Assignment.copyAssignment(tempAssi4));
-      this.addAssignmentToTable(0, 3, 3, Assignment.copyAssignment(tempAssi4));
-      this.addAssignmentToTable(0, 3, 4, Assignment.copyAssignment(tempAssi4));
-      this.addAssignmentToTable(1, 0, 1, Assignment.copyAssignment(tempAssi3));
-      this.addAssignmentToTable(1, 0, 2, Assignment.copyAssignment(tempAssi3));
-      this.addAssignmentToTable(1, 0, 3, Assignment.copyAssignment(tempAssi3));
-      this.addAssignmentToTable(1, 0, 4, Assignment.copyAssignment(tempAssi3));
-      this.addAssignmentToTable(1, 0, 5, Assignment.copyAssignment(tempAssi3));
-      this.addAssignmentToTable(1, 1, 1, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 1, 2, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 1, 3, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 1, 4, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 1, 5, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 0, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 1, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 2, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 3, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 4, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 2, 5, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 0, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 1, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 2, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 3, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 4, Assignment.copyAssignment(tempAssi2));
-      this.addAssignmentToTable(1, 3, 5, Assignment.copyAssignment(tempAssi2));
-  }
-
-  public addAssignmentToTable(empI: number, weekI: number, dayI: number, assi: Assignment): number {
-    if (!this.assignmentTable
-      || !this.assignmentTable[empI]
-      || !this.assignmentTable[empI][weekI]) {
-      return -1;
-    }
-
-    if (!this.assignmentTable[empI][weekI][dayI]) {
-      if (this.assignmentTable[empI][weekI][dayI] === null) {
-        this.assignmentTable[empI][weekI][dayI] = [assi];
-        return 0;
+  public addAssignmentToTable(empI: number, weekI: number, dayI: number, assi: Assignment): Promise<number> {
+    return new Promise<number>((res, rej) => {
+      if (!this.assignmentTable
+        || !this.assignmentTable[empI]
+        || !this.assignmentTable[empI][weekI]) {
+        rej(-1);
+        return;
       }
-      return -1;
-    }
 
-    return this.assignmentTable[empI][weekI][dayI].push(assi) - 1;
+      const afterDbSaysOK = () => {
+        if (!this.assignmentTable[empI][weekI][dayI]) {
+          if (this.assignmentTable[empI][weekI][dayI] === null) {
+            this.assignmentTable[empI][weekI][dayI] = [assi];
+            return 0;
+          }
+          return -1;
+        }
+        return this.assignmentTable[empI][weekI][dayI].push(assi) - 1;
+      };
+
+      const empId = this.selectedEmployeeDocIds[empI];
+      const a = assi;
+      // debugger;
+      this.dbi.addSingleAssignmentToDb(
+        empId,
+        assi.projectId,
+        assi.projectIdentifier,
+        assi.projectName,
+        assi.projectColor,
+        assi.start,
+        assi.end,
+        assi.note,
+        assi.marker,
+        assi.markerColor,
+        false)
+        .then(val => {
+          console.log('DB says ok!!!!!!');
+          res(afterDbSaysOK());
+        })
+        .catch(err => {
+          console.error('DB says,... and i qute: \'go fuckyourself\'');
+          rej(err);
+        });
+    });
   }
 
   public removeAssignmentFromTable(empI: number, weekI: number, dayI: number, assiI?: number): Assignment {
@@ -721,7 +755,7 @@ export class WeekViewService {
   //#region drag and drop
 
   // tslint:disable:variable-name member-ordering
-  private projectDrag: boolean; private assignmentDrag: boolean; private employeeDrag: boolean;
+  private projectDrag: boolean; private assignmentDrag: boolean; private dragginProjId: string; private dragginProj: Project;
   private daIe: number; private daIw: number; private daId: number; private daIa: number;
   // tslint:enable:variable-name member-ordering
 
@@ -735,7 +769,6 @@ export class WeekViewService {
 
     this.projectDrag = false;
     this.assignmentDrag = true;
-    this.employeeDrag = false;
   }
 
   public dragAssignmentEnd() {
@@ -773,7 +806,6 @@ export class WeekViewService {
       // get all marked assignments and move them all
       // dx and dy are delta between first assignment in dragList and dropped employee/day
     } else {
-      // kp ob das hier falsch ist oder noch relevant wird
       // if (!this.selectedAssignmentTupleList[0]) {
       //   // tslint:disable-next-line:no-debugger
       //   debugger;
@@ -786,12 +818,12 @@ export class WeekViewService {
 
       const oldAssignment: Assignment = this.assignmentTable[ie][ic][id][ia];
 
-      const oldStartDate = new Date(oldAssignment.start);  // HIER das muss einfacher gehen
-      const oldEndDate = new Date(oldAssignment.end);      // HIER das muss einfacher gehen
+      const oldStartDate = new Date(oldAssignment.start);
+      const oldEndDate = new Date(oldAssignment.end);
 
       // const newStartDate = new Date(this.daysTS_wv[tableIdD]);
       // const newEndDate = new Date(this.daysTS_wv[tableIdD]);
-      const targetDayTS: number = this.indexTS + ic * Helper.msPerWeek + id * Helper.msPerDay;
+      const targetDayTS: number = this.indexTS + tableIdW * Helper.msPerWeek + tableIdD * Helper.msPerDay;
 
       const newStartDate = new Date(targetDayTS);
       newStartDate.setHours(oldStartDate.getHours());
@@ -847,18 +879,118 @@ export class WeekViewService {
     }
   }
 
+  public dragProjectStart(project: Project) {
+    this.dragginProjId = project.docId;
+    this.dragginProj = project;
+    this.projectDrag = true;
+    this.assignmentDrag = false;
+  }
+
+  public dragProjectEnd() {
+    this.projectDrag = false;
+    this.dragginProjId = undefined;
+  }
+
+  public dropProject(empId: string, tableIdW: number, tableIdD: number) {
+    const tableIdE = this.selectableEmployeeDocIds.indexOf(empId);
+    const projectIndex = this.dragginProjId;
+
+    //#region TEST TEST TEST
+    // TEST TEST TEST
+    // HIER TEST
+    // debugger;
+
+    const tempAssi = new Assignment();
+    tempAssi.docId = FsiService.generatePushId();
+    tempAssi.employeeId = empId;
+    tempAssi.fixed = false;
+    tempAssi.note = 'YO YO YO wie NICE!!!';
+    tempAssi.projectIdentifier = projectIndex;
+    tempAssi.projectName = this.dragginProj.name;
+    tempAssi.projectColor = this.dragginProj.color;
+    tempAssi.projectId = this.dragginProj.docId;
+
+    const targetDayTS: number = this.indexTS + tableIdW * Helper.msPerWeek + tableIdD * Helper.msPerDay;
+
+
+    const dayTimeAxisStart = this.pbs.getDayTimeAxisStart();
+    const dayTimeAxisEnd = this.pbs.getDayTimeAxisEnd();
+    const startMin = dayTimeAxisStart % 60;
+    const endMin = dayTimeAxisEnd % 60;
+    const startHour = Math.floor( dayTimeAxisStart / 60 );
+    const endHour = Math.floor( dayTimeAxisEnd / 60 );
+
+    const newStartDate = new Date(targetDayTS);
+    const newEndDate = new Date(targetDayTS);
+
+    newStartDate.setHours(startHour);
+    newStartDate.setMinutes(startMin);
+    newEndDate.setHours(endHour);
+    newEndDate.setMinutes(endMin);
+
+    tempAssi.start = newStartDate.valueOf();
+    tempAssi.end = newEndDate.valueOf();
+
+    this.addAssignmentToTable(tableIdE, tableIdW, tableIdD, tempAssi);
+
+    // TEST ENDE TEST ENDE
+    // HIER TEST ENDE
+    //#endregion
+  }
+
   //#endregion
 
   //#region blub
 
+  public startMarkEmployeeDays() {
+    if (this.currEditMode === 'markEmployeeDays') {
+      return;
+    }
+
+    const buildFalseTable = () => {
+      const a = this.weekViewTable.columnCount;
+      const b = this.weekViewTable.rowCount * this.daysPerWorkday;
+      return Helper.buildTable( a, b, false );
+    };
+
+    this.markEmployeeDayTable = buildFalseTable();
+    this.currEditMode = 'markEmployeeDays';
+    this.currEditModeEmitter.emit(this.currEditMode);
+  }
+
+  public toggleEmployeeDayMarkedState(empId: string, wI: number, dI: number) {
+    if (!this.markEmployeeDayTable) { this.startMarkEmployeeDays(); }
+
+    const i1 = this.selectableEmployeeDocIds.indexOf(empId);
+    if (i1 === -1) { return; }
+    const i2 = wI * this.daysPerWorkday + dI;
+    this.markEmployeeDayTable[i1][i2] = !this.markEmployeeDayTable[i1][i2];
+    console.log('markEmployeeDayTable', this.markEmployeeDayTable);
+  }
+
+  public getMarkStateOf(empId: string, wI: number, dI: number): boolean {
+    const i1 = this.selectableEmployeeDocIds.indexOf(empId);
+    if (i1 === -1) { return; }
+    const i2 = wI * this.daysPerWorkday + dI;
+    return this.markEmployeeDayTable[i1][i2] === true;
+  }
+
+  public stopMarkEmployeeDays() {
+    this.currEditMode = undefined;
+    this.currEditModeEmitter.emit(this.currEditMode);
+
+    this.markEmployeeDayTable = undefined;
+    console.log('markEmployeeDayTable', this.markEmployeeDayTable);
+  }
+
   public startEditAssignmentMode() {
-    this.currMode = 'editAssignments';
-    this.currModeEmitter.emit(this.currMode);
+    this.currEditMode = 'editAssignments';
+    this.currEditModeEmitter.emit(this.currEditMode);
   }
 
   public stopEditAssignmentMode() {
-    this.currMode = undefined;
-    this.currModeEmitter.emit(this.currMode);
+    this.currEditMode = undefined;
+    this.currEditModeEmitter.emit(this.currEditMode);
   }
 
   //#endregion

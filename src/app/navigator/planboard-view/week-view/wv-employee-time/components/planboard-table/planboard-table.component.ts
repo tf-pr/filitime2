@@ -18,17 +18,18 @@ export class PlanboardTableComponent implements OnInit, AfterViewInit {
     this.employeeNamesTD = wvs.getSelectedEmployeeNames();
     this.employeeDocIdsTD = wvs.getSelectedEmployeeDocIds();
 
-    // wvs.selectedEmployeeNamesChange.subscribe({
-    //   next: value => {
-    //     this.employeeNamesTD = value;
-    //     console.table('da new list', this.employeeNamesTD);
-    //   }
-    // });
-    // wvs.selectedEmployeeDocIdsChange.subscribe({
-    //   next: value => {
-    //     this.employeeDocIdsTD = value;
-    //   }
-    // });
+    // HIER wvs.selectedEmployeeNameAdd & wvs.selectedEmployeeNameModify & wvs.selectedEmployeeNameRemove benutzen
+    wvs.selectedEmployeeNamesChange.subscribe({
+      next: value => {
+        this.employeeNamesTD = value;
+        console.table('da new list', this.employeeNamesTD);
+      }
+    });
+    wvs.selectedEmployeeDocIdsChange.subscribe({
+      next: value => {
+        this.employeeDocIdsTD = value;
+      }
+    });
 
     wvs.selectedEmployeeNameAdd.subscribe({
       next: val => {

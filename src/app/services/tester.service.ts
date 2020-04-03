@@ -135,6 +135,7 @@ export class TesterService {
     this.customDelay(5000,
       () => {
         console.log('tester delay 5s');
+        this.printPublicDpoData();
 
         // this.addLike100Emplyoees();
 
@@ -1440,5 +1441,30 @@ export class TesterService {
 
     const lastSelected = selectedList[selectedList.length - 1];
     this.wvs.removeSelectedEmployeeName(lastSelected);
+  }
+
+  private printPublicDpoData() {
+    console.log('_____________________________');
+    console.log('_____printPublicDpoData______');
+    console.log('_____________________________');
+    console.log('getEmployees');
+    console.log(this.dpo.getEmployees());
+    console.log('_____________________________');
+    console.log('getUsersEmployeeAccesses');
+    console.log(this.dpo.getUsersEmployeeAccesses());
+    console.log('_____________________________');
+    console.log('getProjectList');
+    console.log(this.dpo.getProjectList());
+    console.log('_____________________________');
+    console.log('getTableCwIndexes');
+    console.log(this.dpo.getTableCwIndexes());
+    console.log('_____________________________');
+    console.log('getTableEmployeeIds');
+    console.log(this.dpo.getTableEmployeeIds());
+    console.log('_____________________________');
+    console.log('getTableSubs');
+    console.log(this.dpo.getTableSubs());
+    console.log('_____________________________');
+    console.log('_____________________________');
   }
 }

@@ -82,7 +82,7 @@
         max-width: 100%;
         height: 50px;
     }
-    
+
     .project-card-header {
     }
 
@@ -123,6 +123,13 @@
     .project-detail-card {
         display: block;
         margin: 10px;
+    }
+
+    .project-card-sideNav {
+      display: block;
+      width: 100%;
+      padding: 4px 2px;
+      margin: 8px 0;
     }
 
 

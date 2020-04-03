@@ -9,25 +9,40 @@ import { Observable } from 'rxjs';
   styleUrls: ['./tool-bar.component.css']
 })
 export class ToolBarComponent implements OnInit {
-  @Input('toolbarMode') set toolbarMode(mode: 'editAssignments' | 'editLayout' | 'somethingelse') {
+  @Input('toolbarMode') set toolbarMode(mode: 'editAssignments' | 'editLayout' | 'markEmployeeDays') {
     this.activateSecondaryToolbar(mode);
   }
   @Output() toolbarCountChange = new EventEmitter<number>();
-  public secondaryToolbar: 'editAssignments' | 'editLayout' | 'somethingelse';
+  public secondaryToolbar: 'editAssignments' | 'editLayout' | 'markEmployeeDays';
   public toolbarCount = 1;
-  private secondaryToolbarEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'somethingelse'>();
-  public secondaryToolbarChange: Observable<'editAssignments' | 'editLayout' | 'somethingelse'>
+  private secondaryToolbarEmitter = new EventEmitter<'editAssignments' | 'editLayout' | 'markEmployeeDays'>();
+  public secondaryToolbarChange: Observable<'editAssignments' | 'editLayout' | 'markEmployeeDays'>
     = this.secondaryToolbarEmitter.asObservable();
 
 
   selectableEmployees = this.wvs.getSelectableEmployeeNames();
 
-  constructor(private wvs: WeekViewService) {}
+  constructor(private wvs: WeekViewService) {
+    this.wvs.selectableEmployeeNameAdd.subscribe({
+      next: val => {
+        const empName: string = val[0];
+        const empId: string = val[1];
+
+        if (!empName || !empId) {
+          // tslint:disable-next-line:no-debugger
+          debugger;
+          return;
+        }
+
+        this.selectableEmployees.push(empName);
+      }
+    });
+  }
 
   ngOnInit() {
   }
 
-  private activateSecondaryToolbar(mode: 'editAssignments' | 'editLayout' | 'somethingelse') {
+  private activateSecondaryToolbar(mode: 'editAssignments' | 'editLayout' | 'markEmployeeDays') {
     console.log('activateSecondaryToolbar: ' + mode);
     switch (mode) {
       case 'editAssignments':
@@ -36,8 +51,8 @@ export class ToolBarComponent implements OnInit {
       case 'editLayout':
         this.secondaryToolbar = mode;
         break;
-      case 'somethingelse':
-        //
+      case 'markEmployeeDays':
+        this.secondaryToolbar = mode;
         break;
       default:
         this.secondaryToolbar = undefined;
@@ -100,22 +115,24 @@ export class ToolBarComponent implements OnInit {
   // tslint:disable-next-line:member-ordering
   private oldEmployeesMSList = [];
   public showEmployeesMSChanged(e: any) {
-    const newList = e.value;
-    const compRes = Helper.arrayCompare<string>(this.oldEmployeesMSList, newList);
+    setTimeout(() => {
+      const newList = e.value;
+      const compRes = Helper.arrayCompare<string>(this.oldEmployeesMSList, newList);
 
-    console.table('added', compRes.added);
-    console.table('removed', compRes.removed);
+      console.table('added', compRes.added);
+      console.table('removed', compRes.removed);
 
-    const addedEmpNames = !compRes.added ? undefined : compRes.added as string[];
-    const removedEmpNames = !compRes.removed ? undefined : compRes.removed as string[];
+      const addedEmpNames = !compRes.added ? undefined : compRes.added as string[];
+      const removedEmpNames = !compRes.removed ? undefined : compRes.removed as string[];
 
-    if (!!addedEmpNames && addedEmpNames.length > 0) {
-      for (const tempEmpName of addedEmpNames) { this.wvs.addSelectedEmployeeName(tempEmpName); }
-    }
-    if (!!removedEmpNames && removedEmpNames.length > 0) {
-      for (const tempEmpName of removedEmpNames) { this.wvs.removeSelectedEmployeeName(tempEmpName); }
-    }
+      if (!!addedEmpNames && addedEmpNames.length > 0) {
+        for (const tempEmpName of addedEmpNames) { this.wvs.addSelectedEmployeeName(tempEmpName); }
+      }
+      if (!!removedEmpNames && removedEmpNames.length > 0) {
+        for (const tempEmpName of removedEmpNames) { this.wvs.removeSelectedEmployeeName(tempEmpName); }
+      }
 
-    this.oldEmployeesMSList = newList;
+      this.oldEmployeesMSList = newList;
+    });
   }
 }

@@ -73,6 +73,18 @@ export class GlobalDataService {
 
     this.currRoutePath = tab;
     this.currRoutePathEmitter.emit(this.currRoutePath);
+    this.setCurrViewCode(undefined);
+  }
+
+  private currViewCode: number;
+  private currViewCodeEmitter = new EventEmitter<number>();
+  public currViewCodeChange: Observable<number> = this.currViewCodeEmitter.asObservable();
+  public getCurrViewCode(): number {
+    return this.currViewCode;
+  }
+  public setCurrViewCode(viewCode: number) {
+    this.currViewCode = viewCode;
+    this.currViewCodeEmitter.emit(viewCode);
   }
 
   // tslint:enable:member-ordering

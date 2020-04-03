@@ -28,6 +28,8 @@ export class NavigatorComponent implements OnInit {
   private routerPathAfterLogin: string;
   public currTabName = '';
 
+  public customDrawer: number;
+
   private set isLoggedInSetter(isLoggedIn: boolean) {
     if (this.isLoggedIn === isLoggedIn) { return; }
     this.isLoggedIn = isLoggedIn;
@@ -61,9 +63,21 @@ export class NavigatorComponent implements OnInit {
     this.registerTabChange();
     this.registerRouterUrlChange();
 
+    this.customDrawer = this.viewCodeToDrawerCode(this.globalData.getCurrViewCode());
+    this.globalData.currViewCodeChange.subscribe({
+      next: val => {
+        if (this.customDrawer === val) { return; }
+
+        this.hideNavBar = true;
+        setTimeout(() => this.hideNavBar = false);
+        this.customDrawer = this.viewCodeToDrawerCode(val);
+      }
+    });
+
     this.isLoggedInSetter = dbi.getLoggedInState();
     dbi.loggedInStateChange.subscribe({
-      next: val => { this.isLoggedInSetter = val; }
+      next:
+        val => this.isLoggedInSetter = val
     });
   }
 
@@ -75,6 +89,14 @@ export class NavigatorComponent implements OnInit {
     return outlet &&
       outlet.activatedRouteData &&
       outlet.activatedRouteData[animationStr];
+  }
+
+  private viewCodeToDrawerCode(viewCode): number {
+    // HIER
+    switch (viewCode) {
+      case 1:   return 1;
+      default:  return undefined;
+    }
   }
 
   private registerRouterUrlChange() {

@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { Employee, Helper } from 'src/app/helper';
 import { DpoService } from 'src/app/services/dpo.service';
-import { PageEvent, MatDialog } from '@angular/material';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DbiService } from 'src/app/services/dbi.service';
+import { MatBadgePosition } from '@angular/material';
 import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
@@ -374,35 +376,47 @@ export class EmployeeViewComponent implements OnInit {
   }
 
   public addEmployeeButtonClicked() {
-    // console.log('HIER');
-    // const data = {};
+    console.log('HIER');
+    const data = {};
     // if (!!this.currFolder) { data[Project.folderKeyStr] = this.currFolder; }
     // if (!!this.filterReserved) { data[Project.reservedKeyStr] = this.filterReserved; }
 
-    // const dialog = this.dialog.open(CreateProjectDialogComponent, { data });
+    const dialog = this.dialog.open(CreateEmployeeDialogComponent, { data });
 
-    // dialog.afterClosed().subscribe(result => {
-    //   if (!result) {
-    //     console.warn('Ok ciao...');
-    //     return;
-    //   }
-    //   console.log( 'pls add this to the db... ok... thx' );
-    //   console.log(result);
-    //   const projIdentifier = result[Project.identifierKeyStr];
-    //   const projName = result[Project.nameKeyStr];
-    //   const projDuration = result[Project.durationKeyStr];
-    //   const projEndless = result[Project.endlessKeyStr];
-    //   const projColor = result[Project.colorKeyStr];
-    //   const projMarker = result[Project.markerKeyStr];
-    //   const projMarkerColor = result[Project.markerColorKeyStr];
-    //   const projNote = result[Project.noteKeyStr];
-    //   const projReserved = result[Project.reservedKeyStr];
-    //   const projFolder = result[Project.folderKeyStr];
+    dialog.afterClosed().subscribe(result => {
+      if (!result) {
+        console.warn('Ok ciao...');
+        return;
+      }
+      console.log( 'pls add this to the db... ok... thx' );
+      console.log(result);
+      const identifier = result[Employee.identifierKeyStr];
+      const name       = result[Employee.nameKeyStr];
+      const dept       = result[Employee.deptKeyStr];
+      const deptColor  = result[Employee.deptColorKeyStr];
+      const group      = result[Employee.groupKeyStr];
+      const groupColor = result[Employee.groupColorKeyStr];
+      const user       = result[Employee.userKeyStr];
+      const scheduler  = result[Employee.schedulerKeyStr];
+      const selfEdit   = result[Employee.selfEditKeyStr];
 
-    //   if (!projName || !projIdentifier || ( !projDuration && !projEndless ) ) {
-    //     return;
-    //   }
+      if (!name || !identifier) { return; }
 
+      this.dbi.addEmployeeToDB(identifier,
+                               name,
+                               dept,
+                               deptColor,
+                               group,
+                               groupColor,
+                               user,
+                               scheduler,
+                               selfEdit)
+        .then(() => {
+          console.log('BENE!');
+        })
+        .catch(err => {
+          console.error('FUKEYOU: ' + err);
+        });
     //   this.dbi.addProjectToDB(projIdentifier, projName, projDuration, projEndless, projColor, projMarker,
     //                          projMarkerColor, projNote, projReserved, projFolder)
     //     .then(() => { console.warn('throw a toast'); })
@@ -410,8 +424,41 @@ export class EmployeeViewComponent implements OnInit {
     //       this.logger.logError(31436414, err);
     //       console.warn('throw a toast');
     //     });
-    // });
+    });
   }
 
   // HIER : add dialog stuff
+}
+
+@Component({
+  selector: 'app-create-employee-dialog',
+  templateUrl: 'create-employee-dialog.html',
+})
+export class CreateEmployeeDialogComponent {
+  public empIdentifierKeyStr = Employee.identifierKeyStr;
+  public empNameKeyStr       = Employee.nameKeyStr;
+  public empDeptKeyStr       = Employee.deptKeyStr;
+  public empDeptColorKeyStr  = Employee.deptColorKeyStr;
+  public empGroupKeyStr      = Employee.groupKeyStr;
+  public empGroupColorKeyStr = Employee.groupColorKeyStr;
+  public empUserKeyStr       = Employee.userKeyStr;
+  public empSchedulerKeyStr  = Employee.schedulerKeyStr;
+  public empSelfEditKeyStr   = Employee.selfEditKeyStr;
+
+  constructor(public dialogRef: MatDialogRef<CreateEmployeeDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: {}) {
+    data[this.empIdentifierKeyStr] = undefined;
+    data[this.empNameKeyStr] = undefined;
+    data[this.empDeptKeyStr] = undefined;
+    data[this.empDeptColorKeyStr] = undefined;
+    data[this.empGroupKeyStr] = undefined;
+    data[this.empGroupColorKeyStr] = undefined;
+    data[this.empUserKeyStr] = undefined;
+    data[this.empSchedulerKeyStr] = undefined;
+    data[this.empSelfEditKeyStr] = undefined;
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
 }

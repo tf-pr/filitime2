@@ -2,273 +2,282 @@ import { DbiService } from './services/dbi.service';
 import { LoggerService } from './services/logger.service';
 
 export class Helper {
-    public static readonly msPerWeek: number = 604800000;
-    public static readonly msPerDay: number = 86400000;
-    public static readonly msPerHour: number = 3600000;
-    public static readonly msPerMinute: number = 60000;
-    private static readonly regExpEMail = new RegExp('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$');
-    private static logger: LoggerService;
+  public static readonly msPerWeek: number = 604800000;
+  public static readonly msPerDay: number = 86400000;
+  public static readonly msPerHour: number = 3600000;
+  public static readonly msPerMinute: number = 60000;
+  private static readonly regExpEMail = new RegExp('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$');
+  private static logger: LoggerService;
 
-    constructor(private dbi: DbiService, private logger: LoggerService) {
-        if (!Helper.logger) {
-            Helper.logger = logger;
-        }
+  constructor(private dbi: DbiService, private logger: LoggerService) {
+    if (!Helper.logger) {
+      Helper.logger = logger;
+    }
+  }
+
+  public static checkForValidBoolean(val: any): boolean {
+    if (typeof val !== 'boolean') {
+      return false;
     }
 
-    public static checkForValidBoolean(val: any): boolean {
-        if (typeof val !== 'boolean') {
-            return false;
-        }
-
-        if (val === false) {
-            return true;
-        }
-
-        if (!val) {
-            return false;
-        }
-
-        return true;
+    if (val === false) {
+      return true;
     }
 
-    public static checkForValidNumber(val: any): boolean {
-        if (typeof val !== 'number') {
-            return false;
-        }
-
-        if (val === 0) {
-            return true;
-        }
-
-        if (!val) {
-            return false;
-        }
-
-        return true;
+    if (!val) {
+      return false;
     }
 
-    // public static removeItemFromArrayAtIndex(array: any[], i: number): boolean {
-    //     if (i < 0 || i > array.length) {
-    //         return false;
-    //     }
+    return true;
+  }
 
-    //     array.splice(i, 1);
-    //     return true;
-    // }
-
-    // public static removeItemFromArray(array: any[], item: any): boolean {
-    //     const i = array.indexOf(item);
-    //     if (i === -1) {
-    //         return false;
-    //     }
-
-    //     return this.removeItemFromArrayAtIndex(array, i);
-    // }
-
-    public static emailFormatCheck(email: string): boolean {
-        const result = this.regExpEMail.test(email);
-        return result;
+  public static checkForValidNumber(val: any): boolean {
+    if (typeof val !== 'number') {
+      return false;
     }
 
-    public static encodeDeepLinkData( dataObj: {} ): string {
-        let paresedObjStr: string;
-        let stringifyFailed = false;
-        try {
-            paresedObjStr = JSON.stringify(dataObj);
-        } catch (error) {
-            stringifyFailed = true;
-        }
-
-        if (!!stringifyFailed) {
-            Helper.logger.logError(54635463);
-            return undefined;
-        }
-
-        let encodedStr: string;
-        let uriDecodingFailed = false;
-        try {
-            encodedStr = encodeURIComponent(paresedObjStr);
-        } catch (error) {
-            uriDecodingFailed = true;
-        }
-
-        if (!!uriDecodingFailed) {
-            Helper.logger.logError(63543473);
-            return undefined;
-        }
-
-        return encodedStr;
+    if (val === 0) {
+      return true;
     }
 
-    public  static deocdeDeepLinkData( dataStr: string ): {} {
-        let decodedStr: string;
-        let uriDecodingFailed = false;
-        try {
-            decodedStr = decodeURIComponent(dataStr);
-        } catch (error) {
-            Helper.logger.logError(89436435);
-            uriDecodingFailed = true;
-        }
-
-        if (!!uriDecodingFailed) {
-            return undefined;
-        }
-
-        let paresedObj: {};
-        let jsonParseingFailed = false;
-        try {
-            paresedObj = JSON.parse(decodedStr);
-        } catch (error) {
-            Helper.logger.logError(68354867);
-            jsonParseingFailed = true;
-        }
-
-        if (!!jsonParseingFailed) {
-            return undefined;
-        }
-
-        return paresedObj;
+    if (!val) {
+      return false;
     }
 
-    public static getEuropeanDateString( date: Date, shortYear?: boolean ): string {
-        let yearNum = date.getFullYear();
-        if ( !!shortYear ) {
-            yearNum = yearNum - Math.floor( yearNum / 100 ) * 100;
-        }
-        let yearStr = yearNum.toString();
-        yearStr = yearStr.length > 1 ? yearStr : '0' + yearStr;
+    return true;
+  }
 
-        let monthStr: string = (1 + date.getMonth()).toString();
-        monthStr = monthStr.length > 1 ? monthStr : '0' + monthStr;
+  // public static removeItemFromArrayAtIndex(array: any[], i: number): boolean {
+  //     if (i < 0 || i > array.length) {
+  //         return false;
+  //     }
 
-        let dayStr = date.getDate().toString();
-        dayStr = dayStr.length > 1 ? dayStr : '0' + dayStr;
+  //     array.splice(i, 1);
+  //     return true;
+  // }
 
-        return dayStr + '.' + monthStr + '.' + yearStr;
+  // public static removeItemFromArray(array: any[], item: any): boolean {
+  //     const i = array.indexOf(item);
+  //     if (i === -1) {
+  //         return false;
+  //     }
+
+  //     return this.removeItemFromArrayAtIndex(array, i);
+  // }
+
+  public static emailFormatCheck(email: string): boolean {
+    const result = this.regExpEMail.test(email);
+    return result;
+  }
+
+  public static encodeDeepLinkData(dataObj: {}): string {
+    let paresedObjStr: string;
+    let stringifyFailed = false;
+    try {
+      paresedObjStr = JSON.stringify(dataObj);
+    } catch (error) {
+      stringifyFailed = true;
     }
 
-    public static isColorDark(colorHexStr: string) {
-        const colorHexNum: number = + ('0x' + colorHexStr.slice(1).replace(colorHexStr.length < 5 && /./g, '$&$&'));
-        // tslint:disable:no-bitwise
-        const r = colorHexNum >> 16;
-        const g = colorHexNum >> 8 & 255;
-        const b = colorHexNum & 255;
-        // tslint:enable:no-bitwise
-
-        // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-        const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
-        return (hsp < 127.5);
+    if (!!stringifyFailed) {
+      Helper.logger.logError(54635463);
+      return undefined;
     }
 
-    public static getMondayTS(dateTS: number) {
-        const date: Date = new Date(this.get0oclockTS(dateTS));
-
-        let temp = date.getDay();
-
-        if (temp === 1) {
-            return date.valueOf();
-        }
-
-        if (temp === 0) {
-            temp = 7;
-        }
-
-        this.subtractDaysOfDate(date, (temp - 1));
-        return date.valueOf();
+    let encodedStr: string;
+    let uriDecodingFailed = false;
+    try {
+      encodedStr = encodeURIComponent(paresedObjStr);
+    } catch (error) {
+      uriDecodingFailed = true;
     }
 
-    public static get0oclockTS(dateTS: number): number {
-        const tempDate1280 = new Date(dateTS);
-        this.setDate0oclock(tempDate1280);
-
-        return tempDate1280.valueOf();
+    if (!!uriDecodingFailed) {
+      Helper.logger.logError(63543473);
+      return undefined;
     }
 
-    public static setDate0oclock(date: Date): boolean {
-        if (!date || !date.valueOf || isNaN(date.valueOf())) {
-            return false;
-        }
+    return encodedStr;
+  }
 
-        date.setMilliseconds(0);
-        date.setSeconds(0);
-        date.setMinutes(0);
-        date.setHours(0);
-        return true;
+  public static deocdeDeepLinkData(dataStr: string): {} {
+    let decodedStr: string;
+    let uriDecodingFailed = false;
+    try {
+      decodedStr = decodeURIComponent(dataStr);
+    } catch (error) {
+      Helper.logger.logError(89436435);
+      uriDecodingFailed = true;
     }
 
-    public static addDaysToDate(date: Date, dayCount: number): boolean {
-        if (!date || !date.valueOf || isNaN(date.valueOf())) {
-            return false;
-        }
-
-        date.setDate(date.getDate() + dayCount);
-        return true;
+    if (!!uriDecodingFailed) {
+      return undefined;
     }
 
-    public static subtractDaysOfDate(date: Date, dayCount: number): boolean {
-        return this.addDaysToDate(date, (dayCount * -1));
+    let paresedObj: {};
+    let jsonParseingFailed = false;
+    try {
+      paresedObj = JSON.parse(decodedStr);
+    } catch (error) {
+      Helper.logger.logError(68354867);
+      jsonParseingFailed = true;
     }
 
-    public static getCW(timestamp: number) {
-        const date = new Date(timestamp);
-
-        const currentThursday = new Date(date.getTime() + (3 - ((date.getDay() + 6) % 7)) * 86400000);
-        const yearOfThursday = currentThursday.getFullYear();
-        const firstThursday =
-            new Date(new Date(yearOfThursday, 0, 4).getTime()
-                + (3 - ((new Date(yearOfThursday, 0, 4).getDay() + 6) % 7)) * 86400000);
-        const weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000 / 7);
-
-        return weekNumber;
+    if (!!jsonParseingFailed) {
+      return undefined;
     }
 
-    public static setLooperInterval(cb: () => void, loopCount: number, loopDelay: number): NodeJS.Timer {
-        if (loopCount <= 0 || loopDelay <= 0) { return undefined; }
+    return paresedObj;
+  }
 
-        let counter = 0;
-        const interval = setInterval(() => {
-            cb();
-            counter++;
-            if (counter >= loopCount) {
-                clearInterval(interval);
-            }
-        }, loopDelay);
-        return interval;
+  public static getEuropeanDateString(date: Date, shortYear?: boolean): string {
+    let yearNum = date.getFullYear();
+    if (!!shortYear) {
+      yearNum = yearNum - Math.floor(yearNum / 100) * 100;
+    }
+    let yearStr = yearNum.toString();
+    yearStr = yearStr.length > 1 ? yearStr : '0' + yearStr;
+
+    let monthStr: string = (1 + date.getMonth()).toString();
+    monthStr = monthStr.length > 1 ? monthStr : '0' + monthStr;
+
+    let dayStr = date.getDate().toString();
+    dayStr = dayStr.length > 1 ? dayStr : '0' + dayStr;
+
+    return dayStr + '.' + monthStr + '.' + yearStr;
+  }
+
+  public static isColorDark(colorHexStr: string) {
+    const colorHexNum: number = + ('0x' + colorHexStr.slice(1).replace(colorHexStr.length < 5 && /./g, '$&$&'));
+    // tslint:disable:no-bitwise
+    const r = colorHexNum >> 16;
+    const g = colorHexNum >> 8 & 255;
+    const b = colorHexNum & 255;
+    // tslint:enable:no-bitwise
+
+    // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+    const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+    return (hsp < 127.5);
+  }
+
+  public static getMondayTS(dateTS: number) {
+    const date: Date = new Date(this.get0oclockTS(dateTS));
+
+    let temp = date.getDay();
+
+    if (temp === 1) {
+      return date.valueOf();
     }
 
-    public static arrayCompare<T>(arrComp1: T[], arrComp2: T[]): any {
-        const added: T[] = [];
-        const unchanged: T[] = [];
-        const removed: T[] = arrComp1.slice(0);
-        arrComp2.forEach(elem => {
-            const i = arrComp1.indexOf(elem);
-            if (i === -1) {
-                added.push(elem);
-            } else {
-                unchanged.push(elem);
-            }
-            const i2 = removed.indexOf(elem);
-            if (i2 !== -1) {
-                removed.splice(i2, 1);
-            }
-        });
-        return { added, removed, unchanged };
+    if (temp === 0) {
+      temp = 7;
     }
 
-    public static async cleanArray(arr: any[]) {
-      return await this.asyncTimeout<void>(() => {
-        arr = [];
-        return;
-      });
+    this.subtractDaysOfDate(date, (temp - 1));
+    return date.valueOf();
+  }
+
+  public static get0oclockTS(dateTS: number): number {
+    const tempDate1280 = new Date(dateTS);
+    this.setDate0oclock(tempDate1280);
+
+    return tempDate1280.valueOf();
+  }
+
+  public static setDate0oclock(date: Date): boolean {
+    if (!date || !date.valueOf || isNaN(date.valueOf())) {
+      return false;
     }
 
-    public static asyncTimeout<T>( cb: (...args: any[]) => T, delay?: number ) {
-      return new Promise<T>((res) => {
-        setTimeout(() => {
-          res(cb());
-        }, delay);
-      });
+    date.setMilliseconds(0);
+    date.setSeconds(0);
+    date.setMinutes(0);
+    date.setHours(0);
+    return true;
+  }
+
+  public static addDaysToDate(date: Date, dayCount: number): boolean {
+    if (!date || !date.valueOf || isNaN(date.valueOf())) {
+      return false;
     }
+
+    date.setDate(date.getDate() + dayCount);
+    return true;
+  }
+
+  public static subtractDaysOfDate(date: Date, dayCount: number): boolean {
+    return this.addDaysToDate(date, (dayCount * -1));
+  }
+
+  public static getCW(timestamp: number) {
+    const date = new Date(timestamp);
+
+    const currentThursday = new Date(date.getTime() + (3 - ((date.getDay() + 6) % 7)) * 86400000);
+    const yearOfThursday = currentThursday.getFullYear();
+    const firstThursday =
+      new Date(new Date(yearOfThursday, 0, 4).getTime()
+        + (3 - ((new Date(yearOfThursday, 0, 4).getDay() + 6) % 7)) * 86400000);
+    const weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000 / 7);
+
+    return weekNumber;
+  }
+
+  public static setLooperInterval(cb: () => void, loopCount: number, loopDelay: number): NodeJS.Timer {
+    if (loopCount <= 0 || loopDelay <= 0) { return undefined; }
+
+    let counter = 0;
+    const interval = setInterval(() => {
+      cb();
+      counter++;
+      if (counter >= loopCount) {
+        clearInterval(interval);
+      }
+    }, loopDelay);
+    return interval;
+  }
+
+  public static arrayCompare<T>(arrComp1: T[], arrComp2: T[]): any {
+    const added: T[] = [];
+    const unchanged: T[] = [];
+    const removed: T[] = arrComp1.slice(0);
+    arrComp2.forEach(elem => {
+      const i = arrComp1.indexOf(elem);
+      if (i === -1) {
+        added.push(elem);
+      } else {
+        unchanged.push(elem);
+      }
+      const i2 = removed.indexOf(elem);
+      if (i2 !== -1) {
+        removed.splice(i2, 1);
+      }
+    });
+    return { added, removed, unchanged };
+  }
+
+  public static async cleanArray(arr: any[]) {
+    return await this.asyncTimeout<void>(() => {
+      arr = [];
+      return;
+    });
+  }
+
+  public static asyncTimeout<T>(cb: (...args: any[]) => T, delay?: number) {
+    return new Promise<T>((res) => {
+      setTimeout(() => {
+        res(cb());
+      }, delay);
+    });
+  }
+
+  public static buildTable<T>(columnCount: number, rowCount: number, elementTemplate: T): T[][] {
+    const clone: <T2>(copyObj: T2) => T2 = (copyObj) => JSON.parse(JSON.stringify(copyObj));
+
+    const table: T[][] = []; const columnTemplate: T[] = [];
+    for (let i = 0; i < rowCount; i++)    { columnTemplate.push(clone(elementTemplate)); }
+    for (let i = 0; i < columnCount; i++) { table.push(clone(columnTemplate)); }
+    return table;
+  }
 }
 
 export class Project {
@@ -500,56 +509,78 @@ export class Employee {
 }
 
 export class Assignment {
-    employeeId: string;
-    projectId: string;
-    projectIdentifier: string;
-    start: number;
-    end: number;
-    note: string;
-    isConflicted: boolean;
-    blockedAt;
+  public static employeeIdKeyStr        = 'employeeId';
+  public static projectIdKeyStr         = 'projectId';
+  public static projectIdentifierKeyStr = 'projectIdentifier';
+  public static startKeyStr             = 'start';
+  public static endKeyStr               = 'end';
+  public static noteKeyStr              = 'note';
+  public static isConflictedKeyStr      = 'isConflicted';
+  public static blockedAtKeyStr         = 'blockedAt';
+  public static projectNameKeyStr       = 'projectName';
+  public static projectColorKeyStr      = 'projectColor';
+  public static cwKeyStr                = 'cw';
+  public static dayKeyStr               = 'day';
+  public static markerKeyStr            = 'marker';
+  public static markerColorKeyStr       = 'markerColor';
+  public static fixedKeyStr             = 'fixed';
+  public static docIdKeyStr             = 'docId';
+  public static createIdKeyStr          = 'createId';
+  public static createNameKeyStr        = 'createName';
+  public static createTSKeyStr          = 'createTS';
+  public static editIdKeyStr            = 'editId';
+  public static editNameKeyStr          = 'editName';
+  public static editTSKeyStr            = 'editTS';
 
-    // HIER
-    projectName: string;
-    projectColor: string;
-    cw: number;
-    day: number;
-    marker: string;
-    markerColor: string;
-    fixed: boolean;
-    docId: string;
-    createId: string;
-    createName: string;
-    createTS: number;
-    editId: string;
-    editName: string;
-    editTS: number;
+  // HIER
+  employeeId: string;
+  projectId: string;
+  projectIdentifier: string;
+  start: number;
+  end: number;
+  note: string;
+  isConflicted: boolean;
+  blockedAt;
+  projectName: string;
+  projectColor: string;
+  cw: number;
+  day: number;
+  marker: string;
+  markerColor: string;
+  fixed: boolean;
+  docId: string;
+  createId: string;
+  createName: string;
+  createTS: number;
+  editId: string;
+  editName: string;
+  editTS: number;
 
-    public static copyAssignment(assignment: Assignment): Assignment {
-      // HIER keep up to date
-      const copy: Assignment = new Assignment();
-      copy.employeeId = assignment.employeeId;
-      copy.projectId = assignment.projectId;
-      copy.projectIdentifier = assignment.projectIdentifier;
-      copy.start = assignment.start;
-      copy.end = assignment.end;
-      copy.note = assignment.note;
-      copy.isConflicted = assignment.isConflicted;
-      copy.blockedAt = assignment.blockedAt;
-      copy.projectName = assignment.projectName;
-      copy.projectColor = assignment.projectColor;
-      copy.cw = assignment.cw;
-      copy.day = assignment.day;
-      copy.marker = assignment.marker;
-      copy.markerColor = assignment.markerColor;
-      copy.fixed = assignment.fixed;
-      copy.docId = assignment.docId;
-      copy.createId = assignment.createId;
-      copy.createName = assignment.createName;
-      copy.createTS = assignment.createTS;
-      copy.editId = assignment.editId;
-      copy.editName = assignment.editName;
-      copy.editTS = assignment.editTS;
-      return copy;
-    }
+  public static copyAssignment(assignment: Assignment): Assignment {
+    // HIER keep up to date
+    const copy: Assignment = new Assignment();
+    copy.employeeId = assignment.employeeId;
+    copy.projectId = assignment.projectId;
+    copy.projectIdentifier = assignment.projectIdentifier;
+    copy.start = assignment.start;
+    copy.end = assignment.end;
+    copy.note = assignment.note;
+    copy.isConflicted = assignment.isConflicted;
+    copy.blockedAt = assignment.blockedAt;
+    copy.projectName = assignment.projectName;
+    copy.projectColor = assignment.projectColor;
+    copy.cw = assignment.cw;
+    copy.day = assignment.day;
+    copy.marker = assignment.marker;
+    copy.markerColor = assignment.markerColor;
+    copy.fixed = assignment.fixed;
+    copy.docId = assignment.docId;
+    copy.createId = assignment.createId;
+    copy.createName = assignment.createName;
+    copy.createTS = assignment.createTS;
+    copy.editId = assignment.editId;
+    copy.editName = assignment.editName;
+    copy.editTS = assignment.editTS;
+    return copy;
+  }
 }

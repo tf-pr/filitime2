@@ -2,7 +2,7 @@
     <div class="navigatorViewBG">
         <mat-drawer-container class="example-container" [autosize]="true">
             <mat-drawer mode="side" [opened]="!hideNavBar" [disableClose]="true">
-                <div class="example-container2">
+                <div *ngIf="!customDrawer" class="example-container2">
                     <div *ngIf="!colapsed" class="expandLogoContainer">
                         <h2>FT FiliTime</h2>
                     </div>
@@ -116,6 +116,13 @@
                         </mat-icon>
                     </button>
                 </div>
+                <ng-container *ngIf="customDrawer" class="example-container2">
+                  <div [ngSwitch]="customDrawer" class="example-container2">
+                    <ng-container *ngSwitchCase="1">
+                      <app-project-view [isSideNav]=true></app-project-view>
+                    </ng-container>
+                  </div>
+                </ng-container>
             </mat-drawer>
             <mat-drawer-content>
                 <div *ngIf="!isMobile" class="example-container4" [@routeAnimation]=prepareRoute(outlet)>

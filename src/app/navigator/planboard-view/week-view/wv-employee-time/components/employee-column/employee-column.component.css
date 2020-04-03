@@ -1,4 +1,5 @@
 app-assignment-card {
+  position: absolute;
   width: 100%;
   height: 100%;
   display: inline-block;

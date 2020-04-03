@@ -8,7 +8,6 @@ import { moveItemInArray, CdkDropList } from '@angular/cdk/drag-drop';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { PlanboardSettings } from 'src/app/helper/planboardSettings';
 import { FsiService } from 'src/app/services/fsi.service'; // TEST TEST TEST
-import { DpoService } from 'src/app/services/dpo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -551,11 +550,11 @@ export class WeekViewService {
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
   }
 
-  constructor(private dbi: DbiService, private dpo: DpoService, private globalData: GlobalDataService) {
+  constructor(private dbi: DbiService, private globalData: GlobalDataService) {
     if (!this.cwCount)        { this.cwCount = 2; }
     if (!this.daysPerWorkday) { this.daysPerWorkday = 6; }
 
-    const currEmployees = this.dpo.getEmployees();
+    const currEmployees = this.dbi.dpo.getEmployees();
     console.log('currEmployees', currEmployees);
 
     const tempEmpNames = currEmployees.map(employee => employee.name);
@@ -567,7 +566,7 @@ export class WeekViewService {
     this.selectableEmployeeNames = tempEmpNames;
     this.selectableEmployeeDocIds = tempEmpIds;
 
-    this.dpo.employeeAdd.subscribe({next: newEmp => {
+    this.dbi.dpo.employeeAdd.subscribe({next: newEmp => {
       const empObj = newEmp;
       const empName = newEmp.name;
       const empId = newEmp.docId;
@@ -578,7 +577,7 @@ export class WeekViewService {
       this.selectableEmployeeNameAddEmitter.emit([empName, empId]);
     }});
 
-    this.dpo.employeeRemove.subscribe({next: rmEmp => {
+    this.dbi.dpo.employeeRemove.subscribe({next: rmEmp => {
       const rmEmpId = rmEmp.docId;
       const i = this.selectableEmployeeDocIds.indexOf(rmEmpId);
 
@@ -595,7 +594,7 @@ export class WeekViewService {
       this.selectableEmployeeNameRemoveEmitter.emit([empName, empId]);
     }});
 
-    this.dpo.employeeModify.subscribe({next: modEmp => {
+    this.dbi.dpo.employeeModify.subscribe({next: modEmp => {
       // HIER check mal ob des so passt...
       const empName = modEmp.name;
       const empId = modEmp.docId;

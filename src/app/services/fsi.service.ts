@@ -6,7 +6,6 @@ import { AngularFirestore, Action, DocumentSnapshot, DocumentChangeAction } from
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { Timestamp } from '@firebase/firestore-types';
 import * as firebase from 'firebase/app';
-import { DpoService } from './dpo.service';
 import { async } from 'q';
 
 @Injectable({
@@ -205,8 +204,7 @@ export class FsiService {
 
   //#endregion
 
-  constructor(private dpo: DpoService,
-              private angFireAuth: AngularFireAuth,
+  constructor(private angFireAuth: AngularFireAuth,
               private angFirestore: AngularFirestore,
               private angFireFunctions: AngularFireFunctions,
               private zone: NgZone) {

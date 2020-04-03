@@ -3,7 +3,6 @@ import { FsiService } from './fsi.service';
 import { Subscription } from 'rxjs';
 import { LoggerService } from './logger.service';
 import { DbiService } from './dbi.service';
-import { DpoService } from './dpo.service';
 import { Employee, Helper } from '../helper';
 import { WeekViewService } from '../navigator/planboard-view/week-view/week-view.service';
 
@@ -20,7 +19,6 @@ export class TesterService {
 
   constructor(private fsi: FsiService,
               private dbi: DbiService,
-              private dpo: DpoService,
               private logger: LoggerService,
               private wvs: WeekViewService) {
     this.noDelay();
@@ -295,7 +293,7 @@ export class TesterService {
   }
 
   private checkOnEmployees() {
-    const empList = this.dpo.getEmployees();
+    const empList = this.dbi.dpo.getEmployees();
     console.log( 'SO... THIS SHOULD CONTAIN SOME EMPLOYEES I GUESS...' );
     console.log(JSON.stringify(empList));
   }
@@ -323,19 +321,19 @@ export class TesterService {
   }
 
   private syncEmployeesForEver() {
-    const addSub: Subscription = this.dpo.employeeAdd.subscribe({
+    const addSub: Subscription = this.dbi.dpo.employeeAdd.subscribe({
       next: addedEmployee => {
         console.log({addedEmployee});
       }
     });
 
-    const modSub: Subscription = this.dpo.employeeModify.subscribe({
+    const modSub: Subscription = this.dbi.dpo.employeeModify.subscribe({
       next: modedEmployee => {
         console.log({modedEmployee});
       }
     });
 
-    const remSub: Subscription = this.dpo.employeeRemove.subscribe({
+    const remSub: Subscription = this.dbi.dpo.employeeRemove.subscribe({
       next: remedEmployee => {
         console.log({remedEmployee});
       }
@@ -1448,22 +1446,22 @@ export class TesterService {
     console.log('_____printPublicDpoData______');
     console.log('_____________________________');
     console.log('getEmployees');
-    console.log(this.dpo.getEmployees());
+    console.log(this.dbi.dpo.getEmployees());
     console.log('_____________________________');
     console.log('getUsersEmployeeAccesses');
-    console.log(this.dpo.getUsersEmployeeAccesses());
+    console.log(this.dbi.dpo.getUsersEmployeeAccesses());
     console.log('_____________________________');
     console.log('getProjectList');
-    console.log(this.dpo.getProjectList());
+    console.log(this.dbi.dpo.getProjectList());
     console.log('_____________________________');
     console.log('getTableCwIndexes');
-    console.log(this.dpo.getTableCwIndexes());
+    console.log(this.dbi.dpo.getTableCwIndexes());
     console.log('_____________________________');
     console.log('getTableEmployeeIds');
-    console.log(this.dpo.getTableEmployeeIds());
+    console.log(this.dbi.dpo.getTableEmployeeIds());
     console.log('_____________________________');
     console.log('getTableSubs');
-    console.log(this.dpo.getTableSubs());
+    console.log(this.dbi.dpo.getTableSubs());
     console.log('_____________________________');
     console.log('_____________________________');
   }

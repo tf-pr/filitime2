@@ -5,7 +5,6 @@ import { GlobalDataService } from 'src/app/services/global-data.service';
 import { Project, Helper } from 'src/app/helper';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { DpoService } from 'src/app/services/dpo.service';
 import { DbiService } from 'src/app/services/dbi.service';
 import { LoggerService } from 'src/app/services/logger.service';
 import { MatBadgePosition } from '@angular/material';
@@ -158,7 +157,6 @@ export class ProjectViewComponent implements OnInit {
               private router: Router,
               private location: Location,
               private globalData: GlobalDataService,
-              private dpo: DpoService,
               private dbi: DbiService,
               private logger: LoggerService,
               public dialog: MatDialog,
@@ -284,14 +282,14 @@ export class ProjectViewComponent implements OnInit {
     // this.disablePaginators = this.paginatorLength === 0;
     // this.disableBottomPaginator = this.paginatorPageSize <= 5;
 
-    this.dpo.projectAdd.subscribe({
+    this.dbi.dpo.projectAdd.subscribe({
       next: project => {
         this.projectList.push(project);
         this.queryProjctList('filter');
       }
     });
 
-    this.dpo.projectModify.subscribe({
+    this.dbi.dpo.projectModify.subscribe({
       next: project => {
         console.log('mod me:');
         console.log(project);
@@ -307,7 +305,7 @@ export class ProjectViewComponent implements OnInit {
       }
     });
 
-    this.dpo.projectRemove.subscribe({
+    this.dbi.dpo.projectRemove.subscribe({
       next: project => {
         this.projectIdsToDelete.push( project.docId );
         setTimeout(() => {

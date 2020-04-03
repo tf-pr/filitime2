@@ -2,8 +2,8 @@ import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { FsiService } from './fsi.service';
 import { Observable, Subscription } from 'rxjs';
+import { Dpo } from './dpo';
 import { Helper, Project, Employee, Assignment } from '../helper';
-import { DpoService } from './dpo.service';
 import { LoggerService } from './logger.service';
 
 
@@ -11,6 +11,8 @@ import { LoggerService } from './logger.service';
   providedIn: 'root'
 })
 export class DbiService {
+  public readonly dpo = new Dpo(this);
+
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
   public loggedInStateChange: Observable<boolean> = this.isLoggedInEmitter.asObservable();
@@ -164,7 +166,6 @@ export class DbiService {
   }
 
   constructor(private fsi: FsiService,
-              private dpo: DpoService,
               private logger: LoggerService) {
     logger.setDbi = this;
 

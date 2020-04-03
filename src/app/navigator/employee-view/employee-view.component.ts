@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { Employee, Helper } from 'src/app/helper';
-import { DpoService } from 'src/app/services/dpo.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -158,7 +157,6 @@ export class EmployeeViewComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private router: Router,
               private globalData: GlobalDataService,
-              private dpo: DpoService,
               private dbi: DbiService,
               private logger: LoggerService,
               public dialog: MatDialog) {
@@ -212,7 +210,7 @@ export class EmployeeViewComponent implements OnInit {
     // const wonEmployee = this.dpo.usersEmployeeAccessesAdd;
     // tempList.push(ownEmployee);
 
-    const tempList2 = this.dpo.getEmployees();
+    const tempList2 = this.dbi.dpo.getEmployees();
     // console.log('const tempList2 = this.dpo.getEmployees();'); console.log(tempList2);
     tempList.push(...tempList2);
     // console.log('tempList.push(tempList2);'); console.log(tempList);
@@ -222,14 +220,14 @@ export class EmployeeViewComponent implements OnInit {
     // tslint:disable-next-line:quotemark
     // console.log("this.queryEmployeeList('filter');"); console.log(this.employeeListPaginated);
 
-    this.dpo.employeeAdd.subscribe({
+    this.dbi.dpo.employeeAdd.subscribe({
       next: employee => {
         this.employeeList.push(employee);
         this.queryEmployeeList('filter');
       }
     });
 
-    this.dpo.employeeModify.subscribe({
+    this.dbi.dpo.employeeModify.subscribe({
       next: employee => {
         for (let i = 0; i < this.employeeList.length; i++) {
           if (this.employeeList[i].docId === employee.docId) {
@@ -242,7 +240,7 @@ export class EmployeeViewComponent implements OnInit {
       }
     });
 
-    this.dpo.employeeRemove.subscribe({
+    this.dbi.dpo.employeeRemove.subscribe({
       next: employee => {
         this.employeeIdsToDelete.push( employee.docId );
         setTimeout(() => {

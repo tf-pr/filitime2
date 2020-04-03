@@ -1,11 +1,11 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Project, Employee, Assignment, Helper } from '../helper';
 import { Observable, Subscription } from 'rxjs';
+import { DbiService } from './dbi.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class DpoService {
+export class Dpo {
+  private dbi: DbiService;
+
   //#region projectView properties
 
   private projectList: Project[] = [];
@@ -154,8 +154,8 @@ export class DpoService {
 
   //#endregion
 
-  constructor() {
-    //
+  constructor(parent: DbiService) {
+    this.dbi = parent;
   }
 
   /**

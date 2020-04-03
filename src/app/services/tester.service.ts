@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsiService } from './fsi.service';
+import { Fsi } from './fsi.service';
 import { Subscription } from 'rxjs';
 import { LoggerService } from './logger.service';
 import { DbiService } from './dbi.service';
@@ -17,8 +17,7 @@ export class TesterService {
   // private sub2: Subscription;
   // private sub3: Subscription;
 
-  constructor(private fsi: FsiService,
-              private dbi: DbiService,
+  constructor(private dbi: DbiService,
               private logger: LoggerService,
               private wvs: WeekViewService) {
     this.noDelay();
@@ -265,7 +264,7 @@ export class TesterService {
 
   private createClientTest() {
     console.log('run createClientTest');
-    this.fsi.setUpNewClient(
+    this.dbi.fsi.setUpNewClient(
       'testtest123@filitime.com',
       'Test1!',
       // FsiService.generatePushId(),
@@ -300,7 +299,7 @@ export class TesterService {
 
   private getAllEmployees() {
     console.log('tryna do da getAllEmployees thing');
-    this.fsi.getAllEmployees()
+    this.dbi.fsi.getAllEmployees()
       .then(employees => {
         console.log('look at this, bitch! All the employees are here!');
         console.log(employees);
@@ -314,7 +313,7 @@ export class TesterService {
   private addRandomEmployee() {
     return new Promise<void>((res, rej) => {
       const randomEmployee = this.buildRandomEmployee();
-      this.fsi.addEmployeeToDB(randomEmployee, [], [['45lLcHommncEof54qYpq', true]])
+      this.dbi.fsi.addEmployeeToDB(randomEmployee, [], [['45lLcHommncEof54qYpq', true]])
         .then(() => { res(); })
         .catch(err => { rej(err); });
     });

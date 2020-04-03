@@ -7,11 +7,15 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 import { Timestamp } from '@firebase/firestore-types';
 import * as firebase from 'firebase/app';
 import { async } from 'q';
+import { DbiService } from './dbi.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FsiService {
+export class Fsi {
+  private readonly dbi: DbiService;
+  private readonly angFireAuth: AngularFireAuth;
+  private readonly angFirestore: AngularFirestore;
+  private readonly angFireFunctions: AngularFireFunctions;
+  private readonly zone: NgZone;
+
   //#region  keyStr
 
   private readonly logErrorCFKeyStr = 'logError';
@@ -204,10 +208,17 @@ export class FsiService {
 
   //#endregion
 
-  constructor(private angFireAuth: AngularFireAuth,
-              private angFirestore: AngularFirestore,
-              private angFireFunctions: AngularFireFunctions,
-              private zone: NgZone) {
+  constructor(parent: DbiService,
+              angFireAuth: AngularFireAuth,
+              angFirestore: AngularFirestore,
+              angFireFunctions: AngularFireFunctions,
+              zone: NgZone) {
+    this.dbi = parent;
+    this.angFireAuth = angFireAuth;
+    this.angFirestore = angFirestore;
+    this.angFireFunctions = angFireFunctions;
+    this.zone = zone;
+
     angFireAuth.auth.onAuthStateChanged(user => {
       console.log(user);
       if (!!user) {
@@ -291,7 +302,7 @@ export class FsiService {
     this.usersEmployeeSub = this.syncDocValueChangesFromDbAtDocPath(
       usersEmployeePath,
       docData => {
-        const employee = FsiService.convertDBObjToEmployee(docData);
+        const employee = Fsi.convertDBObjToEmployee(docData);
         if ( !employee ) {
           console.error('Error: 74544149');
         }
@@ -391,7 +402,7 @@ export class FsiService {
     dbObj[Project.createIdKeyStr] = this.usersEmployeeId;
     dbObj[Project.createNameKeyStr] = this.usersEmployeeName;
 
-    if ( !docId ) { docId = FsiService.generatePushId(); }
+    if ( !docId ) { docId = Fsi.generatePushId(); }
     dbObj[this.docIdKeyStr] = docId;
 
     return docId;
@@ -557,7 +568,7 @@ export class FsiService {
         .then(snapList => {
           const projectList: Project[] = [];
           snapList.docs.forEach(doc => {
-            const temp = FsiService.convertDBObjToProject(doc.data());
+            const temp = Fsi.convertDBObjToProject(doc.data());
             if ( !temp ) {
               console.error('Error: 73458658' + ' | invalid projectdata: ' + doc.data());
               return; // continue foreach
@@ -592,7 +603,7 @@ export class FsiService {
         const projList: Project[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const proj = FsiService.convertDBObjToProject(docData);
+          const proj = Fsi.convertDBObjToProject(docData);
           projList.push(proj);
         });
         addedCB(projList);
@@ -609,7 +620,7 @@ export class FsiService {
         const projList: Project[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const proj = FsiService.convertDBObjToProject(docData);
+          const proj = Fsi.convertDBObjToProject(docData);
           projList.push(proj);
         });
         modifiedCB(projList);
@@ -626,7 +637,7 @@ export class FsiService {
         const projList: Project[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const proj = FsiService.convertDBObjToProject(docData);
+          const proj = Fsi.convertDBObjToProject(docData);
           projList.push(proj);
         });
         removedCB(projList);
@@ -651,7 +662,7 @@ export class FsiService {
         .then(dataList => {
           const returnValue: Employee[] = [];
           dataList.forEach(data => {
-            const temp = FsiService.convertDBObjToEmployee(data);
+            const temp = Fsi.convertDBObjToEmployee(data);
             if (!temp) {
               console.error('Error: 41321645');
               return; // continue foreach
@@ -678,7 +689,7 @@ export class FsiService {
         const empList: Employee[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          const tempEmp = Fsi.convertDBObjToEmployee(docData);
           empList.push(tempEmp);
         });
         addedCB(empList);
@@ -695,7 +706,7 @@ export class FsiService {
         const empList: Employee[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          const tempEmp = Fsi.convertDBObjToEmployee(docData);
           empList.push(tempEmp);
         });
         modifiedCB(empList);
@@ -712,7 +723,7 @@ export class FsiService {
         const empList: Employee[] = [];
         snaps.forEach(snap => {
           const docData = snap.payload.doc.data();
-          const tempEmp = FsiService.convertDBObjToEmployee(docData);
+          const tempEmp = Fsi.convertDBObjToEmployee(docData);
           empList.push(tempEmp);
         });
         removedCB(empList);
@@ -732,7 +743,7 @@ export class FsiService {
 
       this.getDocDataFromDbAtDocPath(employeeDocPath)
         .then(data => {
-            const employee = FsiService.convertDBObjToEmployee(data);
+            const employee = Fsi.convertDBObjToEmployee(data);
             if (!employee) {
               const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
               console.error('Error: 94565612' + ' | ' + errMsg);
@@ -755,7 +766,7 @@ export class FsiService {
     const sub = this.syncDocValueChangesFromDbAtDocPath(
       employeeDocPath,
       data => {
-        const employee = FsiService.convertDBObjToEmployee(data);
+        const employee = Fsi.convertDBObjToEmployee(data);
         if (!employee) {
           const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
           console.error('Error: 43148673' + ' | ' + errMsg);
@@ -827,10 +838,10 @@ export class FsiService {
 
     const batch = this.angFirestore.firestore.batch();
 
-    const employeeId = !!employee.docId ? employee.docId : FsiService.generatePushId();
+    const employeeId = !!employee.docId ? employee.docId : Fsi.generatePushId();
 
     // buld docData
-    const employeeDocData = FsiService.converEmplyeeToDBObj(employee);
+    const employeeDocData = Fsi.converEmplyeeToDBObj(employee);
     this.addCreateDataToDbObj(employeeDocData, employeeId);
     this.addChangeDataToDbObj(employeeDocData);
 
@@ -1447,8 +1458,8 @@ export class FsiService {
         return;
       }
 
-      const clientId = FsiService.generatePushId();
-      const employeeId = FsiService.generatePushId();
+      const clientId = Fsi.generatePushId();
+      const employeeId = Fsi.generatePushId();
 
       const data = {
         employeeId,

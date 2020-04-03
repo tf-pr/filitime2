@@ -1,10 +1,13 @@
-import { Injectable, EventEmitter, Output } from '@angular/core';
+import { Injectable, EventEmitter, Output, NgZone } from '@angular/core';
 
-import { FsiService } from './fsi.service';
+import { Fsi } from './fsi.service';
 import { Observable, Subscription } from 'rxjs';
 import { Dpo } from './dpo';
 import { Helper, Project, Employee, Assignment } from '../helper';
 import { LoggerService } from './logger.service';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 
 @Injectable({
@@ -12,6 +15,8 @@ import { LoggerService } from './logger.service';
 })
 export class DbiService {
   public readonly dpo = new Dpo(this);
+  public readonly fsi: Fsi;
+  // public readonly weekViewAssiSubsTable: WeekViewAssiSubsTable;
 
   private isLoggedIn = false;
   private isLoggedInEmitter = new EventEmitter<boolean>();
@@ -165,12 +170,16 @@ export class DbiService {
     this.usersEmployeeEmitter.emit(this.usersEmployee);
   }
 
-  constructor(private fsi: FsiService,
-              private logger: LoggerService) {
+  constructor(private logger: LoggerService,
+              private angFireAuth: AngularFireAuth,
+              private angFirestore: AngularFirestore,
+              private angFireFunctions: AngularFireFunctions,
+              private zone: NgZone) {
+    this.fsi = new Fsi(this, angFireAuth, angFirestore, angFireFunctions, zone);
     logger.setDbi = this;
 
-    this.setIsLoggedInState = fsi.getIsLoggedInState();
-    fsi.loggedInStateChange.subscribe({
+    this.setIsLoggedInState = this.fsi.getIsLoggedInState();
+    this.fsi.loggedInStateChange.subscribe({
       next: async (value) => {
         if (!Helper.checkForValidBoolean(value)) {
           this.logger.logError(35134354);
@@ -191,8 +200,8 @@ export class DbiService {
       }
     });
 
-    this.setUsersEmployee = fsi.getUsersEmployee();
-    fsi.usersEmployeeChange.subscribe({
+    this.setUsersEmployee = this.fsi.getUsersEmployee();
+    this.fsi.usersEmployeeChange.subscribe({
       next: val => {
         this.setUsersEmployee = val;
       }
@@ -240,7 +249,7 @@ export class DbiService {
                          selfEdit: boolean) {
     return new Promise<any>((res, rej) => {
       const employee = new Employee(
-        FsiService.generatePushId(),
+        Fsi.generatePushId(),
         identifier,
         name,
         dept,

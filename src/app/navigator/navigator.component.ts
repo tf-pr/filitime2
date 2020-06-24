@@ -167,7 +167,7 @@ export class NavigatorComponent implements OnInit {
     this.dbi.logOut()
       .then(() => { this.loadingHandler.removeWaitCode(waitCode); })
       .catch(err => {
-        this.logger.logError(68343354, err);
+        this.logger.logError('68343354', err);
         this.loadingHandler.removeWaitCode(waitCode);
       });
   }

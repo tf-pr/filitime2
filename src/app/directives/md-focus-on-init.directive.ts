@@ -9,6 +9,5 @@ export class MdFocusOnInitDirective implements OnInit {
 
   ngOnInit() {
     this.element.nativeElement.focus();
-    // console.log('hi there');    // HIER was das?!
   }
 }

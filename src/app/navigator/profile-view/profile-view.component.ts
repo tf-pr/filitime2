@@ -21,20 +21,21 @@ export class ProfileViewComponent implements OnInit {
   public employeeDataGroup: string;
   public employeeDataGroupColor: string;
 
-
-
-
-
   public changeEMailClicked(arg0?: any, arg1?: any): any {
-    // HIER
+    console.log('4324', arg0);
+    console.log('8375', arg1);
+
+
   }
 
   public changePasswordClicked(arg0?: any, arg1?: any): any {
-    // HIER
+    console.log('6488', arg0);
+    console.log('7375', arg1);
   }
 
   public deleteUserClicked(arg0?: any, arg1?: any): any {
-    // HIER
+    console.log('8656', arg0);
+    console.log('7657', arg1);
   }
 
 

@@ -132,7 +132,7 @@ export class TesterService {
     this.customDelay(5000,
       () => {
         console.log('tester delay 5s');
-        this.printPublicDpoData();
+        // this.printPublicDpoData();
 
         // this.addLike100Emplyoees();
 
@@ -157,7 +157,7 @@ export class TesterService {
         //     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
         //   })
         //   .catch(err => {
-        //     console.error(err);
+        //     this.logger.logError('12749279', err);
         //   });
 
 
@@ -170,7 +170,7 @@ export class TesterService {
         //     console.log(JSON.stringify(accesses));
         //   })
         //   .catch(err => {
-        //     console.error(err);
+        //     this.logger.logError('09955955', err);
         //   });
 
 
@@ -1452,15 +1452,6 @@ export class TesterService {
     console.log('_____________________________');
     console.log('getProjectList');
     console.log(this.dbi.dpo.getProjectList());
-    console.log('_____________________________');
-    console.log('getTableCwIndexes');
-    console.log(this.dbi.dpo.getTableCwIndexes());
-    console.log('_____________________________');
-    console.log('getTableEmployeeIds');
-    console.log(this.dbi.dpo.getTableEmployeeIds());
-    console.log('_____________________________');
-    console.log('getTableSubs');
-    console.log(this.dbi.dpo.getTableSubs());
     console.log('_____________________________');
     console.log('_____________________________');
   }

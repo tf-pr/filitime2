@@ -8,6 +8,7 @@ import { moveItemInArray, CdkDropList } from '@angular/cdk/drag-drop';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { PlanboardSettings } from 'src/app/helper/planboardSettings';
 import { Fsi } from 'src/app/services/fsi.service';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -155,23 +156,22 @@ export class WeekViewService {
 
     const i = this.selectableEmployeeNames.indexOf(name);
     if (i === -1) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('63304778');
       return;
     }
 
     const empId = this.selectableEmployeeDocIds[i];
     const emp = this.selectableEmployees[i];
     if (!empId || !emp || emp.docId !== empId || emp.name !== name) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-      console.error('Oh shit!!!', { empId }); // HIER ...
+      this.logger.logError('78855358');
       return;
     }
 
     this.weekViewTable.addColumn();
-    // this.weekViewAssiSubsTable.addColumn();                        // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
-    // const columnCount = this.weekViewAssiSubsTable.columnCount;    // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
+    // this.weekViewAssiSubsTable.addColumn();
+    // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
+    // const columnCount = this.weekViewAssiSubsTable.columnCount;
+    // HIER weekViewAssiSubsTable mit FS connecten mit weekViewTable verbinden
 
     this.selectedEmployeeNames.push(name);
     this.selectedEmployeeDocIds.push(empId);
@@ -190,7 +190,7 @@ export class WeekViewService {
 
     const empId = this.selectedEmployeeDocIds[i];
     if (!empId) {
-      console.error('Oh shit!!!', { empId }); // HIER ...
+      this.logger.logError('06621584');
       return;
     }
 
@@ -198,8 +198,7 @@ export class WeekViewService {
     const removedDocId = this.selectedEmployeeDocIds.splice(i, 1)[0];
 
     if (removedName !== name || removedDocId !== empId) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('09181507');
     }
 
     this.weekViewTable.removeColumn(i);
@@ -210,17 +209,13 @@ export class WeekViewService {
     this.selectedEmployeeDocIdsEmitter.emit(this.selectedEmployeeDocIds.slice(0));
   }
 
-  constructor(private dbi: DbiService, private globalData: GlobalDataService) {
+  constructor(private dbi: DbiService, private globalData: GlobalDataService, private logger: LoggerService) {
     if (!this.cwCount)        { this.cwCount = 2; }
     if (!this.daysPerWorkday) { this.daysPerWorkday = 6; }
 
     const currEmployees = this.dbi.dpo.getEmployees();
-    console.log('currEmployees', currEmployees);
-
     const tempEmpNames = currEmployees.map(employee => employee.name);
     const tempEmpIds = currEmployees.map(employee => employee.docId);
-    console.log('names', tempEmpNames);
-    console.log('ids', tempEmpIds);
 
     this.selectableEmployees = currEmployees;
     this.selectableEmployeeNames = tempEmpNames;
@@ -242,8 +237,7 @@ export class WeekViewService {
       const i = this.selectableEmployeeDocIds.indexOf(rmEmpId);
 
       if (i === -1) {
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('83691416');
         return;
       }
 
@@ -260,8 +254,7 @@ export class WeekViewService {
       const empId = modEmp.docId;
       const i = this.selectableEmployeeDocIds.indexOf(empId);
       if (i === -1) {
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('31124996');
         return;
       }
 
@@ -315,11 +308,10 @@ export class WeekViewService {
         assi.markerColor,
         false)
         .then(val => {
-          console.log('DB says ok!!!!!!');
           res(afterDbSaysOK());
         })
         .catch(err => {
-          console.error('DB says,... and i qute: \'go fuckyourself\'');
+          this.logger.logError('32737424', err);
           rej(err);
         });
     });
@@ -350,8 +342,7 @@ export class WeekViewService {
     if (i === -1) { return undefined; }
     const name = this.selectedEmployeeNames[i];
     if (!name) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('63573393');
     }
     return name;
   }
@@ -381,8 +372,7 @@ export class WeekViewService {
       const newIndexDate = new Date(this.getIndexTS());
       Helper.subtractDaysOfDate(newIndexDate, 7);
       if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('84942376');
       }
 
       console.warn('this.weekViewTable.moveRowise(\'back\');', new Date());
@@ -399,8 +389,7 @@ export class WeekViewService {
       const newIndexDate = new Date(this.getIndexTS());
       Helper.addDaysToDate(newIndexDate, 7);
       if (newIndexDate.valueOf() !== Helper.getMondayTS(newIndexDate.valueOf())) {
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('25660148');
       }
 
       this.weekViewTable.moveRowise('forth')
@@ -466,8 +455,7 @@ export class WeekViewService {
       // dx and dy are delta between first assignment in dragList and dropped employee/day
     } else {
       // if (!this.selectedAssignmentTupleList[0]) {
-      //   // tslint:disable-next-line:no-debugger
-      //   debugger;
+      //         //   debugger;
       // }
 
       const ie = this.daIe;
@@ -524,8 +512,7 @@ export class WeekViewService {
       //       // this.undoAssignmentContainer.unshift([undoObj]);
       //       // this.redoAssignmentContainer = [];
       //     } else {
-      //       // tslint:disable-next-line:no-debugger
-      //       debugger;
+      //             //       debugger;
       //     }
 
       //     // this.setFirstStepAchievementAssignmentDropped(); HIER

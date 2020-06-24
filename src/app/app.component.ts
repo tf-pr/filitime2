@@ -3,7 +3,7 @@ import { DbiService } from './services/dbi.service';
 import { Helper } from './helper';
 import { LoadingHandlerService } from './services/loading-handler.service';
 import { GlobalDataService } from './services/global-data.service';
-import { TesterService } from './services/tester.service';
+// import { TesterService } from './services/tester.service';
 import { LoggerService } from './services/logger.service';
 
 @Component({
@@ -39,7 +39,7 @@ export class AppComponent {
     this.globalData.setDeviceScreenVar(target.innerWidth, target.innerHeight);
   }
 
-  constructor(private testerService: TesterService,
+  constructor(// private testerService: TesterService,
               private globalData: GlobalDataService,
               private dbi: DbiService,
               private logger: LoggerService,

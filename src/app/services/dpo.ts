@@ -2,6 +2,8 @@ import { EventEmitter } from '@angular/core';
 import { Project, Employee, Assignment, Helper } from '../helper';
 import { Observable, Subscription } from 'rxjs';
 import { DbiService } from './dbi.service';
+import { WeekViewAssiSubsTable } from '../navigator/planboard-view/week-view/week-view-assi-subs-table';
+import { LoggerService } from './logger.service';
 
 export class Dpo {
   private dbi: DbiService;
@@ -73,88 +75,94 @@ export class Dpo {
 
   //#region planboard weekView
 
-  private tableCwIndexes: number[] = [];
-  private tableEmployeeIds: string[] = [];
-  private tableSubs: Subscription[][];
+  private myWeekViewAssiSubsTable: WeekViewAssiSubsTable;
 
-  public getTableCwIndexes() {
-    return this.tableCwIndexes.slice(0);
+  public get weekViewAssiSubsTable(): WeekViewAssiSubsTable {
+    return this.myWeekViewAssiSubsTable;
   }
 
-  public getTableEmployeeIds() {
-    return this.tableEmployeeIds.slice(0);
+  public initWeekViewAssiSubsTable(column: number, row: number) {
+    this.myWeekViewAssiSubsTable = new WeekViewAssiSubsTable(column, row, this.logger);
   }
 
-  public getTableSubs() {
-    if (!this.tableSubs || this.tableSubs.length === 0) {
-      return ([] as Subscription[][]);
-    }
-    return this.tableSubs.slice(0);
-  }
+  // private tableCwIndexes: number[] = [];
+  // private tableEmployeeIds: string[] = [];
+  // private tableSubs: Subscription[][];
 
-  public addCwToTable( newCwIndex: number, newSubs: Subscription[] ): boolean {
-    if ( newSubs.length !== this.tableEmployeeIds.length ) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-      return false;
-    }
+  // public getTableCwIndexes() {
+  //   return this.tableCwIndexes.slice(0);
+  // }
 
-    const cwListWasEmpty = ( this.tableCwIndexes.length === 0 );
-    if (cwListWasEmpty) {
-      this.tableCwIndexes.push(newCwIndex);
-      this.tableSubs.push(newSubs.slice(0));
-      return true;
-    }
+  // public getTableEmployeeIds() {
+  //   return this.tableEmployeeIds.slice(0);
+  // }
 
-    const firstIndex = this.tableCwIndexes[0];
-    const lastIndex = this.tableCwIndexes[this.tableCwIndexes.length - 1];
+  // public getTableSubs() {
+  //   if (!this.tableSubs || this.tableSubs.length === 0) {
+  //     return ([] as Subscription[][]);
+  //   }
+  //   return this.tableSubs.slice(0);
+  // }
 
-    const tempDate1 = new Date(firstIndex);
-    const tempDate2 = new Date(lastIndex);
+  // public addCwToTable( newCwIndex: number, newSubs: Subscription[] ): boolean {
+  //   if ( newSubs.length !== this.tableEmployeeIds.length ) {
+  //       //     debugger;
+  //     return false;
+  //   }
 
-    Helper.subtractDaysOfDate(tempDate1, 7);
-    Helper.addDaysToDate(tempDate2, 7);
+  //   const cwListWasEmpty = ( this.tableCwIndexes.length === 0 );
+  //   if (cwListWasEmpty) {
+  //     this.tableCwIndexes.push(newCwIndex);
+  //     this.tableSubs.push(newSubs.slice(0));
+  //     return true;
+  //   }
 
-    const addBefore = newCwIndex !== tempDate1.valueOf();
-    const addAfter = newCwIndex !== tempDate2.valueOf();
+  //   const firstIndex = this.tableCwIndexes[0];
+  //   const lastIndex = this.tableCwIndexes[this.tableCwIndexes.length - 1];
 
-    if (addAfter) {
-      this.tableCwIndexes.push(newCwIndex);
-      this.tableSubs.push(newSubs.slice(0));
-      return true;
-    }
-    if (addBefore) {
-      this.tableCwIndexes.unshift(newCwIndex);
-      this.tableSubs.unshift(newSubs.slice(0));
-      return true;
-    }
+  //   const tempDate1 = new Date(firstIndex);
+  //   const tempDate2 = new Date(lastIndex);
 
-    // tslint:disable-next-line:no-debugger
-    debugger;
-    return false;
-  }
+  //   Helper.subtractDaysOfDate(tempDate1, 7);
+  //   Helper.addDaysToDate(tempDate2, 7);
 
-  public addEmployeeToTable( newEmployeeId: string, newSubs: Subscription[] ): boolean {
-    if ( newSubs.length !== this.tableCwIndexes.length ) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-      return false;
-    }
+  //   const addBefore = newCwIndex !== tempDate1.valueOf();
+  //   const addAfter = newCwIndex !== tempDate2.valueOf();
 
-    if (this.tableEmployeeIds.indexOf(newEmployeeId) !== -1) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
-      return;
-    }
+  //   if (addAfter) {
+  //     this.tableCwIndexes.push(newCwIndex);
+  //     this.tableSubs.push(newSubs.slice(0));
+  //     return true;
+  //   }
+  //   if (addBefore) {
+  //     this.tableCwIndexes.unshift(newCwIndex);
+  //     this.tableSubs.unshift(newSubs.slice(0));
+  //     return true;
+  //   }
 
-    this.tableEmployeeIds.push(newEmployeeId);
-    this.tableSubs.push(newSubs.slice(0));
-    return true;
-  }
+  //     //   debugger;
+  //   return false;
+  // }
+
+  // public addEmployeeToTable( newEmployeeId: string, newSubs: Subscription[] ): boolean {
+  //   if ( newSubs.length !== this.tableCwIndexes.length ) {
+  //       //     debugger;
+  //     return false;
+  //   }
+
+  //   if (this.tableEmployeeIds.indexOf(newEmployeeId) !== -1) {
+  //       //     debugger;
+  //     return;
+  //   }
+
+  //   this.tableEmployeeIds.push(newEmployeeId);
+  //   this.tableSubs.push(newSubs.slice(0));
+  //   return true;
+  // }
 
   //#endregion
 
-  constructor(parent: DbiService) {
+  constructor(parent: DbiService, private logger: LoggerService) {
     this.dbi = parent;
   }
 
@@ -296,11 +304,11 @@ export class Dpo {
     let i = this.projectIdList.indexOf(projDocId);
     console.log({i});
     if (i === -1) {
-      console.warn('Warning: 46116986');
+      this.logger.logError('46116986');
       this.buildProjectIdList();
       i = this.projectIdList.indexOf(projDocId);
       if (i === -1) {
-        console.error('Error: 16438565');
+        this.logger.logError('16438565');
         return;
       }
     }
@@ -364,7 +372,8 @@ export class Dpo {
   public startSyncEmployee(employeeId: string, employeeSub: Subscription) {
     const i = this.getEmployeeIdsOfEmployeeSubs().indexOf(employeeId);
     if (i !== -1) {
-      console.error('U RLY WANNA DOUBLE SYNC THE SAME EMPLOYEE?! ... GO FU SOAB!!');
+      this.logger.logError('32737424');
+      // U RLY WANNA DOUBLE SYNC THE SAME EMPLOYEE?! ... GO FU SOAB!!
       return;
     }
     this.employeeSubs.push([employeeId, employeeSub]);
@@ -373,7 +382,8 @@ export class Dpo {
   public stopSyncEmployee(employeeId) {
     const i = this.getEmployeeIdsOfEmployeeSubs().indexOf(employeeId);
     if (i === -1) {
-      console.error('U RLY WANNA UNSYNC AN EMPLOYEE NOT BEEING LISTED?! ... GO FU SOAB!!');
+      // U RLY WANNA UNSYNC AN EMPLOYEE NOT BEEING LISTED?! ... GO FU SOAB!!
+      this.logger.logError('87450389');
       return;
     }
     const empSubTuple = this.employeeSubs.splice(i, 1)[0];
@@ -406,15 +416,16 @@ export class Dpo {
   public modifyEmployeeAccess(access: [string, boolean]) {
     const i = this.usersEmployeeAccessesEmpIds.indexOf(access[0]);
     if (i === -1) {
-      console.error('DUDE!!! WTF IS THIS?!?!?');
+      this.logger.logError('05957974');
       return;
     }
 
     if (this.usersEmployeeAccesses[i][0] !== access[0]) {
-      console.error('WOW U STUPID FUCK MANAGED TO FUCK UP THE IDS! WOW! GJ!');
-      console.error('1: ' + JSON.stringify(this.usersEmployeeAccessesEmpIds));
-      console.error('2: ' + JSON.stringify(this.usersEmployeeAccesses));
-      console.error('NOW LOOK AT 1 AND 2 AND THAN GO FUCK YOURSELF!');
+      this.logger.logError('98306262');
+      // ('WOW U STUPID FUCK MANAGED TO FUCK UP THE IDS! WOW! GJ!');
+      // ('1: ' + JSON.stringify(this.usersEmployeeAccessesEmpIds));
+      // ('2: ' + JSON.stringify(this.usersEmployeeAccesses));
+      // ('NOW LOOK AT 1 AND 2 AND THAN GO FUCK YOURSELF!');
       return;
     }
 
@@ -483,11 +494,11 @@ export class Dpo {
     let i = this.employeeIds.indexOf(employeeId);
     console.log({ i });
     if (i === -1) {
-      console.warn('Warning: 78398218');
+      this.logger.logError('78398218');
       this.buildEmployeeIds();
       i = this.employeeIds.indexOf(employeeId);
       if (i === -1) {
-        console.error('Error: 85614532');
+        this.logger.logError('85614532');
         return;
       }
     }

@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute, } from '@angular/router';
 import { Location } from '@angular/common';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { Project, Helper } from 'src/app/helper';
@@ -441,14 +441,15 @@ export class ProjectViewComponent implements OnInit {
 
     dialog.afterClosed().subscribe(result => {
       if (!result) {
-        console.warn('Ok ciao...');
         return;
       }
-      console.log( 'pls add this to the db... ok... thx' );
       console.log(result);
       const projIdentifier = result[Project.identifierKeyStr];
       const projName = result[Project.nameKeyStr];
-      const projDuration = result[Project.durationKeyStr];
+      const projDuration =
+        (result[Project.projDurationDayKeyStr] * 8 +
+          result[Project.projDurationHourKeyStr]) * 60 +
+        result[Project.projDurationMinKeyStr];
       const projEndless = result[Project.endlessKeyStr];
       const projColor = result[Project.colorKeyStr];
       const projMarker = result[Project.markerKeyStr];
@@ -458,6 +459,7 @@ export class ProjectViewComponent implements OnInit {
       const projFolder = result[Project.folderKeyStr];
 
       if (!projName || !projIdentifier || ( !projDuration && !projEndless ) ) {
+        // HIER Error PLS ... thx...
         return;
       }
 
@@ -465,7 +467,7 @@ export class ProjectViewComponent implements OnInit {
                              projMarkerColor, projNote, projReserved, projFolder)
         .then(() => { console.warn('throw a toast'); })
         .catch(err => {
-          this.logger.logError(31436414, err);
+          this.logger.logError('31436414', err);
           console.warn('throw a toast');
         });
     });
@@ -481,7 +483,6 @@ export class ProjectViewComponent implements OnInit {
 
     dialog.afterClosed().subscribe(result => {
       if (!result) {
-        console.warn('Ok ciao...');
         return;
       }
 
@@ -491,8 +492,7 @@ export class ProjectViewComponent implements OnInit {
 
   public pcDragStarted(e: { source: CdkDrag }, project: Project) {
     if ( !e || !e.source || !e.source.dropContainer ) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('68823906');
       return;
     }
     e.source.data = 'project';
@@ -508,7 +508,10 @@ export class ProjectViewComponent implements OnInit {
 export class CreateProjectDialogComponent {
   public projIdentifierKeyStr = Project.identifierKeyStr;
   public projNameKeyStr = Project.nameKeyStr;
-  public projDurationKeyStr = Project.durationKeyStr;
+  // public projDurationKeyStr = Project.durationKeyStr;
+  public projDurationDayKeyStr = Project.projDurationDayKeyStr;
+  public projDurationHourKeyStr = Project.projDurationHourKeyStr;
+  public projDurationMinKeyStr = Project.projDurationMinKeyStr;
   public projEndlessKeyStr = Project.endlessKeyStr;
   public projColorKeyStr = Project.colorKeyStr;
   public projMarkerKeyStr = Project.markerKeyStr;
@@ -522,13 +525,19 @@ export class CreateProjectDialogComponent {
     data[this.projNameKeyStr] = '';
     data[this.projIdentifierKeyStr] = '';
     data[this.projEndlessKeyStr] = false;
-    data[this.projDurationKeyStr] = undefined;
+    data[this.projDurationDayKeyStr] = 0;
+    data[this.projDurationHourKeyStr] = 0;
+    data[this.projDurationMinKeyStr] = 0;
     data[this.projColorKeyStr] = '#ff0000';
     data[this.projMarkerKeyStr] = '';
-    data[this.projMarkerColorKeyStr] = '#00ff00';
+    data[this.projMarkerColorKeyStr] = '';
     data[this.projNoteKeyStr] = '';
     data[this.projReservedKeyStr] = false;
     data[this.projFolderKeyStr] = '';
+  }
+
+  public gRandomProjIdentifier() {
+    this.data[this.projIdentifierKeyStr] = Project.randomIdentifier();
   }
 
   onNoClick(): void {

@@ -1,4 +1,5 @@
 import { Subscription } from 'rxjs';
+import { LoggerService } from 'src/app/services/logger.service';
 
 export class WeekViewAssiSubsTable {
   public table: Subscription[][][] = [];
@@ -15,15 +16,11 @@ export class WeekViewAssiSubsTable {
     return this.columnTemplate.length;
   }
 
-  constructor(column: number, row: number) {
+  constructor(column: number, row: number, private logger: LoggerService) {
     this.initColumnTemplate(row);
     this.initTable(column);
 
-    // tslint:disable-next-line:no-console
-    console.time('fillColumnRowPool');  // HIER
     this.fillColumnRowPool(200).then(() => {
-      // tslint:disable-next-line:no-console
-      console.timeEnd('fillColumnRowPool');  // HIER
     });
   }
 
@@ -192,8 +189,7 @@ export class WeekViewAssiSubsTable {
   private clearAndPoolColumnRow(columnRow: Subscription[]): Promise<any> {
     return new Promise<any>((res) => {
       if (columnRow.length !== 7) {
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('09955955');
       }
       let cleanCount = 0;
       columnRow.forEach(assiDaySub => {

@@ -225,14 +225,14 @@ export class LoginComponent implements OnInit {
       .then(succes => {
         this.loadingHandler.removeWaitCode(waitCode);
         if (!succes) {
-          this.logger.logError(89354343);
+          this.logger.logError('89354343');
           return;
         }
         this.formGroupLogin = undefined;
       })
       .catch(err => {
         const detail: string = err;
-        this.logger.logError(43546853, detail);
+        this.logger.logError('43546853', detail);
         this.logInErrorMsg = detail;
         this.loadingHandler.removeWaitCode(waitCode);
       });

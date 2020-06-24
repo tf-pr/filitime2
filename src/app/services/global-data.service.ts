@@ -2,6 +2,8 @@ import { Injectable, EventEmitter, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Helper } from '../helper';
 import { PlanboardSettings } from '../helper/planboardSettings';
+import { DbiService } from './dbi.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -89,7 +91,9 @@ export class GlobalDataService {
 
   // tslint:enable:member-ordering
 
-  constructor() {
+  constructor(private logger: LoggerService) {
+    console.log('AppVersion: ' + this.appVersion);
+
     this.setDeviceScreenVar(window.innerWidth, window.innerHeight);
 
     this.setIsOffline = !(navigator.onLine.valueOf());
@@ -103,11 +107,11 @@ export class GlobalDataService {
 
     if (!widthValid || !heightValid) {
       if (!widthValid) {
-        console.error('Error: 35465312');
+        this.logger.logError('35465312');
       }
 
       if (!heightValid) {
-        console.error('Error: 43653476');
+        this.logger.logError('43653476');
       }
       return;
     }

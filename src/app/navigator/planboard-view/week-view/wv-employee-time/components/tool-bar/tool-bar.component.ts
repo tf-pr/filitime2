@@ -2,6 +2,7 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { WeekViewService } from '../../../week-view.service';
 import { Helper } from 'src/app/helper';
 import { Observable } from 'rxjs';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-tool-bar',
@@ -22,15 +23,14 @@ export class ToolBarComponent implements OnInit {
 
   selectableEmployees = this.wvs.getSelectableEmployeeNames();
 
-  constructor(private wvs: WeekViewService) {
+  constructor(private wvs: WeekViewService, private logger: LoggerService) {
     this.wvs.selectableEmployeeNameAdd.subscribe({
       next: val => {
         const empName: string = val[0];
         const empId: string = val[1];
 
         if (!empName || !empId) {
-          // tslint:disable-next-line:no-debugger
-          debugger;
+          this.logger.logError('05254389');
           return;
         }
 

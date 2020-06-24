@@ -8,6 +8,7 @@ import { Timestamp } from '@firebase/firestore-types';
 import * as firebase from 'firebase/app';
 import { async } from 'q';
 import { DbiService } from './dbi.service';
+import { LoggerService } from './logger.service';
 
 export class Fsi {
   private readonly dbi: DbiService;
@@ -94,7 +95,7 @@ export class Fsi {
         projectDbObj[Project.useNameKeyStr],
       );
     } catch (error) {
-      console.error('Error: 35468453' + ' | ' + error);
+      // this.logError('35468453', error);
       returnValue = undefined;
     }
 
@@ -123,7 +124,7 @@ export class Fsi {
         employeeDbObj[Employee.editNameKeyStr]
       );
     } catch (error) {
-      console.error('Error: 45165445' + ' | ' + error);
+      // this.logger.logError('45165445', error);
       returnValue = undefined;
     }
 
@@ -212,7 +213,8 @@ export class Fsi {
               angFireAuth: AngularFireAuth,
               angFirestore: AngularFirestore,
               angFireFunctions: AngularFireFunctions,
-              zone: NgZone) {
+              zone: NgZone,
+              private logger: LoggerService) {
     this.dbi = parent;
     this.angFireAuth = angFireAuth;
     this.angFirestore = angFirestore;
@@ -220,7 +222,6 @@ export class Fsi {
     this.zone = zone;
 
     angFireAuth.auth.onAuthStateChanged(user => {
-      console.log(user);
       if (!!user) {
         this.zone.run(() => {
           this.usersUserId = user.uid;
@@ -234,7 +235,7 @@ export class Fsi {
               });
             })
             .catch(err => {
-              console.error('Error: 16473834' + ' | ' + err);
+              this.logger.logError('16473834', err);
               this.setIsLoggedInState = false;
             });
         });
@@ -264,7 +265,7 @@ export class Fsi {
           const employeeId = userDocData[this.userDocEmployeeIdKeyStr];
 
           if ( !clientId || !employeeId ) {
-            console.error('FATALERROR:438');
+            this.logger.logError('FATALERROR:438');
             rej('userdoc data invalid');
             return;
           }
@@ -277,7 +278,7 @@ export class Fsi {
           res();
         })
         .catch(err => {
-          console.error('Error: 14647313');
+          this.logger.logError('14647313', err);
           rej(err);
         });
     });
@@ -291,26 +292,25 @@ export class Fsi {
     //   next: docData => {
     //     const employee = FsiService.convertDBObjToEmployee(docData);
     //     if ( !employee ) {
-    //       console.error('Error: 74544149');
+    //       this.logger.logError('74544149');
     //     }
     //     this.setUsersEmployee = employee;
     //     this.setUsersEmployeeName = this.usersEmployee.name;
     //   }
     // });
 
-    console.log('PLS GIVE ME ' + usersEmployeePath);
     this.usersEmployeeSub = this.syncDocValueChangesFromDbAtDocPath(
       usersEmployeePath,
       docData => {
         const employee = Fsi.convertDBObjToEmployee(docData);
         if ( !employee ) {
-          console.error('Error: 74544149');
+          this.logError(74544149);
         }
         this.setUsersEmployee = employee;
         this.setUsersEmployeeName = this.usersEmployee.name;
       },
       err => {
-        console.error('Error: 42864475' + ' | ' + err);
+        this.logger.logError('42864475', err);
       });
   }
 
@@ -336,7 +336,7 @@ export class Fsi {
           // const isAdmin = !(val[this.usersUserId]);
           const isAdmin = !!val;
 
-          if (!isAdmin) { console.error('Error 97567363'); }
+          if (!isAdmin) { this.logger.logError('97567363'); }
 
           this.userIsAdmin = isAdmin;
           res(isAdmin);
@@ -484,7 +484,7 @@ export class Fsi {
         this.addDocToDbAtDocPath(projDocPath, dataObj)
           .then(() => { res(); })
           .catch(err => {
-            console.error('Error: 46534135' + ' | ' + err);
+            this.logger.logError('22574811');
             rej(err);
           });
       });
@@ -549,7 +549,7 @@ export class Fsi {
         this.updateDocInDbAtDocPath(projDocPath, dataObj)
           .then(() => { res(); })
           .catch(err => {
-            console.error('Error: 46534135' + ' | ' + err);
+            this.logger.logError('46534135', err);
             rej(err);
           });
       });
@@ -570,7 +570,7 @@ export class Fsi {
           snapList.docs.forEach(doc => {
             const temp = Fsi.convertDBObjToProject(doc.data());
             if ( !temp ) {
-              console.error('Error: 73458658' + ' | invalid projectdata: ' + doc.data());
+              this.logger.logError('73458658', 'invalid projectdata: ' + doc.data());
               return; // continue foreach
             }
             projectList.push(temp);
@@ -578,7 +578,7 @@ export class Fsi {
           res(projectList);
         })
         .catch(err => {
-          console.error('Error: 41354354' + ' | ' + err);
+          this.logger.logError('41354354', err);
           rej(err);
         });
     });
@@ -609,7 +609,7 @@ export class Fsi {
         addedCB(projList);
       },
       error: err => {
-        console.error('Error: 54635163' + ' | ' + err);
+        this.logger.logError('54635163', err);
       }
     });
 
@@ -626,7 +626,7 @@ export class Fsi {
         modifiedCB(projList);
       },
       error: err => {
-        console.error('Error: 13541653' + ' | ' + err);
+        this.logger.logError('13541653', err);
       }
     });
 
@@ -643,7 +643,7 @@ export class Fsi {
         removedCB(projList);
       },
       error: err => {
-        console.error('Error: 65453641' + ' | ' + err);
+        this.logger.logError('65453641', err);
       }
     });
 
@@ -664,7 +664,7 @@ export class Fsi {
           dataList.forEach(data => {
             const temp = Fsi.convertDBObjToEmployee(data);
             if (!temp) {
-              console.error('Error: 41321645');
+              this.logger.logError('41321645');
               return; // continue foreach
             }
             returnValue.push(temp);
@@ -672,7 +672,7 @@ export class Fsi {
           res(returnValue);
         })
         .catch(err => {
-          console.error('Error: 78467359');
+          this.logger.logError('78467359', err);
           rej(err);
         });
     });
@@ -695,7 +695,7 @@ export class Fsi {
         addedCB(empList);
       },
       err => {
-        console.error('Error: 69527761' + ' | ' + err);
+        this.logger.logError('69527761', err);
       },
       'added',
       true);
@@ -712,7 +712,7 @@ export class Fsi {
         modifiedCB(empList);
       },
       err => {
-        console.error('Error: 76346751' + ' | ' + err);
+        this.logger.logError('76346751', err);
       },
       'modified',
       true);
@@ -729,7 +729,7 @@ export class Fsi {
         removedCB(empList);
       },
       err => {
-        console.error('Error: 75754761' + ' | ' + err);
+        this.logger.logError('75754761', err);
       },
       'removed',
       true);
@@ -746,14 +746,14 @@ export class Fsi {
             const employee = Fsi.convertDBObjToEmployee(data);
             if (!employee) {
               const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
-              console.error('Error: 94565612' + ' | ' + errMsg);
+              this.logger.logError('94565612', errMsg);
               rej(errMsg);
               return;
             }
             res(employee);
         })
         .catch(err => {
-          console.error('Error: 78467359');
+          this.logger.logError('78467359');
           rej(err);
         });
     });
@@ -769,7 +769,7 @@ export class Fsi {
         const employee = Fsi.convertDBObjToEmployee(data);
         if (!employee) {
           const errMsg = 'employeeData invalid: ' + JSON.stringify(data);
-          console.error('Error: 43148673' + ' | ' + errMsg);
+          this.logger.logError('43148673', errMsg);
           errCB(errMsg);
           return;
         }
@@ -777,7 +777,7 @@ export class Fsi {
         cb(employee);
       },
       err => {
-        console.error('Error: 55568421');
+        this.logger.logError('55568421');
         errCB(err);
       });
     return sub;
@@ -816,7 +816,7 @@ export class Fsi {
         cb(accesses);
       },
       err => {
-        console.error('Error: 72851185');
+        this.logger.logError('72851185');
         errCB(err);
       }
     );
@@ -880,7 +880,7 @@ export class Fsi {
         res();
       })
       .catch(err => {
-        console.error('Was ist jetzt schon wieder los!?!?'); // HIER
+        this.logger.logError('26708961', err);
         rej(err);
       });
     });
@@ -951,7 +951,7 @@ export class Fsi {
       this.addDocToDbAtDocPath(projDocPath, dataObj)
         .then(() => { res(); })
         .catch(err => {
-          console.error('Error: 64163929' + ' | ' + err);
+          this.logger.logError('64163929', err);
           rej(err);
         });
     });
@@ -1026,7 +1026,7 @@ export class Fsi {
       this.updateDocInDbAtDocPath(projDocPath, dataObj)
         .then(() => { res(); })
         .catch(err => {
-          console.error('Error: 99089856' + ' | ' + err);
+          this.logger.logError('99089856', err);
           rej(err);
         });
     });
@@ -1046,7 +1046,7 @@ export class Fsi {
       this.deleteDocFromDbAtDocPath(projDocPath)
         .then(() => { res(); })
         .catch(err => {
-          console.error('Error: 45417576' + ' | ' + err);
+          this.logger.logError('45417576', err);
           rej(err);
         });
     });
@@ -1080,7 +1080,7 @@ export class Fsi {
       email = email.replace(/\s/g, ''); // delete whitespaces
 
       if (!Helper.emailFormatCheck(email)) {
-        console.error('Error: 67346271');
+        this.logger.logError('67346271');
         rej('email invalid');
         return;
       }
@@ -1105,8 +1105,7 @@ export class Fsi {
               });
           } else {
             this.setIsLoggedInState = false;
-            // tslint:disable-next-line:no-debugger
-            debugger;
+            this.logger.logError('30518059');
             rej('????');
           }
         })
@@ -1143,7 +1142,7 @@ export class Fsi {
         })
         .catch(err => {
           // isLoggedInState unchanged i guess?!
-          console.error('Error: 86435489');
+          this.logger.logError('86435489', err);
           rej();
         });
     });
@@ -1259,7 +1258,7 @@ export class Fsi {
           res(val.data());
         })
         .catch(err => {
-          console.error('Error: 87986431');
+          this.logger.logError('87986431', err);
           rej(err);
         });
     });
@@ -1272,7 +1271,7 @@ export class Fsi {
           res(val);
         })
         .catch(err => {
-          console.error('Error: 64465215');
+          this.logger.logError('64465215', err);
           rej(err);
         });
     });
@@ -1287,7 +1286,7 @@ export class Fsi {
       this.getColSnapFromDbAtColPath(colPath)
         .then(snaps => { if (snaps.size === 0) { cb([]); } })
         .catch(err => {
-          console.error( 'Error: 56676159' );
+          this.logger.logError('56676159', err);
           errCB(err);
         });
     }
@@ -1309,7 +1308,7 @@ export class Fsi {
       this.getColSnapFromDbAtColPath(colPath)
         .then(snaps => { if (snaps.size === 0) { cb([]); } })
         .catch(err => {
-          console.error( 'Error: 56733436' );
+          this.logger.logError('56733436');
           errCB(err);
         });
     }
@@ -1332,7 +1331,7 @@ export class Fsi {
       this.getColSnapFromDbAtColPath(colPath)
         .then(snaps => { if (snaps.size === 0) { cb([]); } })
         .catch(err => {
-          console.error( 'Error: 13984641' );
+          this.logger.logError('13984641');
           errCB(err);
         });
     }
@@ -1356,7 +1355,7 @@ export class Fsi {
           res(returnVal);
         })
         .catch(err => {
-          console.error('Error: 59415573');
+          this.logger.logError('59415573', err);
           rej(err);
         });
     });
@@ -1369,7 +1368,7 @@ export class Fsi {
           res(val);
         })
         .catch(err => {
-          console.error('Error: 84153773');
+          this.logger.logError('84153773', err);
           rej(err);
         });
     });
@@ -1383,7 +1382,7 @@ export class Fsi {
     return new Promise<boolean>((res, rej) => {
       const latestVersionCheckCF = this.angFireFunctions.functions.httpsCallable(this.latestVersionCheckCFKeyStr);
       if (!latestVersionCheckCF) {
-        console.error('FATALERROR:753');
+        this.logger.logError('FATALERROR:753');
         rej('server not available');
         return;
       }
@@ -1397,7 +1396,7 @@ export class Fsi {
   public logError(code: string|number, details?: string) {
     const data = {};
     const codeKeyStr = 'errCode';
-    data[codeKeyStr] = code + '';
+    data[codeKeyStr] = code as string;
 
     if (!!details) {
       const msgKeyStr = 'errMsg';
@@ -1407,17 +1406,17 @@ export class Fsi {
     const logErrorCF = this.angFireFunctions.functions.httpsCallable(this.logErrorCFKeyStr);
 
     if (!logErrorCF) {
-      console.error('FATALERROR:514');
+      this.logger.logError('FATALERROR:514');
       return;
     }
 
     logErrorCF(data)
       .then(res => {
         if (res.data === 200) { return; }
-        console.error('FATALERROR:978' + ' | ' + res.data);
+        this.logger.logError('FATALERROR:978' + ' | ' + res.data);
       })
       .catch(err => {
-        console.error('FATALERROR:379' + ' | ' + err);
+        this.logger.logError('FATALERROR:379' + ' | ' + err);
       });
   }
 
@@ -1435,17 +1434,17 @@ export class Fsi {
     const logInputsCF = this.angFireFunctions.functions.httpsCallable(this.logInputsCFKeyStr);
 
     if (!logInputsCF) {
-      console.error('FATALERROR:514');
+      this.logger.logError('FATALERROR:514');
       return;
     }
 
     logInputsCF(data)
       .then(res => {
         if (res.data === 200) { return; }
-        console.error('FATALERROR:464' + ' | ' + res.data);
+        this.logError('FATALERROR:464' + ' | ' + res.data);
       })
       .catch(err => {
-        console.error('FATALERROR:379' + ' | ' + err);
+        this.logError('FATALERROR:379' + ' | ' + err);
       });
   }
 
@@ -1453,7 +1452,7 @@ export class Fsi {
     return new Promise<any>((res, rej) => {
       const createClientCF = this.angFireFunctions.functions.httpsCallable(this.createClientCFKeyStr);
       if (!createClientCF) {
-        console.error('FATALERROR:344');
+        this.logError('FATALERROR:344');
         rej('server not available');
         return;
       }

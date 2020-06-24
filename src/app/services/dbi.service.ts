@@ -14,7 +14,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
   providedIn: 'root'
 })
 export class DbiService {
-  public readonly dpo = new Dpo(this);
+  public readonly dpo = new Dpo(this, this.logger);
   public readonly fsi: Fsi;
   // public readonly weekViewAssiSubsTable: WeekViewAssiSubsTable;
 
@@ -28,87 +28,7 @@ export class DbiService {
 
   //#region planboard weekView
 
-  public initTable() {
-    //
-  }
 
-  public addEmployeeToTable(employeeId: string) {
-    //
-  }
-
-  public removeEmployeeFromTable(employeeId: string) {
-    //
-  }
-
-  public addNextCwToTable(): Promise<void> {
-    return new Promise<void>((res, rej) => {
-      const tableCwIndexes = this.dpo.getTableCwIndexes();
-      const lastCwIndex = tableCwIndexes[tableCwIndexes.length - 1];
-      const newDate = new Date(lastCwIndex);
-      Helper.subtractDaysOfDate(newDate, 7);
-      const nextCwIndex = newDate.valueOf();
-
-      this.dpo.getTableEmployeeIds().forEach(eId => {
-        // this.startSyncEmployeeAssignmentsInCw(eId, nextCwIndex)
-        //   .then(tempSubs => {
-        //     const seccedded = this.dpo.addCwToTable(nextCwIndex, tempSubs);
-        //     if (seccedded === true) { res(); } else { rej(); }
-
-        //   })
-        //   .catch(err => {
-        //     rej();
-        //   });
-        // HIER hab das oben ausgeklammert.. kp was hier abgeht
-      });
-    });
-  }
-
-  public removeLastCwFromTable() {
-    //
-  }
-
-  public addPreviousCwToTable() {
-    //
-  }
-
-  public removeFirstCwToTable() {
-    //
-  }
-
-  public changeSingleAssignment(assignment: Assignment): Promise<any> {
-    return new Promise<any>(() => {
-      //
-    });
-  }
-
-  /*
-
-  // HIER    gehts spätestens am 13.03.2020 weiter
-
-  // tslint:disable-next-line:member-ordering
-  private wvInedexDate: Date;
-  public startSyncAssignmentWVTable( indexTS: number, employeeIds: string[] ) {
-    const newIndexDate = new Date(indexTS);
-    const oldIndexDate = this.wvInedexDate;
-
-    if (!this.wvInedexDate) {
-      this.wvInedexDate = newIndexDate;
-    } else if ( newIndexDate.getMonth() === oldIndexDate.getMonth() && newIndexDate.getFullYear() === oldIndexDate.getFullYear()  ) {
-      //  alles gut. immer noch im selben index monat => kein neuer preload
-      return;
-    }
-
-    this.stopSyncAssignmentWVTable();
-
-    this.
-
-  }
-
-  public stopSyncAssignmentWVTable() {
-    //
-  }
-
-  */
 
   //#endregion
 
@@ -121,7 +41,7 @@ export class DbiService {
     });
   }
 
-  public logError(code: string|number, details?: string) {
+  public logError(code: string, details?: string) {
     this.fsi.logError(code, details);
   }
 
@@ -175,14 +95,14 @@ export class DbiService {
               private angFirestore: AngularFirestore,
               private angFireFunctions: AngularFireFunctions,
               private zone: NgZone) {
-    this.fsi = new Fsi(this, angFireAuth, angFirestore, angFireFunctions, zone);
+    this.fsi = new Fsi(this, angFireAuth, angFirestore, angFireFunctions, zone, this.logger);
     logger.setDbi = this;
 
     this.setIsLoggedInState = this.fsi.getIsLoggedInState();
     this.fsi.loggedInStateChange.subscribe({
       next: async (value) => {
         if (!Helper.checkForValidBoolean(value)) {
-          this.logger.logError(35134354);
+          this.logError('35134354');
           return;
         }
 
@@ -196,7 +116,7 @@ export class DbiService {
         this.setIsLoggedInState = value;
       },
       error: err => {
-        this.logger.logError(46843546, err);
+        this.logError('46843546', err);
       }
     });
 
@@ -213,7 +133,7 @@ export class DbiService {
       this.fsi.logIn(email, pw)
         .then(value => { res(value); })
         .catch(err => {
-          this.logError(89466354, err);
+          this.logError('89466354', err);
           rej(err);
         });
     });
@@ -227,7 +147,7 @@ export class DbiService {
           res();
         })
         .catch(err => {
-          this.logError(94374963, err);
+          this.logError('94374963', err);
           rej(err);
         });
     });
@@ -291,7 +211,7 @@ export class DbiService {
                              markerColor, note, reserved, folder)
         .then(val => { res(); })
         .catch(err => {
-          this.logError(2354131352, err);
+          this.logError('2354131352', err);
           rej(err);
         });
     });
@@ -313,7 +233,7 @@ export class DbiService {
         projectColor, start, end, note, marker, markerColor, fixed)
         .then(val => { res(); })
         .catch(err => {
-          this.logError(6496531498, err);
+          this.logError('6496531498', err);
           rej(err);
         });
     });
@@ -336,7 +256,7 @@ export class DbiService {
         projectColor, start, end, note, marker, markerColor, fixed)
         .then(val => { res(); })
         .catch(err => {
-          this.logError(1462275567, err);
+          this.logError('1462275567', err);
           rej(err);
         });
     });
@@ -347,7 +267,7 @@ export class DbiService {
       this.fsi.removeSingleAssignmentFromDb(assignmentId)
         .then(val => { res(); })
         .catch(err => {
-          this.logError(4449611579, err);
+          this.logError('4449611579', err);
           rej(err);
         });
     });
@@ -420,7 +340,7 @@ export class DbiService {
 
       // check if users accesses are empty
       if (lolamk.length === 0) {
-        console.error('lolamk-Length is Zero!!!');
+        this.logError('33247575');
       }
     }
 
@@ -475,12 +395,10 @@ export class DbiService {
           const empSub = this.fsi.syncEmployee(
             access[0],
             employee => {
-              // console.error('DO SOMTHING WITH THIS!!!');
-              // console.warn(employee);
               this.dpo.addOrModifyEmployee(employee);
             },
             err => {
-              console.error('WTF IS THIS?!?!?');
+              this.logError('37259005', err);
             });
 
           this.dpo.startSyncEmployee(empId, empSub);
@@ -492,7 +410,7 @@ export class DbiService {
 
       },
       err => {
-        console.error('AHHHHHHH: ' + err);
+        this.logError('21543453', err);
       });
     this.dpo.startSyncUsersEmployeeAccesses(accessesSub);
 
@@ -531,7 +449,7 @@ export class DbiService {
         this.dpo.setUsersEmployeeAccesses( newAccesses );
       },
       err => {
-        console.error('FUFU: ' + err);
+        this.logError('68315204', err);
       });
     this.dpo.startSyncUsersEmployeeAccesses(accessesSub);
 

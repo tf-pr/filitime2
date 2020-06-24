@@ -80,7 +80,7 @@ export class Helper {
     }
 
     if (!!stringifyFailed) {
-      Helper.logger.logError(54635463);
+      // Helper.logger.logError(54635463); // HIER
       return undefined;
     }
 
@@ -93,7 +93,7 @@ export class Helper {
     }
 
     if (!!uriDecodingFailed) {
-      Helper.logger.logError(63543473);
+      // Helper.logger.logError(63543473); // HIER
       return undefined;
     }
 
@@ -106,7 +106,7 @@ export class Helper {
     try {
       decodedStr = decodeURIComponent(dataStr);
     } catch (error) {
-      Helper.logger.logError(89436435);
+      // Helper.logger.logError(89436435); // HIER
       uriDecodingFailed = true;
     }
 
@@ -119,7 +119,7 @@ export class Helper {
     try {
       paresedObj = JSON.parse(decodedStr);
     } catch (error) {
-      Helper.logger.logError(68354867);
+      // Helper.logger.logError(68354867); // HIER
       jsonParseingFailed = true;
     }
 
@@ -278,6 +278,20 @@ export class Helper {
     for (let i = 0; i < columnCount; i++) { table.push(clone(columnTemplate)); }
     return table;
   }
+
+  public static randomStringNumber(digitCount?: number): string {
+    if (!digitCount) {
+      digitCount = 6;
+    }
+
+    let returnValue = '';
+
+    for (let i = 0; i < digitCount; i++) {
+      returnValue += (Math.floor(Math.random() * 10));
+    }
+
+    return returnValue;
+  }
 }
 
 export class Project {
@@ -305,6 +319,10 @@ export class Project {
     public static readonly useTsKeyStr          = 'useTS';
     public static readonly useIdKeyStr          = 'useId';
     public static readonly useNameKeyStr        = 'useName';
+
+    public static projDurationDayKeyStr  = 'durationDay';
+    public static projDurationHourKeyStr = 'durationHour';
+    public static projDurationMinKeyStr  = 'durationMin';
 
     public docId: string;
     public identifier: string;
@@ -379,6 +397,10 @@ export class Project {
         this.useTS = useTS;
         this.useId = useId;
         this.useName = useName;
+    }
+
+    public static randomIdentifier() {
+      return Helper.randomStringNumber(8);
     }
 
     public static projectsAreEqual(project1: Project, project2: Project): boolean {

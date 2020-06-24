@@ -56,21 +56,19 @@ export class LoggerService {
 
     //#region errorLogger methodes
 
-    public logError(code: string | number, details?: string) {
+    public logError(code: string, details?: string) {
         let logMsg = 'Error: ' + code;
         if (!!details) { logMsg += ' | ' + details; }
         console.error(logMsg);
-
-        // HIER implement error buffer
     }
 
-    public logErrorASAP(code: string | number, details?: string) {
+    public logErrorASAP(code: string, details?: string) {
         let logMsg = 'Error: ' + code;
         if (!!details) { logMsg += ' | ' + details; }
         console.error(logMsg);
 
         // HIER wichtig für beta test => vor beta release umbedingt einklammern!
-        this.dbi.logError(code, details);
+        this.logError(code, details);
     }
 
     //#endregion

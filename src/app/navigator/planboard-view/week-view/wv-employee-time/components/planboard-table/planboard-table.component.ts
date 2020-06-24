@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, Output, EventEmitter, ViewChild, NgZo
 import { Assignment } from 'src/app/helper';
 import { WeekViewService } from '../../../week-view.service';
 import { CdkDropListGroup, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-planboard-table',
@@ -14,7 +15,7 @@ export class PlanboardTableComponent implements OnInit, AfterViewInit {
   public employeeNamesTD: string[] = [];
   public employeeDocIdsTD: string[] = [];
 
-  constructor(private wvs: WeekViewService) {
+  constructor(private wvs: WeekViewService, private logger: LoggerService) {
     this.employeeNamesTD = wvs.getSelectedEmployeeNames();
     this.employeeDocIdsTD = wvs.getSelectedEmployeeDocIds();
 
@@ -37,8 +38,7 @@ export class PlanboardTableComponent implements OnInit, AfterViewInit {
         const id = val[1];
 
         if ( name === undefined || !id === undefined ) {
-          // tslint:disable-next-line:no-debugger
-          debugger;
+          this.logger.logError('77257568');
           return;
         }
 
@@ -55,8 +55,7 @@ export class PlanboardTableComponent implements OnInit, AfterViewInit {
         const i = this.employeeDocIdsTD.indexOf(id);
 
         if ( i === -1 ) {
-          // tslint:disable-next-line:no-debugger
-          debugger;
+          this.logger.logError('05271779');
           return;
         }
 

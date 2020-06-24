@@ -236,7 +236,8 @@ export class EmployeeViewComponent implements OnInit {
             return;
           }
         }
-        console.error('CHANGING AN EMPLOYEE THAT IS UNKNOWN IS NOT PSOOIBLE'); // HIER
+        // CHANGING AN EMPLOYEE THAT IS UNKNOWN IS NOT PSOOIBLE
+        this.logger.logError('88377355');
       }
     });
 
@@ -383,7 +384,6 @@ export class EmployeeViewComponent implements OnInit {
 
     dialog.afterClosed().subscribe(result => {
       if (!result) {
-        console.warn('Ok ciao...');
         return;
       }
       console.log( 'pls add this to the db... ok... thx' );
@@ -413,7 +413,7 @@ export class EmployeeViewComponent implements OnInit {
           console.log('BENE!');
         })
         .catch(err => {
-          console.error('FUKEYOU: ' + err);
+          this.logger.logError('94885585', err);
         });
     //   this.dbi.addProjectToDB(projIdentifier, projName, projDuration, projEndless, projColor, projMarker,
     //                          projMarkerColor, projNote, projReserved, projFolder)

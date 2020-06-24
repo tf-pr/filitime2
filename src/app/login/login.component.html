@@ -31,7 +31,7 @@
                         <button mat-raised-button color="primary" type="submit" class="wideButton" [disabled]="!formGroupLogin.valid">Login</button>
                     </div>
                     <br>
-                    <a (click)="changeMode('resetPassword')">Password vergessen?</a>
+                    <a style="cursor: pointer;" (click)="changeMode('resetPassword')">Password vergessen?</a>
                 </form>
             </mat-card-content>
         </mat-card>
@@ -56,7 +56,7 @@
                         <button mat-raised-button color="primary" type="submit" class="wideButton"
                             [disabled]="!formGroupResetPW.valid">Passwort zurücksetzen</button>
                     </div>
-                    <br><a (click)="changeMode('login')">zurück</a>
+                    <br><a style="cursor: pointer;" (click)="changeMode('login')">zurück</a>
                 </form>
             </mat-card-content>
         </mat-card>
@@ -145,11 +145,11 @@
                     <img height="111px" src="../../assets/animatedLogo/label.png" alt="FiliTime Logo">
                 </div>
                 <h3 style="text-align: center">Fast geschafft!</h3>
-                <p style="text-align: center">Um den Einstieg n die Digitale Plantafel, zu erleichtern, empfehlen wir gleich hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
+                <p style="text-align: center">Um den Einstieg in die Digitale Plantafel zu erleichtern, empfehlen wir gleich hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
                 <div style="text-align: right">
                     <button mat-raised-button class="nextButton" (click)="startQuickStart()">weiter</button>
                 </div>
-                <br><a (click)="cancelQuickStart()">überspringen</a>
+                <br><a style="cursor: pointer;" (click)="cancelQuickStart()">überspringen</a>
             </mat-card-content>
         </mat-card>
 
@@ -176,7 +176,7 @@
                 <div style="text-align: right; margin-top: 30px;">
                     <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
                 </div>
-                <br><a (click)="cancelQuickStart()">überspringen</a>
+                <br><a style="cursor: pointer;" (click)="cancelQuickStart()">überspringen</a>
             </mat-card-content>
         </mat-card>
 
@@ -203,7 +203,7 @@
                 <div style="text-align: right; margin-top: 30px;">
                     <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
                 </div>
-                <br><a (click)="finishQuickStart()">überspringen</a>
+                <br><a style="cursor: pointer;" (click)="finishQuickStart()">überspringen</a>
             </mat-card-content>
         </mat-card>
 
@@ -263,13 +263,13 @@
             </mat-card-content>
         </mat-card>
 
-    </div>    
+    </div>
 </ng-container>
 <ng-container *ngIf="isMobile && isLandscape">
     <div class="loginViewBG">
         <p>Hi Landscape-Smartphone-User, Please log in!</p>
         <button mat-raised-button color="primary" (click)="loginClicked()">Login</button>
-    </div>  
+    </div>
 </ng-container>
 <ng-container *ngIf="isMobile && !isLandscape">
     <div class="loginViewBG">
@@ -277,7 +277,7 @@
             <span class="registerSideText">neu hier?</span><!-- HIER -->
             <button mat-raised-button color="primary" (click)="changeMode('register')">Registrieren</button>
         </div>
-    
+
         <div *ngIf="currMode == 'login'" class="formContainer" [style.animation]="showAni ? 'cardAni 1s' : 'unset'">
             <div class="filitimeLogo" [style.animation]="showAni ? 'logoAni 1s' : 'unset'">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -308,7 +308,7 @@
                 <a class="resetPwButton" (click)="changeMode('resetPassword')">Password vergessen?</a>
             </form>
         </div>
-    
+
         <div *ngIf="currMode == 'resetPassword'" class="formContainer">
             <div class="filitimeLogo" [style.animation]="showAni ? 'logoAni 1s' : 'unset'">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -332,7 +332,7 @@
                 <br><a (click)="changeMode('login')">zurück</a>
             </form>
         </div>
-    
+
         <div *ngIf="currMode == 'register'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -353,7 +353,7 @@
                 </div>
             </div>
         </div>
-    
+
         <div *ngIf="currMode == 'registerCompany'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -408,7 +408,7 @@
                 </div>
             </form>
         </div>
-    
+
         <div *ngIf="currMode == 'registerCompany2'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -416,16 +416,15 @@
             </div>
             <div class="form">
                 <h3 style="text-align: center">Fast geschafft!</h3>
-                <p style="text-align: center">Um den Einstieg n die Digitale Plantafel, zu erleichtern, empfehlen wir gleich
-                    hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
+                <p style="text-align: center">Um den Einstieg in die Digitale Plantafel zu erleichtern, empfehlen wir gleich hier die verplanenden Mitarbeiter anzulegen und die ersten Projekte zu erstellen.</p>
                 <div style="text-align: right">
                     <button mat-raised-button class="nextButton" (click)="startQuickStart()">weiter</button>
                 </div>
                 <br>
-                <a class="resetPwButton" (click)="cancelQuickStart()">überspringen</a>
+                <a class="resetPwButton" style="cursor: pointer;" (click)="cancelQuickStart()">überspringen</a>
             </div>
         </div>
-    
+
         <div *ngIf="currMode == 'registerCompany3'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -450,7 +449,7 @@
                     <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
                 </div>
                 <br>
-                <a class="form" (click)="cancelQuickStart()">überspringen</a>
+                <a class="form" style="cursor: pointer;" (click)="cancelQuickStart()">überspringen</a>
             </div>
         </div>
 
@@ -479,10 +478,10 @@
                     <button mat-raised-button class="nextButton" (click)="continueQuickStart()">weiter</button>
                 </div>
                 <br>
-                <a class="form" (click)="finishQuickStart()">überspringen</a>
+                <a class="form" style="cursor: pointer;" (click)="finishQuickStart()">überspringen</a>
             </div>
         </div>
-    
+
         <div *ngIf="currMode == 'registerEmployee'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -503,7 +502,7 @@
                 </div>
             </form>
         </div>
-    
+
         <div *ngIf="currMode == 'registerEmployee2'" class="formContainer">
             <div class="filitimeLogo">
                 <img height="111px" src="../../assets/animatedLogo/logo.png" alt="FiliTime Logo">
@@ -531,8 +530,7 @@
                                     </div> -->
                 <div class="form-element">
                     <button mat-raised-button class="backButton" (click)="changeMode('registerEmployee')">zurück</button>
-                    <button mat-raised-button type="submit" style="float: right;"
-                        class="nextButton">weiter</button>
+                    <button mat-raised-button type="submit" style="float: right;" class="nextButton">weiter</button>
                 </div>
             </form>
         </div>

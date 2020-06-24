@@ -8,31 +8,44 @@
     <input matInput placeholder="Kennziffer" [(ngModel)]="data[projIdentifierKeyStr]" [required]="true">
     <mat-error>Bitte geben Sie eine Kennziffer an</mat-error>
   </mat-form-field>
+  <button mat-icon-button color="primary" (click)="gRandomProjIdentifier()" aria-label="Zufallskennziffer erzeugen">
+    <mat-icon>shuffle</mat-icon>
+  </button>
+  <div>
+  </div>
   <mat-form-field style="display: block">
     <input matInput placeholder="Ordner" [(ngModel)]="data[projFolderKeyStr]">
   </mat-form-field>
-  <mat-checkbox [(ngModel)]="data[projEndlessKeyStr]">
-    <span style="font-weight: normal">Bearbeitungsdauer unbegrenzt</span>
-  </mat-checkbox>
   <h3>Dauer</h3>
-  <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Tage (8 Stunden)" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
-    <mat-error>Bitte geben Sie eine Dauer an</mat-error>
-  </mat-form-field>
-  <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Stunden" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
-    <mat-error>Bitte geben Sie eine Dauer an</mat-error>
-  </mat-form-field>
-  <mat-form-field style="display: block">
-    <input matInput type="number" placeholder="Minuten" [(ngModel)]="data[projDurationKeyStr]" [required]="true">
-    <mat-error>Bitte geben Sie eine Dauer an</mat-error>
-  </mat-form-field>
+  <mat-checkbox [(ngModel)]="data[projEndlessKeyStr]">
+    <span style="font-weight: normal">unbegrenzt</span>
+  </mat-checkbox>
+  <ng-container *ngIf="!data[projEndlessKeyStr]">
+    <mat-form-field style="display: block">
+      <input matInput type="number" placeholder="Tage (8 Stunden)" [(ngModel)]="data[projDurationDayKeyStr]"
+        [required]="true">
+      <mat-error>Bitte geben Sie eine Dauer an</mat-error>
+    </mat-form-field>
+    <mat-form-field style="display: block">
+      <input matInput type="number" placeholder="Stunden" [(ngModel)]="data[projDurationHourKeyStr]" [required]="true">
+      <mat-error>Bitte geben Sie eine Dauer an</mat-error>
+    </mat-form-field>
+    <mat-form-field style="display: block">
+      <input matInput type="number" placeholder="Minuten" [(ngModel)]="data[projDurationMinKeyStr]" [required]="true">
+      <mat-error>Bitte geben Sie eine Dauer an</mat-error>
+    </mat-form-field>
+  </ng-container>
   <h3>Farbe</h3>
   <p-colorPicker [(ngModel)]="data[projColorKeyStr]"></p-colorPicker>
   <mat-form-field style="display: block">
      <!-- HIER später matAutocomplete -->
     <input matInput placeholder="Kategorie" [(ngModel)]="data[projMarkerKeyStr]">
   </mat-form-field>
+  <h3>Kategoriefarbe</h3>
+  <mat-checkbox [(ngModel)]="data[projReservedKeyStr]">
+    <span style="font-weight: normal">unter Vorbehalt</span>
+  </mat-checkbox>
+  <p-colorPicker [(ngModel)]="data[projMarkerColorKeyStr]"></p-colorPicker>
   <!-- <span>Kategoriefarbe</span><p-colorPicker [(ngModel)]="data[projMarkerColorKeyStr]"></p-colorPicker> -->
   <mat-form-field style="display: block">
     <!-- <input matInput placeholder="Notiz" [(ngModel)]="data[projNoteKeyStr]"> -->
@@ -46,6 +59,6 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abbrechen</button>
   <button mat-button
-    [disabled]="!data[projNameKeyStr] || !data[projIdentifierKeyStr] || (!data[projDurationKeyStr] && !data[projEndlessKeyStr])"
+    [disabled]="!data[projNameKeyStr] || !data[projIdentifierKeyStr] || ( !data[projEndlessKeyStr] && ( !data[projDurationDayKeyStr] && !data[projDurationHourKeyStr] && !data[projDurationHourKeyStr] ))"
     [mat-dialog-close]="data">Ok</button>
 </div>

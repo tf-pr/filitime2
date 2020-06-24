@@ -3,6 +3,8 @@ import { Assignment, Helper } from 'src/app/helper';
 import { WeekViewService } from '../../../week-view.service';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { CdkDropList, CdkDrag, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DbiService } from 'src/app/services/dbi.service';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-employee-column',
@@ -22,14 +24,11 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
   private dayCount = 6;
   public stupidArray: any[] = []; // HIER rename
   private weekAssignmentTemplate: Assignment[][];
-
   public assignmentTable: Assignment[][][];
-
   private employeeDayDropRefList: CdkDropList[] = [];
-
   public employeeDayColors: string[] = [];
 
-  constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
+  constructor(private wvs: WeekViewService, private globalData: GlobalDataService, private logger: LoggerService) {
     this.cwCount = this.wvs.getCwCount();
     this.indexTS = this.wvs.getIndexTS();
 
@@ -101,7 +100,7 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
     const newIndexTS = Helper.getMondayTS(this.indexTS);
 
     if (!newIndexTS) {
-      console.error('bzzzzzzzzzzzzzzz');
+      this.logger.logError('56999202');
       return;
     }
 
@@ -128,8 +127,7 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
     const i = this.wvs.getSelectedEmployeeDocIds().indexOf( this.employeeDocId );
 
     if (i === -1) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('54719053');
       return;
     }
 
@@ -170,8 +168,7 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
 
   public acDragStarted(e: {source: CdkDrag}, cwI: number, dI: number, aI: number) {
     if ( !e || !e.source || !e.source.dropContainer ) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('23926918');
       return;
     }
 
@@ -183,8 +180,7 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
   public employeeDayDropped(event: CdkDragDrop<any>, cwI: number, dI: number) {
     console.log('employeeDayDropped');
     if (!event || !event.item || !event.item.data) {
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('89124712');
       return;
     }
 
@@ -213,20 +209,16 @@ export class EmployeeColumnComponent implements OnInit, AfterViewInit, OnDestroy
     const dataStr = drag.data as string;
     console.log(2);
     if (!dataStr) {
-      // tslint:disable-next-line:no-debugger
       console.log(3);
-      // tslint:disable-next-line:no-debugger
-      debugger;
+      this.logger.logError('70240034');
       return false;
     }
     if (this.wvs.getCurrEditMode() === 'markEmployeeDays') {
       console.log(4);
       const dataArr = dataStr.split('_');
       if (!dataArr || dataArr.length !== 2) {
-        // tslint:disable-next-line:no-debugger
         console.log(5);
-        // tslint:disable-next-line:no-debugger
-        debugger;
+        this.logger.logError('99922348');
         return false;
       }
 

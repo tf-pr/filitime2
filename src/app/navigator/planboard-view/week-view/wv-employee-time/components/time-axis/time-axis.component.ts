@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WeekViewService } from '../../../week-view.service';
 import { Helper } from 'src/app/helper';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-time-axis',
@@ -18,7 +19,7 @@ export class TimeAxisComponent implements OnInit {
   public dayContainer: string[][] = [];
   public dateContainer: string[][] = [];
 
-  constructor(private wvs: WeekViewService) {
+  constructor(private wvs: WeekViewService, private logger: LoggerService) {
     this.indexTS = wvs.getIndexTS();
     this.cwCount = wvs.getCwCount();
     this.dayCount = wvs.getDaysPerWorkday();
@@ -63,7 +64,7 @@ export class TimeAxisComponent implements OnInit {
     const newIndexTS = Helper.getMondayTS(this.indexTS);
 
     if (!newIndexTS) {
-      console.error('bzzzzzzzzzzzzzzz');
+      this.logger.logError('56999202');
       return;
     }
 

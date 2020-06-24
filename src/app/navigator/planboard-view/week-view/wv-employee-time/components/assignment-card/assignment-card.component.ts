@@ -3,6 +3,8 @@ import { Assignment, Helper } from 'src/app/helper';
 import { GlobalDataService } from 'src/app/services/global-data.service';
 import { CdkDropList } from '@angular/cdk/drag-drop';
 import { WeekViewService } from '../../../week-view.service';
+import { DbiService } from 'src/app/services/dbi.service';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-assignment-card',
@@ -23,7 +25,7 @@ export class AssignmentCardComponent implements OnInit {
 
   public checked = false; // HIER umbenennen o.d.s.
 
-  constructor(private wvs: WeekViewService, private globalData: GlobalDataService) {
+  constructor(private wvs: WeekViewService, private globalData: GlobalDataService, private logger: LoggerService) {
     this.showCheckBox = wvs.getCurrEditMode() === 'editAssignments';
     wvs.currEditModeChange.subscribe({
       next: val => {
@@ -40,7 +42,8 @@ export class AssignmentCardComponent implements OnInit {
       || !this.assignment.start || typeof this.assignment.start !== 'number'
       || !this.assignment.end || typeof this.assignment.end !== 'number'
       || !this.assignment.projectColor || typeof this.assignment.projectColor !== 'string') {
-      console.error('what´s wrong with this?!:', this.assignment); // HIER ERROR HANDLE i guess
+      // what´s wrong with this?! // HIER ERROR HANDLE i guess
+      this.logger.logError('74807840');
       this.cardInvalid = true;
       return;
     }
